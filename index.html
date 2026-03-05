@@ -275,30 +275,51 @@
         }
         .section-subtitle .source-link { color: #8ab4f8; text-decoration: none; }
         .section-subtitle .source-link:hover { text-decoration: underline; }
-        .page-nav {
+        .tab-nav {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 8px 20px;
-            margin-bottom: 32px;
-            padding: 12px 16px;
+            gap: 4px 8px;
+            margin-bottom: 24px;
+            padding: 8px 12px;
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 12px;
         }
-        .page-nav-link {
+        .tab-link {
             color: #b0b0b0;
             text-decoration: none;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            padding: 6px 12px;
+            padding: 10px 16px;
             border-radius: 8px;
             transition: color 0.2s, background 0.2s;
+            border: 1px solid transparent;
         }
-        .page-nav-link:hover {
+        .tab-link:hover {
             color: #fff;
             background: rgba(255,255,255,0.08);
         }
+        .tab-link.active {
+            color: #fff;
+            background: rgba(102, 126, 234, 0.35);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+        .tab-panels { min-height: 320px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .tab-panel .page-section { margin-bottom: 28px; }
+        .tab-panel .page-section:last-child { margin-bottom: 0; }
+        .tab-panel .section-title { font-size: 1.25rem; margin-bottom: 6px; }
+        .tab-panel .section-subtitle { font-size: 0.9rem; margin-bottom: 16px; }
+        .page-nav { display: none; }
+
+        .calc-sub-nav { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+        .calc-sub-link { padding: 10px 18px; border-radius: 10px; background: rgba(255,255,255,0.06); color: #b0b0b0; text-decoration: none; font-size: 0.95rem; font-weight: 500; border: 1px solid transparent; transition: background 0.2s, color 0.2s; }
+        .calc-sub-link:hover { background: rgba(255,255,255,0.1); color: #e0e0e0; }
+        .calc-sub-link.active { background: rgba(102, 126, 234, 0.3); color: #fff; border-color: rgba(102, 126, 234, 0.5); }
+        .calc-sub-panel { display: none; }
+        .calc-sub-panel.active { display: block; }
 
         .page-footer {
             margin-top: 48px;
@@ -310,6 +331,99 @@
         .calculator-single { max-width: 520px; margin: 0 auto; }
         .calculator-card-wide { width: 100%; }
         .calc-hint { color: #888; font-weight: normal; font-size: 0.85em; }
+
+        .prompt-estimator-card {
+            max-width: 640px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .prompt-estimator-card .calc-row label { display: block; color: #a0a0a0; font-size: 0.9rem; margin-bottom: 6px; }
+        .prompt-estimator-card textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .prompt-estimator-card textarea::placeholder { color: #666; }
+        .prompt-estimator-meta { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px 24px; margin-bottom: 16px; }
+        .prompt-estimator-tokens { flex: 0 0 auto; max-width: 200px; }
+        .prompt-estimator-tokens input { width: 100%; }
+        .prompt-token-count { color: #8ab4f8; font-size: 0.95rem; margin: 0; font-weight: 500; }
+        .prompt-cost-result { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); max-height: 380px; overflow-y: auto; overflow-x: hidden; }
+        .prompt-cost-result h4 { color: #e0e0e0; font-size: 0.95rem; margin: 0 0 10px 0; }
+        .prompt-cost-result .prompt-cost-list { margin: 0; padding: 0; }
+        .prompt-cost-list { list-style: none; padding: 0; margin: 0; }
+        .prompt-cost-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border-left: 3px solid rgba(102, 126, 234, 0.5);
+        }
+        .prompt-cost-list li .model-label { color: #fff; font-weight: 500; }
+        .prompt-cost-list li .model-cost { color: #4ade80; font-family: 'Courier New', monospace; font-weight: 600; }
+
+        .context-window-card {
+            max-width: 720px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .context-window-inputs { display: flex; flex-wrap: wrap; gap: 20px 32px; margin-bottom: 16px; }
+        .context-window-inputs .calc-row { flex: 1 1 200px; }
+        .context-window-result { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); max-height: 380px; overflow-y: auto; overflow-x: auto; }
+        .context-window-result h4 { color: #e0e0e0; font-size: 0.95rem; margin: 0 0 10px 0; }
+        .context-window-result .model-table { font-size: 0.9rem; }
+        .context-window-result .model-table thead th { position: sticky; top: 0; background: rgba(26, 26, 46, 0.98); z-index: 1; }
+        .context-window-result .result-fits { color: #4ade80; font-weight: 600; }
+        .context-window-result .result-near { color: #fbbf24; font-weight: 600; }
+        .context-window-result .result-exceeds { color: #f87171; font-weight: 600; }
+
+        .production-cost-card {
+            max-width: 720px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .production-cost-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px 24px; margin-bottom: 20px; }
+        .production-cost-inputs .calc-row label { display: block; color: #a0a0a0; font-size: 0.9rem; margin-bottom: 6px; }
+        .production-cost-inputs .calc-row input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.25); color: #fff; }
+        .production-cost-result { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); max-height: 380px; overflow-y: auto; overflow-x: auto; }
+        .production-cost-result h4 { color: #e0e0e0; font-size: 0.95rem; margin: 0 0 10px 0; }
+        .production-cost-result .model-table { font-size: 0.9rem; }
+        .production-cost-result .model-table thead th { position: sticky; top: 0; background: rgba(26, 26, 46, 0.98); z-index: 1; }
+        .calc-result-capped { color: #a0a0a0; font-size: 0.85rem; margin-top: 8px; }
+        .production-cost-result .cost-daily { color: #8ab4f8; font-weight: 600; }
+        .production-cost-result .cost-monthly { color: #4ade80; font-weight: 600; }
+
+        .benchmark-dashboard-wrap { max-width: 900px; margin: 0 auto; overflow-x: auto; }
+        .benchmark-dashboard-table { margin-bottom: 12px; }
+        .benchmark-dashboard-table .model-table { font-size: 0.9rem; width: 100%; }
+        .benchmark-dashboard-table .model-table th { white-space: nowrap; }
+        .benchmark-dashboard-table .model-table td.benchmark-score { text-align: center; font-weight: 600; color: #a5b4fc; }
+        .benchmark-dashboard-table .model-table td.cost-tier { font-weight: 600; color: #4ade80; }
+        .benchmark-note { color: #888; font-size: 0.85rem; margin: 0; }
+        .benchmark-legend { color: #a0a0a0; font-size: 0.8rem; margin: 10px 0 0 0; padding: 8px 12px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .benchmark-legend .cost-legend { color: #4ade80; font-weight: 600; }
         .calculator-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
@@ -388,6 +502,8 @@
             background: rgba(255, 255, 255, 0.15);
             box-shadow: none;
         }
+        .calc-result.wrap-scroll { max-height: 380px; overflow-y: auto; overflow-x: hidden; }
+        .calc-result.wrap-scroll .calc-result-table thead th { position: sticky; top: 0; background: rgba(26, 26, 46, 0.98); z-index: 1; }
         .calc-result {
             margin-top: 20px;
             padding: 16px;
@@ -628,13 +744,16 @@
                 <a href="#" class="history-btn" id="historyBtn" title="View pricing history">📜 History</a>
             </div>
         </header>
-        <nav class="page-nav" aria-label="Page sections">
-            <a href="#section-pricing" class="page-nav-link">📊 Pricing</a>
-            <a href="#section-calculator" class="page-nav-link">💰 Calculator</a>
-            <a href="#section-recommend" class="page-nav-link">🎯 Find the right model</a>
+        <nav class="tab-nav" aria-label="Main sections" role="tablist">
+            <a href="#pricing" class="tab-link tab-link-home active" data-tab="pricing" role="tab" id="tab-btn-pricing" title="Dashboard">🏠 Home</a>
+            <a href="#calculators" class="tab-link" data-tab="calculators" role="tab" id="tab-btn-calculators">💰 Calculators</a>
+            <a href="#benchmarks" class="tab-link" data-tab="benchmarks" role="tab" id="tab-btn-benchmarks">📈 Benchmarks</a>
+            <a href="#recommend" class="tab-link" data-tab="recommend" role="tab" id="tab-btn-recommend">🎯 Recommend</a>
         </nav>
         <div id="toast" class="toast hidden"></div>
 
+        <div class="tab-panels">
+        <div id="tab-pricing" class="tab-panel active" role="tabpanel">
         <!-- 1. Current pricing table -->
         <section class="page-section" id="section-pricing">
             <h2 class="section-title">📊 Current pricing</h2>
@@ -702,8 +821,16 @@
                 </div>
             </div>
         </section>
+        </div>
 
-        <!-- 2. Pricing calculator -->
+        <div id="tab-calculators" class="tab-panel" role="tabpanel">
+        <nav class="calc-sub-nav" aria-label="Calculator tools">
+            <a href="#calc-pricing" class="calc-sub-link active" data-calc-sub="pricing" role="tab">💰 Pricing</a>
+            <a href="#calc-prompt" class="calc-sub-link" data-calc-sub="prompt" role="tab">📝 Prompt cost</a>
+            <a href="#calc-context" class="calc-sub-link" data-calc-sub="context" role="tab">📐 Context window</a>
+            <a href="#calc-production" class="calc-sub-link" data-calc-sub="production" role="tab">🏭 Production cost</a>
+        </nav>
+        <div id="calc-sub-pricing" class="calc-sub-panel active" role="tabpanel">
         <section class="page-section" id="section-calculator">
             <h2 class="section-title">💰 Pricing Calculator</h2>
             <p class="section-subtitle">Enter token usage to estimate API cost. Compare any two models across Gemini and OpenAI.</p>
@@ -738,16 +865,110 @@
                 </div>
             </div>
         </section>
+        </div>
+        <div id="calc-sub-prompt" class="calc-sub-panel" role="tabpanel">
+        <section class="page-section" id="section-prompt-cost">
+            <h2 class="section-title">📝 Estimate cost from prompt</h2>
+            <p class="section-subtitle">Paste your prompt to get an approximate token count (≈4 chars/token) and cost across Gemini and OpenAI models. Embedding-only models are excluded.</p>
+            <div class="prompt-estimator-card">
+                <div class="calc-row">
+                    <label for="prompt-input">Paste your prompt</label>
+                    <textarea id="prompt-input" rows="5" placeholder="Paste your prompt here…"></textarea>
+                </div>
+                <div class="prompt-estimator-meta">
+                    <div class="calc-row prompt-estimator-tokens">
+                        <label for="prompt-output-tokens">Estimated output tokens</label>
+                        <input type="number" id="prompt-output-tokens" placeholder="e.g. 500" min="0" value="500" title="Expected length of model response">
+                    </div>
+                    <p id="prompt-token-count" class="prompt-token-count">Prompt tokens: —</p>
+                </div>
+                <div class="calc-actions">
+                    <button type="button" class="calc-btn" id="promptEstimateBtn" onclick="runPromptCostEstimate()">Estimate cost</button>
+                    <button type="button" class="calc-btn reset" onclick="resetPromptEstimator()">Reset</button>
+                </div>
+                <div id="prompt-cost-result" class="prompt-cost-result" style="display: none;"></div>
+            </div>
+        </section>
+        </div>
+        <div id="calc-sub-context" class="calc-sub-panel" role="tabpanel">
+        <section class="page-section" id="section-context-window">
+            <h2 class="section-title">📐 Context window calculator</h2>
+            <p class="section-subtitle">Check if your prompt + output fits within each model's context limit. Helps avoid context overflow errors.</p>
+            <div class="context-window-card">
+                <div class="context-window-inputs">
+                    <div class="calc-row">
+                        <label for="context-prompt-tokens">Prompt tokens</label>
+                        <input type="number" id="context-prompt-tokens" placeholder="e.g. 50000" min="0" value="10000">
+                    </div>
+                    <div class="calc-row">
+                        <label for="context-output-tokens">Output tokens</label>
+                        <input type="number" id="context-output-tokens" placeholder="e.g. 4000" min="0" value="4000">
+                    </div>
+                </div>
+                <div class="calc-actions">
+                    <button type="button" class="calc-btn" id="contextCheckBtn" onclick="runContextWindowCheck()">Check context</button>
+                    <button type="button" class="calc-btn reset" onclick="resetContextWindowCheck()">Reset</button>
+                </div>
+                <div id="context-window-result" class="context-window-result" style="display: none;"></div>
+            </div>
+        </section>
+        </div>
+        <div id="calc-sub-production" class="calc-sub-panel" role="tabpanel">
+        <section class="page-section" id="section-production-cost">
+            <h2 class="section-title">🏭 Production cost simulator</h2>
+            <p class="section-subtitle">Estimate real-world application costs. Useful for startup cost planning.</p>
+            <div class="production-cost-card">
+                <div class="production-cost-inputs">
+                    <div class="calc-row">
+                        <label for="prod-users-per-day">Users per day</label>
+                        <input type="number" id="prod-users-per-day" placeholder="e.g. 1000" min="0" value="1000">
+                    </div>
+                    <div class="calc-row">
+                        <label for="prod-requests-per-user">Requests per user</label>
+                        <input type="number" id="prod-requests-per-user" placeholder="e.g. 10" min="0" value="10">
+                    </div>
+                    <div class="calc-row">
+                        <label for="prod-prompt-tokens">Prompt tokens (per request)</label>
+                        <input type="number" id="prod-prompt-tokens" placeholder="e.g. 500" min="0" value="500">
+                    </div>
+                    <div class="calc-row">
+                        <label for="prod-output-tokens">Output tokens (per request)</label>
+                        <input type="number" id="prod-output-tokens" placeholder="e.g. 200" min="0" value="200">
+                    </div>
+                </div>
+                <div class="calc-actions">
+                    <button type="button" class="calc-btn" id="prodSimulateBtn" onclick="runProductionCostSim()">Simulate</button>
+                    <button type="button" class="calc-btn reset" onclick="resetProductionCostSim()">Reset</button>
+                </div>
+                <div id="production-cost-result" class="production-cost-result" style="display: none;"></div>
+            </div>
+        </section>
+        </div>
+        </div>
 
-        <!-- 3. Find the right model -->
+        <div id="tab-benchmarks" class="tab-panel" role="tabpanel">
+        <!-- 6. Model benchmark dashboard -->
+        <section class="page-section" id="section-benchmark">
+            <h2 class="section-title">📈 Model benchmark dashboard</h2>
+            <p class="section-subtitle">Compare models by capability. <strong>MMLU</strong> (knowledge), <strong>Code</strong> (HumanEval), <strong>Reasoning</strong> (GSM8K), <strong>Arena</strong> (leaderboard-style). Cost tier from current pricing.</p>
+            <div class="benchmark-dashboard-wrap">
+                <div id="benchmark-dashboard-table" class="benchmark-dashboard-table"></div>
+                <p class="benchmark-note">Benchmark scores are indicative from published results; Arena is illustrative. Check official sources for latest benchmarks.</p>
+                <p class="benchmark-legend"><strong>Cost tier</strong> (blended $/1M tokens: 70% input + 30% output): <span class="cost-legend">$</span> = free or very low (≤$0) · <span class="cost-legend">$$</span> = budget (&lt;$2) · <span class="cost-legend">$$$</span> = premium (≥$2).</p>
+            </div>
+        </section>
+        </div>
+
+        <div id="tab-recommend" class="tab-panel" role="tabpanel">
+        <!-- 7. Model recommendation engine -->
         <section class="page-section recommend-section" id="section-recommend">
-            <h2 class="section-title">🎯 Find the right model</h2>
-            <p class="section-subtitle">Describe your use case and get suggestions for the best model — cost-optimized, accurate, or balanced</p>
+            <h2 class="section-title">🎯 Model recommendation engine</h2>
+            <p class="section-subtitle">Describe your use case — we recommend models by <strong>cost</strong>, <strong>reasoning ability</strong>, <strong>context length</strong>, and <strong>performance</strong>.</p>
             <div class="recommend-card">
                 <div class="recommend-form">
                     <div class="calc-row">
                         <label for="useCaseDesc">Describe your use case</label>
-                        <textarea id="useCaseDesc" rows="3" placeholder="e.g. I need to summarize long PDFs at low cost, or generate code with high accuracy"></textarea>
+                        <textarea id="useCaseDesc" rows="3" placeholder="e.g. I need a cheap model for summarizing PDFs"></textarea>
                     </div>
                     <div class="recommend-actions">
                         <button type="button" class="calc-btn recommend-btn" id="getRecommendBtn">Get recommendation</button>
@@ -760,6 +981,9 @@
                 </div>
             </div>
         </section>
+        </div>
+
+        </div>
 
         <footer class="page-footer">
             <p class="last-updated">Last updated: <span id="lastUpdated">—</span>. Prices may vary. Check official docs for latest pricing.</p>
@@ -832,6 +1056,64 @@
         let geminiData = DEFAULT_PRICING.gemini.slice();
         let openaiData = DEFAULT_PRICING.openai.slice();
 
+        function formatContextLabel(tokens) {
+            if (tokens >= 1e6) return (tokens / 1e6) + 'M';
+            if (tokens >= 1e3) return (tokens / 1e3) + 'k';
+            return String(tokens);
+        }
+
+        function getContextWindow(providerKey, modelName) {
+            const n = (modelName || '').toLowerCase();
+            if (providerKey === 'gemini') {
+                if (/3\.1\s*pro|2\.5\s*pro|1\.5\s*pro/i.test(n)) return { tokens: 2097152, label: '2M' };
+                if (/3\.|2\.5|2\.0|1\.5/i.test(n)) return { tokens: 1048576, label: '1M' };
+                return { tokens: 1048576, label: '1M' };
+            }
+            if (providerKey === 'openai') {
+                if (/^text-embedding/i.test(n)) return null;
+                if (/o1|o3|o4/i.test(n)) return { tokens: 200000, label: '200k' };
+                if (/gpt-5|gpt-5\./i.test(n)) return { tokens: 256000, label: '256k' };
+                return { tokens: 128000, label: '128k' };
+            }
+            return null;
+        }
+
+        function getBenchmarkForModel(name, providerKey) {
+            const n = (name || '').toLowerCase();
+            if (providerKey === 'gemini') {
+                if (/3\.1\s*pro/i.test(n)) return { mmlu: 87, code: 90, reasoning: 91, arena: 92 };
+                if (/3\.1\s*flash-lite|3\s*flash/i.test(n)) return { mmlu: 84, code: 86, reasoning: 87, arena: 88 };
+                if (/2\.5\s*pro/i.test(n)) return { mmlu: 86, code: 89, reasoning: 90, arena: 91 };
+                if (/2\.5\s*flash/i.test(n)) return { mmlu: 82, code: 85, reasoning: 86, arena: 87 };
+                if (/2\.0\s*flash/i.test(n)) return { mmlu: 80, code: 83, reasoning: 84, arena: 85 };
+                if (/1\.5\s*pro/i.test(n)) return { mmlu: 86, code: 88, reasoning: 89, arena: 90 };
+                if (/1\.5\s*flash/i.test(n)) return { mmlu: 80, code: 82, reasoning: 83, arena: 84 };
+                return { mmlu: 80, code: 82, reasoning: 83, arena: 84 };
+            }
+            if (providerKey === 'openai') {
+                if (/gpt-5\.2-pro|gpt-5-pro/i.test(n)) return { mmlu: 90, code: 93, reasoning: 96, arena: 97 };
+                if (/gpt-5\.2|gpt-5\.1|^gpt-5$/i.test(n)) return { mmlu: 89, code: 92, reasoning: 95, arena: 96 };
+                if (/gpt-5-mini/i.test(n)) return { mmlu: 85, code: 88, reasoning: 90, arena: 91 };
+                if (/gpt-5-nano/i.test(n)) return { mmlu: 82, code: 85, reasoning: 87, arena: 88 };
+                if (/o1|o3|o4/i.test(n)) return { mmlu: 89, code: 91, reasoning: 96, arena: 97 };
+                if (/gpt-4\.1|gpt-4o/i.test(n)) return { mmlu: 88, code: 90, reasoning: 92, arena: 93 };
+                if (/gpt-4\.1-mini|gpt-4o-mini/i.test(n)) return { mmlu: 84, code: 86, reasoning: 88, arena: 89 };
+                return { mmlu: 85, code: 87, reasoning: 88, arena: 89 };
+            }
+            return { mmlu: 75, code: 78, reasoning: 80, arena: 82 };
+        }
+
+        function getCostTier(blended) {
+            if (blended <= 0) return '$';
+            if (blended < 2) return '$$';
+            return '$$$';
+        }
+        function getCostTierLabel(blended) {
+            if (blended <= 0) return { tier: '$', desc: 'Free / very low' };
+            if (blended < 2) return { tier: '$$', desc: 'Budget (<$2/1M blended)' };
+            return { tier: '$$$', desc: 'Premium (≥$2/1M blended)' };
+        }
+
         function showToast(msg, type) {
             const el = document.getElementById('toast');
             el.textContent = msg;
@@ -881,6 +1163,21 @@
                 const opts = unified.map(u => `<option value="${u.key}">${u.label}</option>`).join('');
                 calcCompareSel.innerHTML = '<option value="">— None —</option>' + opts;
             }
+            renderBenchmarkDashboard();
+        }
+
+        function renderBenchmarkDashboard() {
+            const container = document.getElementById('benchmark-dashboard-table');
+            if (!container) return;
+            const all = getAllModels();
+            const rows = all.map(m => {
+                const b = getBenchmarkForModel(m.name, m.providerKey);
+                const { tier, desc } = getCostTierLabel(m.blended);
+                const blendedStr = m.blended <= 0 ? '0' : m.blended.toFixed(2);
+                const costTitle = `Blended: $${blendedStr}/1M tokens (70% input, 30% output) — ${desc}`;
+                return `<tr><td class="model-name">${m.name}</td><td class="benchmark-score">${b.mmlu}</td><td class="benchmark-score">${b.code}</td><td class="benchmark-score">${b.reasoning}</td><td class="benchmark-score">${b.arena}</td><td class="cost-tier" title="${costTitle}">${tier}</td></tr>`;
+            }).join('');
+            container.innerHTML = '<table class="model-table"><thead><tr><th>Model</th><th title="Massive Multitask Language Understanding — broad knowledge across 57 subjects (STEM, humanities, etc.). Higher = better.">MMLU</th><th title="HumanEval — code generation benchmark (Python). Higher = better.">Code</th><th title="GSM8K — grade-school math word problems; measures reasoning. Higher = better.">Reasoning</th><th title="Arena / leaderboard-style ranking (e.g. LMSys Chatbot Arena). Higher = better overall preference.">Arena</th><th title="Based on blended price per 1M tokens (70% input + 30% output). $ = free/low, $$ = budget, $$$ = premium.">Cost</th></tr></thead><tbody>' + rows + '</tbody></table>';
         }
 
         function getUnifiedCalcModels() {
@@ -920,24 +1217,47 @@
                 const input = Number(m.input) || 0, output = Number(m.output) || 0;
                 const blended = input * INPUT_WEIGHT + output * OUTPUT_WEIGHT;
                 const tier = (input === 0 && output === 0) ? 'budget' : (blended >= 8 ? 'pro' : blended < 1 ? 'budget' : 'mid');
-                list.push({ provider: 'Google Gemini', providerKey: 'gemini', name: m.name, input, output, cachedInput: null, blended, tier, hasCached: false });
+                const ctx = getContextWindow('gemini', m.name);
+                list.push({ provider: 'Google Gemini', providerKey: 'gemini', name: m.name, input, output, cachedInput: null, blended, tier, hasCached: false, contextWindow: ctx ? ctx.label : null, contextTokens: ctx ? ctx.tokens : 0 });
             });
             openaiData.forEach(m => {
+                if (/^text-embedding/i.test(m.name)) return;
                 const input = Number(m.input) || 0, output = Number(m.output) || 0, cached = Number(m.cachedInput) || 0;
                 const blended = input * INPUT_WEIGHT + output * OUTPUT_WEIGHT;
                 const tier = blended >= 8 ? 'pro' : blended < 1 ? 'budget' : 'mid';
-                list.push({ provider: 'OpenAI', providerKey: 'openai', name: m.name, input, output, cachedInput: m.cachedInput != null ? cached : null, blended, tier, hasCached: m.cachedInput != null });
+                const ctx = getContextWindow('openai', m.name);
+                list.push({ provider: 'OpenAI', providerKey: 'openai', name: m.name, input, output, cachedInput: m.cachedInput != null ? cached : null, blended, tier, hasCached: m.cachedInput != null, contextWindow: ctx ? ctx.label : null, contextTokens: ctx ? ctx.tokens : 0 });
             });
             return list;
+        }
+
+        function scoreModelForUseCase(m, useCaseType, description) {
+            const d = (description || '').toLowerCase();
+            const costScore = m.blended <= 0 ? 1 : Math.max(0, 1 - (m.blended / 20));
+            const reasoningScore = (m.tier === 'pro' || /Pro|o1|o3|o4|gpt-5-pro|gpt-5\.2-pro/i.test(m.name)) ? 1 : (m.tier === 'mid' ? 0.5 : 0.2);
+            const contextScore = m.contextTokens >= 1e6 ? 1 : m.contextTokens >= 200000 ? 0.7 : m.contextTokens >= 128000 ? 0.5 : 0.3;
+            const performanceScore = m.tier === 'pro' ? 1 : m.tier === 'mid' ? 0.6 : 0.4;
+            let wCost = 0.25, wReasoning = 0.25, wContext = 0.25, wPerf = 0.25;
+            if (/cheap|low cost|budget|affordable|save money|minimize cost/i.test(d)) { wCost = 0.5; wReasoning = 0.1; wContext = 0.2; wPerf = 0.2; }
+            if (/accurate|reasoning|complex|quality|precise|sophisticated/i.test(d)) { wReasoning = 0.5; wCost = 0.15; wContext = 0.2; wPerf = 0.15; }
+            if (/long document|pdf|context|large file|many pages|summariz|cached|high context/i.test(d)) { wContext = 0.45; wCost = 0.25; wReasoning = 0.1; wPerf = 0.2; }
+            if (/performance|fast|speed|throughput|scale|high volume/i.test(d)) { wPerf = 0.4; wCost = 0.3; wContext = 0.15; wReasoning = 0.15; }
+            const score = wCost * costScore + wReasoning * reasoningScore + wContext * contextScore + wPerf * performanceScore;
+            const dimensions = [];
+            if (costScore >= 0.6) dimensions.push('Cost');
+            if (reasoningScore >= 0.5) dimensions.push('Reasoning');
+            if (contextScore >= 0.5) dimensions.push('Context');
+            if (performanceScore >= 0.5) dimensions.push('Performance');
+            return { score, dimensions, costScore, reasoningScore, contextScore, performanceScore };
         }
 
         function inferUseCaseType(description) {
             const d = (description || '').toLowerCase();
             if (/cheap|low cost|budget|minimize cost|cost effective|save money|affordable|lowest cost/i.test(d)) return 'cost';
             if (/accurate|best quality|complex|reasoning|precise|correct|quality|sophisticated/i.test(d)) return 'accuracy';
-            if (/long document|pdf|context|cached|large file|many pages|high context/i.test(d)) return 'long-doc';
+            if (/long document|pdf|context|cached|large file|many pages|high context|summariz/i.test(d)) return 'long-doc';
             if (/code|programming|developer|software|script|api/i.test(d)) return 'code';
-            if (/high volume|throughput|real-time|realtime|batch|millions|scale/i.test(d)) return 'high-volume';
+            if (/high volume|throughput|real-time|realtime|batch|millions|scale|performance|fast|speed/i.test(d)) return 'high-volume';
             if (/balance|general|default|all purpose|multi|various/i.test(d)) return 'general';
             if (d.trim().length > 0) return 'balanced';
             return 'general';
@@ -1051,62 +1371,24 @@
 
         function getRecommendations(useCaseType, description) {
             const all = getAllModels();
-            let filtered = all.slice();
-            let sortBy = (a, b) => a.blended - b.blended;
-
-            switch (useCaseType) {
-                case 'cost':
-                    sortBy = (a, b) => a.blended - b.blended;
-                    filtered = all.filter(m => m.tier === 'budget' || m.blended < 2);
-                    if (filtered.length < 2) filtered = all.slice();
-                    filtered = filtered.slice(0, 8);
-                    break;
-                case 'accuracy':
-                    filtered = all.filter(m => m.tier === 'pro' || /Pro|o1|o3|o4|gpt-5\.2-pro|gpt-5-pro|GPT-5\.2 pro/i.test(m.name));
-                    if (filtered.length === 0) filtered = all.slice();
-                    sortBy = (a, b) => b.blended - a.blended;
-                    break;
-                case 'balanced':
-                    filtered = all.filter(m => m.tier === 'mid' || (m.tier === 'budget' && m.blended > 0.1));
-                    sortBy = (a, b) => a.blended - b.blended;
-                    break;
-                case 'long-doc':
-                    filtered = all.filter(m => m.hasCached || m.input < 1);
-                    if (filtered.length === 0) filtered = all.slice();
-                    sortBy = (a, b) => (a.cachedInput != null ? a.cachedInput : a.input) - (b.cachedInput != null ? b.cachedInput : b.input);
-                    break;
-                case 'code':
-                    filtered = all.filter(m => m.tier === 'mid' || m.tier === 'pro' || /pro|flash/i.test(m.name));
-                    if (filtered.length === 0) filtered = all.slice();
-                    sortBy = (a, b) => a.blended - b.blended;
-                    break;
-                case 'high-volume':
-                    filtered = all.filter(m => m.blended < 1.5);
-                    if (filtered.length === 0) filtered = all.slice();
-                    sortBy = (a, b) => a.blended - b.blended;
-                    break;
-                case 'general':
-                default:
-                    filtered = all.filter(m => m.tier === 'mid' || (m.tier === 'budget' && m.blended > 0));
-                    if (filtered.length < 2) filtered = all.slice();
-                    sortBy = (a, b) => a.blended - b.blended;
-                    break;
-            }
-            filtered.sort(sortBy);
-            const top = filtered.slice(0, 4);
-            const reasons = {
-                cost: m => `Lowest cost at $${m.blended.toFixed(2)}/1M tokens (blended). Best for tight budgets.`,
-                accuracy: m => `High capability / reasoning tier. Best for complex tasks and accuracy.`,
-                balanced: m => `Good balance of cost ($${m.blended.toFixed(2)}/1M blended) and quality.`,
-                'long-doc': m => m.hasCached ? `Cached input support — cheaper for repeated long context.` : `Low input cost ($${m.input}/1M) for long documents.`,
-                code: m => `Strong for code generation; cost $${m.blended.toFixed(2)}/1M blended.`,
-                'high-volume': m => `Cheap per token ($${m.blended.toFixed(2)}/1M) for high throughput.`,
-                general: m => `Solid default: $${m.blended.toFixed(2)}/1M blended, good for most tasks.`
-            };
-            const reasonFn = reasons[useCaseType] || reasons.general;
+            const scored = all.map(m => {
+                const { score, dimensions } = scoreModelForUseCase(m, useCaseType, description);
+                return { ...m, _score: score, _dimensions: dimensions };
+            });
+            scored.sort((a, b) => (b._score || 0) - (a._score || 0));
+            const top = scored.slice(0, 6);
             return top.map(m => {
-                const reason = reasonFn(m);
-                return { ...m, reason: (reason && String(reason).trim()) || getFallbackReason(m) };
+                const dims = (m._dimensions && m._dimensions.length) ? m._dimensions.join(' · ') : '';
+                let reason = '';
+                if (dims) reason = dims + ' — ';
+                if (m.blended <= 0) reason += 'Free tier. ';
+                else reason += `$${m.blended.toFixed(2)}/1M blended. `;
+                if (m.contextWindow) reason += `${m.contextWindow} context. `;
+                if (m.hasCached) reason += 'Cached input for long context. ';
+                if (m.tier === 'pro' || /Pro|o1|o3|o4|gpt-5-pro/i.test(m.name)) reason += 'Strong reasoning.';
+                else if (m.tier === 'budget') reason += 'Cost-optimized.';
+                else reason += 'Good balance.';
+                return { ...m, reason: reason.trim() || getFallbackReason(m) };
             });
         }
 
@@ -1842,6 +2124,144 @@
             return (inputTokens / 1e6) * inputPerM + (outputTokens / 1e6) * outputPerM;
         }
 
+        function estimatePromptTokens(text) {
+            if (!text || typeof text !== 'string') return 0;
+            const t = text.trim();
+            if (t.length === 0) return 0;
+            return Math.ceil(t.length / 4);
+        }
+
+        function runPromptCostEstimate() {
+            const textarea = document.getElementById('prompt-input');
+            const outputTokensEl = document.getElementById('prompt-output-tokens');
+            const resultEl = document.getElementById('prompt-cost-result');
+            const promptText = textarea ? textarea.value : '';
+            const promptTokens = estimatePromptTokens(promptText);
+            const outputTokens = Math.max(0, parseInt(outputTokensEl && outputTokensEl.value ? outputTokensEl.value : '500', 10) || 500);
+            const tokenCountEl = document.getElementById('prompt-token-count');
+            if (tokenCountEl) tokenCountEl.textContent = 'Prompt tokens: ' + promptTokens;
+            if (promptTokens === 0 && !promptText.trim()) {
+                resultEl.style.display = 'none';
+                return;
+            }
+            const list = [];
+            geminiData.forEach(m => {
+                const cost = calcCost(promptTokens, outputTokens, m.input, m.output);
+                list.push({ provider: 'Google Gemini', name: m.name, cost });
+            });
+            openaiData.forEach(m => {
+                if (/^text-embedding/i.test(m.name)) return;
+                const cost = calcCostOpenAI(promptTokens, 0, outputTokens, m.input, m.cachedInput, m.output);
+                list.push({ provider: 'OpenAI', name: m.name, cost });
+            });
+            list.sort((a, b) => a.cost - b.cost);
+            const rows = list.map(m => `<li><span class="model-label">${m.name}</span> <span class="model-cost">$${m.cost.toFixed(5)}</span></li>`).join('');
+            resultEl.innerHTML = '<h4>Cost by model (cheapest first)</h4><ul class="prompt-cost-list">' + rows + '</ul>';
+            resultEl.style.display = 'block';
+        }
+
+        function resetPromptEstimator() {
+            const textarea = document.getElementById('prompt-input');
+            const outputTokensEl = document.getElementById('prompt-output-tokens');
+            const resultEl = document.getElementById('prompt-cost-result');
+            const tokenCountEl = document.getElementById('prompt-token-count');
+            if (textarea) textarea.value = '';
+            if (outputTokensEl) outputTokensEl.value = '500';
+            if (tokenCountEl) tokenCountEl.textContent = 'Prompt tokens: —';
+            if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
+        }
+
+        function runContextWindowCheck() {
+            const promptEl = document.getElementById('context-prompt-tokens');
+            const outputEl = document.getElementById('context-output-tokens');
+            const resultEl = document.getElementById('context-window-result');
+            const promptTokens = Math.max(0, parseInt(promptEl && promptEl.value ? promptEl.value : '0', 10) || 0);
+            const outputTokens = Math.max(0, parseInt(outputEl && outputEl.value ? outputEl.value : '0', 10) || 0);
+            const total = promptTokens + outputTokens;
+            const rows = [];
+            const NEAR_THRESHOLD = 0.9;
+            geminiData.forEach(m => {
+                const ctx = getContextWindow('gemini', m.name);
+                if (!ctx) return;
+                let resultClass = 'result-fits';
+                let resultText = 'Fits';
+                if (total > ctx.tokens) {
+                    resultClass = 'result-exceeds';
+                    resultText = 'Exceeds';
+                } else if (total >= ctx.tokens * NEAR_THRESHOLD) {
+                    resultClass = 'result-near';
+                    resultText = 'Near limit';
+                }
+                rows.push(`<tr><td class="model-name">${m.name}</td><td>${ctx.label}</td><td class="${resultClass}">${resultText}</td></tr>`);
+            });
+            openaiData.forEach(m => {
+                if (/^text-embedding/i.test(m.name)) return;
+                const ctx = getContextWindow('openai', m.name);
+                if (!ctx) return;
+                let resultClass = 'result-fits';
+                let resultText = 'Fits';
+                if (total > ctx.tokens) {
+                    resultClass = 'result-exceeds';
+                    resultText = 'Exceeds';
+                } else if (total >= ctx.tokens * NEAR_THRESHOLD) {
+                    resultClass = 'result-near';
+                    resultText = 'Near limit';
+                }
+                rows.push(`<tr><td class="model-name">${m.name}</td><td>${ctx.label}</td><td class="${resultClass}">${resultText}</td></tr>`);
+            });
+            resultEl.innerHTML = '<h4>Results</h4><table class="model-table"><thead><tr><th>Model</th><th>Context window</th><th>Result</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+            resultEl.style.display = 'block';
+        }
+
+        function resetContextWindowCheck() {
+            const promptEl = document.getElementById('context-prompt-tokens');
+            const outputEl = document.getElementById('context-output-tokens');
+            const resultEl = document.getElementById('context-window-result');
+            if (promptEl) promptEl.value = '10000';
+            if (outputEl) outputEl.value = '4000';
+            if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
+        }
+
+        function runProductionCostSim() {
+            const usersPerDay = Math.max(0, parseInt(document.getElementById('prod-users-per-day')?.value || '0', 10) || 0);
+            const requestsPerUser = Math.max(0, parseInt(document.getElementById('prod-requests-per-user')?.value || '0', 10) || 0);
+            const promptTokens = Math.max(0, parseInt(document.getElementById('prod-prompt-tokens')?.value || '0', 10) || 0);
+            const outputTokens = Math.max(0, parseInt(document.getElementById('prod-output-tokens')?.value || '0', 10) || 0);
+            const resultEl = document.getElementById('production-cost-result');
+            const totalRequestsPerDay = usersPerDay * requestsPerUser;
+            if (totalRequestsPerDay === 0) {
+                resultEl.style.display = 'none';
+                return;
+            }
+            const list = [];
+            geminiData.forEach(m => {
+                const costPerRequest = calcCost(promptTokens, outputTokens, m.input, m.output);
+                const daily = costPerRequest * totalRequestsPerDay;
+                const monthly = daily * 30;
+                list.push({ name: m.name, daily, monthly });
+            });
+            openaiData.forEach(m => {
+                if (/^text-embedding/i.test(m.name)) return;
+                const costPerRequest = calcCostOpenAI(promptTokens, 0, outputTokens, m.input, m.cachedInput, m.output);
+                const daily = costPerRequest * totalRequestsPerDay;
+                const monthly = daily * 30;
+                list.push({ name: m.name, daily, monthly });
+            });
+            list.sort((a, b) => a.monthly - b.monthly);
+            const rows = list.map(m => `<tr><td class="model-name">${m.name}</td><td class="cost-daily">$${m.daily.toFixed(2)}</td><td class="cost-monthly">$${m.monthly.toFixed(2)}</td></tr>`).join('');
+            resultEl.innerHTML = '<h4>Estimated costs (30-day month)</h4><table class="model-table"><thead><tr><th>Model</th><th>Daily cost</th><th>Monthly cost</th></tr></thead><tbody>' + rows + '</tbody></table>';
+            resultEl.style.display = 'block';
+        }
+
+        function resetProductionCostSim() {
+            document.getElementById('prod-users-per-day').value = '1000';
+            document.getElementById('prod-requests-per-user').value = '10';
+            document.getElementById('prod-prompt-tokens').value = '500';
+            document.getElementById('prod-output-tokens').value = '200';
+            const resultEl = document.getElementById('production-cost-result');
+            if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
+        }
+
         function renderCompareResult(name1, cost1, name2, cost2) {
             const diff = Math.abs(cost1 - cost2);
             const summary = diff === 0 ? 'Same cost' : (cost1 < cost2 ? name1 : name2) + ' is cheaper by $' + diff.toFixed(4);
@@ -1877,12 +2297,17 @@
             }
             if (sel === '__all__') {
                 const unified = getUnifiedCalcModels();
-                const rows = unified.map(u => {
+                const withCost = unified.map(u => {
                     const cost = calcCostForEntry({ provider: u.provider, model: u.model }, inputTokens, cachedTokens, outputTokens);
-                    return `<tr><td>${u.label}</td><td class="cost">$${cost.toFixed(4)}</td></tr>`;
-                }).join('');
-                resultEl.className = 'calc-result';
-                resultEl.innerHTML = '<table class="calc-result-table"><thead><tr><th>Model</th><th>Est. cost</th></tr></thead><tbody>' + rows + '</tbody></table>';
+                    return { label: u.label, cost };
+                });
+                withCost.sort((a, b) => a.cost - b.cost);
+                const MAX_ROWS = 20;
+                const showList = withCost.slice(0, MAX_ROWS);
+                const rows = showList.map(r => `<tr><td>${r.label}</td><td class="cost">$${r.cost.toFixed(4)}</td></tr>`).join('');
+                const capNote = withCost.length > MAX_ROWS ? `<p class="calc-result-capped">Showing top ${MAX_ROWS} (cheapest). ${withCost.length - MAX_ROWS} more models not shown.</p>` : '';
+                resultEl.className = 'calc-result wrap-scroll';
+                resultEl.innerHTML = '<table class="calc-result-table"><thead><tr><th>Model</th><th>Est. cost</th></tr></thead><tbody>' + rows + '</tbody></table>' + capNote;
                 return;
             }
             const entry = getCalcModelByKey(sel);
@@ -1920,12 +2345,78 @@
             resultEl.innerHTML = '';
         }
 
+        function switchCalcSub(subId) {
+            const ids = ['pricing', 'prompt', 'context', 'production'];
+            if (!ids.includes(subId)) return;
+            document.querySelectorAll('.calc-sub-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.calc-sub-link').forEach(l => l.classList.remove('active'));
+            const panel = document.getElementById('calc-sub-' + subId);
+            const link = document.querySelector('.calc-sub-link[data-calc-sub="' + subId + '"]');
+            if (panel) panel.classList.add('active');
+            if (link) link.classList.add('active');
+            if (history.replaceState) history.replaceState(null, '', '#calc-' + subId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function switchTab(tabId) {
+            const ids = ['pricing', 'calculators', 'benchmarks', 'recommend'];
+            if (!ids.includes(tabId)) return;
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            const panel = document.getElementById('tab-' + tabId);
+            const link = document.querySelector('.tab-link[data-tab="' + tabId + '"]');
+            if (panel) panel.classList.add('active');
+            if (link) link.classList.add('active');
+            if (tabId === 'calculators') {
+                const h = (location.hash || '').replace(/^#/, '');
+                const calcSub = h.startsWith('calc-') ? h.replace('calc-', '') : 'pricing';
+                if (['pricing', 'prompt', 'context', 'production'].includes(calcSub)) switchCalcSub(calcSub);
+                else switchCalcSub('pricing');
+            }
+            if (history.replaceState && tabId !== 'calculators') history.replaceState(null, '', '#' + tabId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        document.querySelectorAll('.calc-sub-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                switchCalcSub(this.getAttribute('data-calc-sub'));
+            });
+        });
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                switchTab(this.getAttribute('data-tab'));
+            });
+        });
+        const hash = (location.hash || '').replace(/^#/, '');
+        if (hash.startsWith('calc-')) {
+            switchTab('calculators');
+            const sub = hash.replace('calc-', '');
+            if (['pricing', 'prompt', 'context', 'production'].includes(sub)) switchCalcSub(sub);
+        } else if (['pricing', 'calculators', 'benchmarks', 'recommend'].includes(hash)) switchTab(hash);
+        window.addEventListener('hashchange', function () {
+            const h = (location.hash || '').replace(/^#/, '');
+            if (h.startsWith('calc-')) {
+                switchTab('calculators');
+                const sub = h.replace('calc-', '');
+                if (['pricing', 'prompt', 'context', 'production'].includes(sub)) switchCalcSub(sub);
+            } else if (['pricing', 'calculators', 'benchmarks', 'recommend'].includes(h)) switchTab(h);
+        });
+        document.querySelector('.header-home-link')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            switchTab('pricing');
+            window.scrollTo(0, 0);
+        });
         document.getElementById('refreshWebBtn').addEventListener('click', refreshFromWeb);
         document.getElementById('getRecommendBtn').addEventListener('click', runRecommendation);
         const geminiSearchEl = document.getElementById('gemini-search');
         const openaiSearchEl = document.getElementById('openai-search');
         if (geminiSearchEl) geminiSearchEl.addEventListener('input', () => filterPricingTable('gemini-tbody', geminiSearchEl.value));
         if (openaiSearchEl) openaiSearchEl.addEventListener('input', () => filterPricingTable('openai-tbody', openaiSearchEl.value));
+        const promptInputEl = document.getElementById('prompt-input');
+        if (promptInputEl) promptInputEl.addEventListener('input', function () {
+            const el = document.getElementById('prompt-token-count');
+            if (el) el.textContent = 'Prompt tokens: ' + estimatePromptTokens(this.value);
+        });
         document.getElementById('recommendResetBtn').addEventListener('click', function resetRecommendation() {
             const descEl = document.getElementById('useCaseDesc');
             const btn = document.getElementById('getRecommendBtn');
