@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Model Pricing - Gemini & OpenAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header.main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .header-left { flex: 1; min-width: 0; }
+        .header-home-link { color: inherit; text-decoration: none; cursor: pointer; display: inline-block; }
+        .header-home-link:hover { opacity: 0.85; }
+        .header-right-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .header-right-actions .refresh-btn { margin: 0; }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.05rem;
+            line-height: 1.4;
+        }
+
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .refresh-btn:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.35); transform: translateY(-1px); }
+        .refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .refresh-icon.spinning { animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            font-size: 0.9rem;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .toast.success { border: 1px solid #4ade80; }
+        .toast.error { border: 1px solid #ef4444; }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 28px;
+            margin-bottom: 0;
+        }
+
+        .provider-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .provider-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .provider-logo-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .provider-logo-badge svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .provider-logo-gemini {
+            background: linear-gradient(145deg, #5b7cff 0%, #8b5cf6 50%, #a78bfa 100%);
+            color: #fff;
+        }
+
+        .provider-logo-openai-custom {
+            background: linear-gradient(145deg, #0d9488 0%, #10b981 50%, #34d399 100%);
+            color: #fff;
+        }
+
+        .provider-logo-badge:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .provider-name {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-table-wrap { margin-top: 8px; }
+        .pricing-search {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .pricing-search::placeholder { color: #888; }
+        .pricing-search:focus { outline: none; border-color: rgba(102, 126, 234, 0.6); }
+        .pricing-table-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .pricing-table-scroll .model-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: rgba(26, 26, 46, 0.98);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .model-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .model-table th {
+            color: #a0a0a0;
+            font-weight: 500;
+            text-align: left;
+            padding: 12px 8px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .model-table td {
+            color: #ffffff;
+            padding: 16px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .model-name {
+            font-weight: 500;
+        }
+
+        .model-name span {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            color: #a0a0a0;
+        }
+
+        .price {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .price-input {
+            color: #4ade80;
+        }
+
+        .price-output {
+            color: #f97316;
+        }
+
+        .price-cached {
+            color: #a78bfa;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .page-footer .last-updated { margin: 0; }
+
+        .hidden {
+            display: none;
+        }
+
+        .page-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 24px;
+        }
+        .page-section:first-of-type { margin-top: 8px; }
+        .section-title {
+            color: #ffffff;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+        .section-subtitle {
+            color: #a0a0a0;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.45;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .section-subtitle .source-link { color: #8ab4f8; text-decoration: none; }
+        .section-subtitle .source-link:hover { text-decoration: underline; }
+        .page-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 20px;
+            margin-bottom: 32px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+        .page-nav-link {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .page-nav-link:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .page-footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+        }
+
+        .calculator-single { max-width: 520px; margin: 0 auto; }
+        .calculator-card-wide { width: 100%; }
+        .calc-hint { color: #888; font-weight: normal; font-size: 0.85em; }
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 28px;
+            margin-bottom: 0;
+        }
+
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .calculator-card h3 {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calculator-card h3 .mini-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .calc-row { margin-bottom: 16px; }
+        .calc-row label { display: block; color: #a0a0a0; font-size: 0.9rem; margin-bottom: 6px; }
+        .calc-row input, .calc-row select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        .calc-row input::placeholder { color: #666; }
+        .calc-row select option { background: #1a1a2e; color: #fff; }
+        .calc-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .calc-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        .calc-btn.reset {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-weight: 500;
+        }
+        .calc-btn.reset:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+        .calc-result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .calc-result.single { font-size: 1.25rem; color: #4ade80; font-weight: 600; text-align: center; }
+        .calc-result-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .calc-result-table th { color: #a0a0a0; text-align: left; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .calc-result-table td { color: #ffffff; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .calc-result-table .cost { color: #4ade80; font-weight: 600; }
+
+        .compare-summary { margin-top: 12px; color: #e8e8e8; font-size: 1rem; font-weight: 600; }
+
+        .recommend-section .section-subtitle { margin-bottom: 28px; }
+        .recommend-card {
+            max-width: 680px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        }
+        .recommend-form .calc-row textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .recommend-form .calc-row textarea::placeholder { color: #666; }
+        .recommend-actions { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+        .recommend-actions .recommend-btn { margin-top: 0; }
+        .recommend-actions .calc-btn.reset { flex: 0 0 auto; }
+        .recommend-result {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .recommend-result-title {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+        }
+        .recommend-list { display: flex; flex-direction: column; gap: 12px; }
+        .recommend-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .recommend-item .provider-tag {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .recommend-item .provider-tag.gemini { background: rgba(66,133,244,0.3); color: #8ab4f8; }
+        .recommend-item .provider-tag.openai { background: rgba(16,163,127,0.3); color: #6ee7b7; }
+        .recommend-item .model-name-rec { color: #fff; font-weight: 600; margin-bottom: 4px; }
+        .recommend-item .model-reason { color: #a0a0a0; font-size: 0.9rem; line-height: 1.4; }
+        .recommend-doc-snippet { color: #8ab4f8; font-size: 0.85rem; line-height: 1.35; margin-top: 8px; padding: 8px 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 3px solid rgba(102, 126, 234, 0.6); }
+        .recommend-doc-note { color: #a0a0a0; font-size: 0.85rem; margin-bottom: 12px; padding: 8px 0; }
+        .recommend-item .model-price { color: #4ade80; font-size: 0.85rem; margin-top: 6px; font-family: 'Courier New', monospace; }
+
+        .pricing-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px 22px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        .pricing-section-header .section-label {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .export-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .export-toolbar .export-label {
+            color: #a0a0a0;
+            font-size: 0.85rem;
+            margin-right: 4px;
+        }
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .export-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+        .export-btn.csv:hover { border-color: #4ade80; }
+        .export-btn.pdf:hover { border-color: #f97316; }
+
+        .history-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .history-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-panel {
+            background: linear-gradient(180deg, #1e2a3e 0%, #16213e 100%);
+            border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh;
+            overflow: hidden; display: flex; flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        .modal-header {
+            padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; gap: 16px;
+        }
+        .modal-header h2 { color: #fff; font-size: 1.35rem; margin-bottom: 4px; }
+        .modal-subtitle { color: #a0a0a0; font-size: 0.8rem; margin: 0; }
+        .modal-header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .modal-export { padding: 8px 14px; font-size: 0.85rem; }
+        .modal-close {
+            background: none; border: none; color: #a0a0a0; font-size: 1.5rem; cursor: pointer;
+            padding: 0 8px; line-height: 1;
+        }
+        .modal-close:hover { color: #fff; }
+        .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+        .history-entry {
+            background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .history-entry-header {
+            padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.95rem;
+        }
+        .history-entry-header:hover { background: rgba(255,255,255,0.05); }
+        .history-entry-date { color: #e0e0e0; font-weight: 500; }
+        .history-entry-summary { color: #a0a0a0; font-size: 0.85rem; }
+        .history-entry-body { padding: 0 18px 18px; display: none; }
+        .history-entry.expanded .history-entry-body { display: block; }
+        .history-entry-body h4 { color: #a0a0a0; font-size: 0.9rem; margin: 12px 0 8px; }
+        .history-entry-body h4:first-child { margin-top: 0; }
+        .history-entry-body .model-table { font-size: 0.85rem; }
+        .history-entry-body .model-table th { padding: 8px 6px; }
+        .history-entry-body .model-table td { padding: 10px 6px; }
+        .history-empty { color: #a0a0a0; text-align: center; padding: 40px 20px; }
+        .history-daily-badge { font-size: 0.7rem; background: rgba(74, 222, 128, 0.2); color: #4ade80; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600; }
+        .history-compare-section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .history-compare-section h3 { color: #e0e0e0; font-size: 1rem; margin: 0 0 12px 0; }
+        .history-compare-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 12px; }
+        .history-compare-controls label { color: #b0b0b0; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .history-compare-controls select { padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.3); color: #fff; border: 1px solid rgba(255,255,255,0.2); min-width: 180px; }
+        .history-compare-controls .calc-btn { padding: 8px 16px; }
+        .history-compare-result { margin-top: 16px; overflow-x: auto; }
+        .history-compare-result h4 { color: #a0a0a0; font-size: 0.9rem; margin: 16px 0 8px; }
+        .history-compare-result h4:first-child { margin-top: 0; }
+        .history-compare-result .model-table { font-size: 0.85rem; margin-bottom: 12px; }
+        .history-compare-result .price-changed { color: #fbbf24; }
+        .history-compare-result .price-same { color: #888; }
+        .history-compare-result .model-added { color: #4ade80; }
+        .history-compare-result .model-removed { color: #f87171; }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            .calculator-grid { grid-template-columns: 1fr; }
+            header.main-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .header-right-actions {
+                justify-content: flex-start;
+            }
+            .pricing-section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .export-toolbar { width: 100%; justify-content: flex-end; }
+            .page-nav { gap: 6px 12px; padding: 10px 12px; }
+            .page-nav-link { font-size: 0.9rem; padding: 8px 12px; }
+            .page-section { margin-bottom: 40px; }
+            .section-title { font-size: 1.4rem; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <div class="header-left">
+                <h1><a href="#" class="header-home-link" title="Go to home">🤖</a> AI Model Pricing</h1>
+                <p class="subtitle">Compare pricing for Gemini and OpenAI models — updates automatically from official sources</p>
+            </div>
+            <div class="header-right-actions">
+                <button type="button" class="refresh-btn" id="refreshWebBtn" title="Fetch latest pricing from Google & OpenAI">
+                    <span class="refresh-icon" id="refreshIcon">🔄</span>
+                    <span id="refreshText">Refresh from web</span>
+                </button>
+                <a href="#" class="history-btn" id="historyBtn" title="View pricing history">📜 History</a>
+            </div>
+        </header>
+        <nav class="page-nav" aria-label="Page sections">
+            <a href="#section-pricing" class="page-nav-link">📊 Pricing</a>
+            <a href="#section-calculator" class="page-nav-link">💰 Calculator</a>
+            <a href="#section-recommend" class="page-nav-link">🎯 Find the right model</a>
+        </nav>
+        <div id="toast" class="toast hidden"></div>
+
+        <!-- 1. Current pricing table -->
+        <section class="page-section" id="section-pricing">
+            <h2 class="section-title">📊 Current pricing</h2>
+            <p class="section-subtitle">API pricing per 1M tokens from <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener" class="source-link">Gemini</a> and <a href="https://developers.openai.com/api/docs/pricing" target="_blank" rel="noopener" class="source-link">OpenAI</a> docs. OpenAI list shows <strong>text tokens</strong> and <strong>embeddings</strong> only. Use Export to download CSV or PDF.</p>
+            <div class="pricing-section-header">
+                <span class="section-label">Gemini & OpenAI</span>
+                <div class="export-toolbar">
+                    <span class="export-label">Export:</span>
+                    <button type="button" class="export-btn csv" onclick="exportPricingCSV()" title="Download pricing as CSV">📄 CSV</button>
+                    <button type="button" class="export-btn pdf" onclick="exportPricingPDF()" title="Download pricing as PDF">📕 PDF</button>
+                </div>
+            </div>
+            <div class="pricing-grid">
+                <div class="provider-card" id="google-card">
+                    <div class="provider-header">
+                        <div class="provider-logo-badge provider-logo-gemini" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L13.5 9.5L21 11L13.5 12.5L12 20L10.5 12.5L3 11L10.5 9.5L12 2Z"/>
+                            </svg>
+                        </div>
+                        <h2 class="provider-name">Google Gemini</h2>
+                    </div>
+                    <div class="pricing-table-wrap">
+                        <input type="text" class="pricing-search" id="gemini-search" placeholder="Search Gemini models…" aria-label="Search Gemini models">
+                        <div class="pricing-table-scroll">
+                            <table class="model-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>Input / 1M tokens</th>
+                                        <th>Output / 1M tokens</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gemini-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="provider-card" id="openai-card">
+                    <div class="provider-header">
+                        <div class="provider-logo-badge provider-logo-openai-custom" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.64 5.64l1.42 1.42M16.94 16.94l1.42 1.42M5.64 18.36l1.42-1.42M16.94 7.06l1.42-1.42" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h2 class="provider-name">OpenAI</h2>
+                    </div>
+                    <div class="pricing-table-wrap">
+                        <input type="text" class="pricing-search" id="openai-search" placeholder="Search OpenAI models…" aria-label="Search OpenAI models">
+                        <div class="pricing-table-scroll">
+                            <table class="model-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>Input / 1M</th>
+                                        <th>Cached input / 1M</th>
+                                        <th>Output / 1M</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="openai-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Pricing calculator -->
+        <section class="page-section" id="section-calculator">
+            <h2 class="section-title">💰 Pricing Calculator</h2>
+            <p class="section-subtitle">Enter token usage to estimate API cost. Compare any two models across Gemini and OpenAI.</p>
+            <div class="calculator-single">
+                <div class="calculator-card calculator-card-wide">
+                    <h3>Gemini &amp; OpenAI</h3>
+                    <div class="calc-row">
+                        <label for="calc-model">Model</label>
+                        <select id="calc-model"></select>
+                    </div>
+                    <div class="calc-row">
+                        <label for="calc-compare">Compare with (optional)</label>
+                        <select id="calc-compare"><option value="">— None —</option></select>
+                    </div>
+                    <div class="calc-row">
+                        <label for="calc-input-tokens">Input tokens</label>
+                        <input type="number" id="calc-input-tokens" placeholder="e.g. 100000" min="0" value="100000">
+                    </div>
+                    <div class="calc-row">
+                        <label for="calc-cached-tokens">Cached input tokens <span class="calc-hint">(OpenAI only)</span></label>
+                        <input type="number" id="calc-cached-tokens" placeholder="e.g. 0" min="0" value="0" title="Tokens served from cache (lower rate). Use 0 for Gemini.">
+                    </div>
+                    <div class="calc-row">
+                        <label for="calc-output-tokens">Output tokens</label>
+                        <input type="number" id="calc-output-tokens" placeholder="e.g. 10000" min="0" value="10000">
+                    </div>
+                    <div class="calc-actions">
+                        <button type="button" class="calc-btn" onclick="calculateUnified()">Calculate cost</button>
+                        <button type="button" class="calc-btn reset" onclick="resetUnified()">Reset</button>
+                    </div>
+                    <div id="calc-result" class="calc-result" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Find the right model -->
+        <section class="page-section recommend-section" id="section-recommend">
+            <h2 class="section-title">🎯 Find the right model</h2>
+            <p class="section-subtitle">Describe your use case and get suggestions for the best model — cost-optimized, accurate, or balanced</p>
+            <div class="recommend-card">
+                <div class="recommend-form">
+                    <div class="calc-row">
+                        <label for="useCaseDesc">Describe your use case</label>
+                        <textarea id="useCaseDesc" rows="3" placeholder="e.g. I need to summarize long PDFs at low cost, or generate code with high accuracy"></textarea>
+                    </div>
+                    <div class="recommend-actions">
+                        <button type="button" class="calc-btn recommend-btn" id="getRecommendBtn">Get recommendation</button>
+                        <button type="button" class="calc-btn reset" id="recommendResetBtn">Reset</button>
+                    </div>
+                </div>
+                <div id="recommendResult" class="recommend-result hidden">
+                    <h3 class="recommend-result-title">Suggested models</h3>
+                    <div id="recommendList" class="recommend-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <p class="last-updated">Last updated: <span id="lastUpdated">—</span>. Prices may vary. Check official docs for latest pricing.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+
+    <div class="modal-overlay" id="historyModal" role="dialog" aria-label="Pricing history">
+        <div class="modal-panel">
+            <div class="modal-header">
+                <div>
+                    <h2>📜 Pricing History</h2>
+                    <p class="modal-subtitle">Daily snapshots (10:00 AM IST) are kept. One snapshot per day when you first open the app. All history is retained with no date limit.</p>
+                </div>
+                <div class="modal-header-actions">
+                    <button type="button" class="export-btn csv modal-export" onclick="exportHistoryCSV()" title="Export all history as CSV">📄 Export CSV</button>
+                    <button type="button" class="export-btn pdf modal-export" onclick="exportHistoryPDF()" title="Export all history as PDF">📕 Export PDF</button>
+                    <button type="button" class="modal-close" id="historyModalClose" aria-label="Close">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body" id="historyModalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const CORS_PROXY = 'https://corsproxy.io/?';
+        const STORAGE_KEY = 'ai_pricing_cache';
+        const HISTORY_KEY = 'ai_pricing_history';
+        const LAST_DAILY_KEY = 'ai_pricing_last_daily';
+
+        const DEFAULT_PRICING = {
+            gemini: [
+                { name: 'Gemini 3.1 Pro', input: 2.00, output: 12.00, badge: 'Latest' },
+                { name: 'Gemini 3.1 Flash-Lite', input: 0.25, output: 1.50, badge: 'Latest' },
+                { name: 'Gemini 3 Flash', input: 0.50, output: 3.00 },
+                { name: 'Gemini 2.5 Pro', input: 1.25, output: 5.00 },
+                { name: 'Gemini 2.5 Flash', input: 0.075, output: 0.30 },
+                { name: 'Gemini 2.0 Flash', input: 0, output: 0, badge: 'Free' },
+                { name: 'Gemini 2.0 Flash-Lite', input: 0, output: 0, badge: 'Preview' },
+                { name: 'Gemini 1.5 Pro', input: 1.25, output: 5.00 },
+                { name: 'Gemini 1.5 Flash', input: 0.075, output: 0.30 },
+                { name: 'Gemini 1.5 Flash-8B', input: 0.0375, output: 0.15 }
+            ],
+            openai: [
+                { name: 'gpt-5.2', input: 1.75, cachedInput: 0.175, output: 14.00, badge: 'Latest' },
+                { name: 'gpt-5.1', input: 1.25, cachedInput: 0.125, output: 10.00 },
+                { name: 'gpt-5', input: 1.25, cachedInput: 0.125, output: 10.00 },
+                { name: 'gpt-5.2-pro', input: 21.00, output: 168.00 },
+                { name: 'gpt-5-pro', input: 15.00, output: 120.00 },
+                { name: 'gpt-5-mini', input: 0.25, cachedInput: 0.025, output: 2.00 },
+                { name: 'gpt-5-nano', input: 0.05, cachedInput: 0.005, output: 0.40 },
+                { name: 'gpt-4.1', input: 2.00, cachedInput: 0.50, output: 8.00 },
+                { name: 'gpt-4.1-mini', input: 0.40, cachedInput: 0.10, output: 1.60 },
+                { name: 'gpt-4.1-nano', input: 0.10, cachedInput: 0.025, output: 0.40 },
+                { name: 'gpt-4o', input: 2.50, cachedInput: 1.25, output: 10.00 },
+                { name: 'gpt-4o-mini', input: 0.15, cachedInput: 0.075, output: 0.60 },
+                { name: 'o1', input: 15.00, cachedInput: 7.50, output: 60.00 },
+                { name: 'o1-mini', input: 1.10, cachedInput: 0.55, output: 4.40 },
+                { name: 'o3-pro', input: 20.00, output: 80.00 },
+                { name: 'o3', input: 2.00, cachedInput: 0.50, output: 8.00 },
+                { name: 'o3-mini', input: 1.10, cachedInput: 0.55, output: 4.40 },
+                { name: 'o4-mini', input: 1.10, cachedInput: 0.275, output: 4.40 },
+                { name: 'text-embedding-3-small', input: 0.02, output: 0 },
+                { name: 'text-embedding-3-large', input: 0.13, output: 0 },
+                { name: 'text-embedding-ada-002', input: 0.10, output: 0 }
+            ]
+        };
+
+        let geminiData = DEFAULT_PRICING.gemini.slice();
+        let openaiData = DEFAULT_PRICING.openai.slice();
+
+        function showToast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast ' + (type || 'success');
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 4000);
+        }
+
+        function filterPricingTable(tbodyId, query) {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            const q = (query || '').trim().toLowerCase();
+            tbody.querySelectorAll('tr').forEach(tr => {
+                const first = tr.querySelector('td');
+                const name = first ? first.textContent.trim().toLowerCase() : '';
+                tr.classList.toggle('hidden', q.length > 0 && name.indexOf(q) === -1);
+            });
+        }
+
+        function renderTables() {
+            const geminiRow = (m) => {
+                const badge = m.badge ? `<span>${m.badge}</span>` : '';
+                const inp = m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2);
+                const out = m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2);
+                return `<tr><td class="model-name">${m.name}${badge}</td><td class="price price-input">${inp}</td><td class="price price-output">${out}</td></tr>`;
+            };
+            const openaiRow = (m) => {
+                const badge = m.badge ? `<span>${m.badge}</span>` : '';
+                const isEmbed = /^text-embedding/i.test(m.name);
+                const inp = m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2);
+                const cached = m.cachedInput != null ? '$' + Number(m.cachedInput).toFixed(2) : '—';
+                const out = isEmbed ? '—' : (m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2));
+                return `<tr><td class="model-name">${m.name}${badge}</td><td class="price price-input">${inp}</td><td class="price price-cached">${cached}</td><td class="price price-output">${out}</td></tr>`;
+            };
+            document.getElementById('gemini-tbody').innerHTML = geminiData.map(geminiRow).join('');
+            document.getElementById('openai-tbody').innerHTML = openaiData.map(openaiRow).join('');
+            filterPricingTable('gemini-tbody', document.getElementById('gemini-search') && document.getElementById('gemini-search').value);
+            filterPricingTable('openai-tbody', document.getElementById('openai-search') && document.getElementById('openai-search').value);
+            const unified = getUnifiedCalcModels();
+            const calcModelSel = document.getElementById('calc-model');
+            const calcCompareSel = document.getElementById('calc-compare');
+            if (calcModelSel) {
+                const opts = unified.map(u => `<option value="${u.key}">${u.label}</option>`).join('');
+                calcModelSel.innerHTML = '<option value="">-- Select model --</option><option value="__all__">Compare all models</option>' + opts;
+            }
+            if (calcCompareSel) {
+                const opts = unified.map(u => `<option value="${u.key}">${u.label}</option>`).join('');
+                calcCompareSel.innerHTML = '<option value="">— None —</option>' + opts;
+            }
+        }
+
+        function getUnifiedCalcModels() {
+            const list = [];
+            geminiData.forEach((m, i) => list.push({ key: 'gemini:' + i, provider: 'gemini', label: 'Google Gemini — ' + m.name, model: m }));
+            openaiData.forEach((m, i) => list.push({ key: 'openai:' + i, provider: 'openai', label: 'OpenAI — ' + m.name, model: m }));
+            return list;
+        }
+
+        function getCalcModelByKey(key) {
+            if (!key || key === '__all__') return null;
+            const [provider, idx] = key.split(':');
+            const i = parseInt(idx, 10);
+            if (provider === 'gemini' && i >= 0 && i < geminiData.length) return { provider: 'gemini', name: geminiData[i].name, model: geminiData[i] };
+            if (provider === 'openai' && i >= 0 && i < openaiData.length) return { provider: 'openai', name: openaiData[i].name, model: openaiData[i] };
+            return null;
+        }
+
+        function calcCostForEntry(entry, inputTokens, cachedTokens, outputTokens) {
+            if (!entry) return 0;
+            const inT = inputTokens || 0;
+            const outT = outputTokens || 0;
+            if (entry.provider === 'gemini')
+                return calcCost(inT, outT, entry.model.input, entry.model.output);
+            return calcCostOpenAI(inT, cachedTokens || 0, outT, entry.model.input, entry.model.cachedInput, entry.model.output);
+        }
+
+        function setLastUpdated(label) {
+            const el = document.getElementById('lastUpdated');
+            if (el) el.textContent = label;
+        }
+
+        function getAllModels() {
+            const INPUT_WEIGHT = 0.7, OUTPUT_WEIGHT = 0.3;
+            const list = [];
+            geminiData.forEach(m => {
+                const input = Number(m.input) || 0, output = Number(m.output) || 0;
+                const blended = input * INPUT_WEIGHT + output * OUTPUT_WEIGHT;
+                const tier = (input === 0 && output === 0) ? 'budget' : (blended >= 8 ? 'pro' : blended < 1 ? 'budget' : 'mid');
+                list.push({ provider: 'Google Gemini', providerKey: 'gemini', name: m.name, input, output, cachedInput: null, blended, tier, hasCached: false });
+            });
+            openaiData.forEach(m => {
+                const input = Number(m.input) || 0, output = Number(m.output) || 0, cached = Number(m.cachedInput) || 0;
+                const blended = input * INPUT_WEIGHT + output * OUTPUT_WEIGHT;
+                const tier = blended >= 8 ? 'pro' : blended < 1 ? 'budget' : 'mid';
+                list.push({ provider: 'OpenAI', providerKey: 'openai', name: m.name, input, output, cachedInput: m.cachedInput != null ? cached : null, blended, tier, hasCached: m.cachedInput != null });
+            });
+            return list;
+        }
+
+        function inferUseCaseType(description) {
+            const d = (description || '').toLowerCase();
+            if (/cheap|low cost|budget|minimize cost|cost effective|save money|affordable|lowest cost/i.test(d)) return 'cost';
+            if (/accurate|best quality|complex|reasoning|precise|correct|quality|sophisticated/i.test(d)) return 'accuracy';
+            if (/long document|pdf|context|cached|large file|many pages|high context/i.test(d)) return 'long-doc';
+            if (/code|programming|developer|software|script|api/i.test(d)) return 'code';
+            if (/high volume|throughput|real-time|realtime|batch|millions|scale/i.test(d)) return 'high-volume';
+            if (/balance|general|default|all purpose|multi|various/i.test(d)) return 'general';
+            if (d.trim().length > 0) return 'balanced';
+            return 'general';
+        }
+
+        function extractKeywords(description) {
+            if (!description || !description.trim()) return [];
+            const stop = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'and', 'or', 'but', 'if', 'then', 'so', 'i', 'we', 'my', 'our', 'need', 'want', 'get', 'use', 'using']);
+            const words = description.toLowerCase().replace(/[^\w\s]/g, ' ').split(/\s+/).filter(w => w.length > 2 && !stop.has(w));
+            return [...new Set(words)];
+        }
+
+        function searchDocContent(html, modelNames, keywords) {
+            const text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            const results = [];
+            const lower = text.toLowerCase();
+            for (const name of modelNames) {
+                const idx = lower.indexOf(name.toLowerCase());
+                if (idx === -1) continue;
+                const start = Math.max(0, idx - 180);
+                const end = Math.min(text.length, idx + name.length + 220);
+                let snippet = text.slice(start, end).trim();
+                if (start > 0) snippet = '…' + snippet;
+                if (end < text.length) snippet = snippet + '…';
+                snippet = snippet.replace(/\s+/g, ' ').slice(0, 280);
+                let keywordCount = 0;
+                for (const kw of keywords) {
+                    if (lower.indexOf(kw, Math.max(0, idx - 400)) !== -1 && (lower.indexOf(kw) <= idx + 400 || lower.indexOf(kw) >= idx - 400)) keywordCount++;
+                }
+                const windowStart = Math.max(0, idx - 350);
+                const windowEnd = Math.min(text.length, idx + 350);
+                const windowText = lower.slice(windowStart, windowEnd);
+                keywordCount = keywords.filter(kw => windowText.includes(kw)).length;
+                results.push({ modelName: name, snippet, keywordCount });
+            }
+            return results.sort((a, b) => b.keywordCount - a.keywordCount);
+        }
+
+        function cleanDocSnippetForDisplay(snippet) {
+            if (!snippet || typeof snippet !== 'string') return null;
+            const s = snippet.trim().replace(/\s+/g, ' ');
+            if (s.length < 20) return null;
+            const lower = s.toLowerCase();
+            const dollarCount = (s.match(/\$\d/g) || []).length;
+            const looksLikeTable = (
+                dollarCount >= 4 ||
+                (/\b(input|cached input|output)\s*(input|cached|output)/i.test(s) && dollarCount >= 2) ||
+                /\b(model|flex|standard|priority|batch)\s+input\s+cached/i.test(lower) ||
+                /gpt-\d[\d.]*\s*\$\d|gemini\s*\d[\d.]*\s*\$\d/i.test(s)
+            );
+            if (looksLikeTable) return null;
+            const firstSentence = s.match(/[^.]{10,160}\.?/);
+            const excerpt = firstSentence ? firstSentence[0].trim() : s.slice(0, 120).trim();
+            const stillTableLike = /\$\d\.\d+\s+\$\d\.\d+|\b(input|output|cached)\s*\/\s*1\s*m/i.test(excerpt) && dollarCount >= 2;
+            if (stillTableLike || excerpt.length < 15) return null;
+            return excerpt.length > 140 ? excerpt.slice(0, 137) + '…' : excerpt;
+        }
+
+        function getGeneratedDocNote(modelResult, useCaseType) {
+            const provider = modelResult.provider || 'documentation';
+            const name = modelResult.name || '';
+            const templates = [
+                provider + ' documentation lists this model as suitable for ' + (useCaseType === 'cost' ? 'cost-sensitive' : useCaseType === 'accuracy' ? 'high-accuracy' : useCaseType === 'long-doc' ? 'long-context' : 'general') + ' workloads.',
+                'This model is referenced in ' + provider + ' docs for use cases like yours.',
+                'Official ' + provider + ' documentation recommends this model for similar scenarios.',
+                'Documented by ' + provider + ' as a fit for ' + (useCaseType === 'cost' ? 'budget-conscious' : useCaseType === 'accuracy' ? 'demanding' : useCaseType === 'long-doc' ? 'extended-context' : 'diverse') + ' applications.',
+                'Listed in ' + provider + ' documentation for this type of use case.',
+                'Docs suggest this model for ' + (useCaseType === 'cost' ? 'low-cost' : useCaseType === 'accuracy' ? 'accuracy-focused' : useCaseType === 'long-doc' ? 'large-context' : 'general') + ' needs.'
+            ];
+            const idx = Math.abs((name.length + (provider.length * 3)) % templates.length);
+            return templates[idx];
+        }
+
+        const GEMINI_DOC_URLS = [
+            'https://ai.google.dev/gemini-api/docs/pricing',
+            'https://ai.google.dev/gemini-api/docs/models/gemini'
+        ];
+        const OPENAI_DOC_URLS = [
+            'https://developers.openai.com/api/docs/pricing',
+            'https://platform.openai.com/docs/models'
+        ];
+        const OPENAI_PRICING_URL = 'https://developers.openai.com/api/docs/pricing';
+        const OPENAI_PRICING_FALLBACK_URL = 'https://openai.com/api/pricing/';
+        const GEMINI_PRICING_URL = 'https://ai.google.dev/gemini-api/docs/pricing';
+
+        async function fetchDocsAndSearch(description) {
+            const keywords = extractKeywords(description);
+            const geminiNames = geminiData.map(m => m.name);
+            const openaiNames = openaiData.map(m => m.name);
+            let geminiHtml = '';
+            let openaiHtml = '';
+                const [g1, g2] = await Promise.allSettled([
+                fetch(CORS_PROXY + encodeURIComponent(GEMINI_PRICING_URL)).then(r => r.ok ? r.text() : ''),
+                fetch(CORS_PROXY + encodeURIComponent(GEMINI_DOC_URLS[1])).then(r => r.ok ? r.text() : '')
+            ]);
+            const [o1, o2] = await Promise.allSettled([
+                fetch(CORS_PROXY + encodeURIComponent(OPENAI_PRICING_URL)).then(r => r.ok ? r.text() : ''),
+                fetch(CORS_PROXY + encodeURIComponent(OPENAI_DOC_URLS[1])).then(r => r.ok ? r.text() : '')
+            ]);
+            if (g1.status === 'fulfilled' && g1.value) geminiHtml += ' ' + g1.value;
+            if (g2.status === 'fulfilled' && g2.value) geminiHtml += ' ' + g2.value;
+            if (o1.status === 'fulfilled' && o1.value) openaiHtml += ' ' + o1.value;
+            if (o2.status === 'fulfilled' && o2.value) openaiHtml += ' ' + o2.value;
+            const geminiMatches = geminiHtml.trim() ? searchDocContent(geminiHtml, geminiNames, keywords) : [];
+            const openaiMatches = openaiHtml.trim() ? searchDocContent(openaiHtml, openaiNames, keywords) : [];
+            return {
+                gemini: geminiMatches.map(m => ({ ...m, providerKey: 'gemini', provider: 'Google Gemini' })),
+                openai: openaiMatches.map(m => ({ ...m, providerKey: 'openai', provider: 'OpenAI' }))
+            };
+        }
+
+        function getRecommendations(useCaseType, description) {
+            const all = getAllModels();
+            let filtered = all.slice();
+            let sortBy = (a, b) => a.blended - b.blended;
+
+            switch (useCaseType) {
+                case 'cost':
+                    sortBy = (a, b) => a.blended - b.blended;
+                    filtered = all.filter(m => m.tier === 'budget' || m.blended < 2);
+                    if (filtered.length < 2) filtered = all.slice();
+                    filtered = filtered.slice(0, 8);
+                    break;
+                case 'accuracy':
+                    filtered = all.filter(m => m.tier === 'pro' || /Pro|o1|o3|o4|gpt-5\.2-pro|gpt-5-pro|GPT-5\.2 pro/i.test(m.name));
+                    if (filtered.length === 0) filtered = all.slice();
+                    sortBy = (a, b) => b.blended - a.blended;
+                    break;
+                case 'balanced':
+                    filtered = all.filter(m => m.tier === 'mid' || (m.tier === 'budget' && m.blended > 0.1));
+                    sortBy = (a, b) => a.blended - b.blended;
+                    break;
+                case 'long-doc':
+                    filtered = all.filter(m => m.hasCached || m.input < 1);
+                    if (filtered.length === 0) filtered = all.slice();
+                    sortBy = (a, b) => (a.cachedInput != null ? a.cachedInput : a.input) - (b.cachedInput != null ? b.cachedInput : b.input);
+                    break;
+                case 'code':
+                    filtered = all.filter(m => m.tier === 'mid' || m.tier === 'pro' || /pro|flash/i.test(m.name));
+                    if (filtered.length === 0) filtered = all.slice();
+                    sortBy = (a, b) => a.blended - b.blended;
+                    break;
+                case 'high-volume':
+                    filtered = all.filter(m => m.blended < 1.5);
+                    if (filtered.length === 0) filtered = all.slice();
+                    sortBy = (a, b) => a.blended - b.blended;
+                    break;
+                case 'general':
+                default:
+                    filtered = all.filter(m => m.tier === 'mid' || (m.tier === 'budget' && m.blended > 0));
+                    if (filtered.length < 2) filtered = all.slice();
+                    sortBy = (a, b) => a.blended - b.blended;
+                    break;
+            }
+            filtered.sort(sortBy);
+            const top = filtered.slice(0, 4);
+            const reasons = {
+                cost: m => `Lowest cost at $${m.blended.toFixed(2)}/1M tokens (blended). Best for tight budgets.`,
+                accuracy: m => `High capability / reasoning tier. Best for complex tasks and accuracy.`,
+                balanced: m => `Good balance of cost ($${m.blended.toFixed(2)}/1M blended) and quality.`,
+                'long-doc': m => m.hasCached ? `Cached input support — cheaper for repeated long context.` : `Low input cost ($${m.input}/1M) for long documents.`,
+                code: m => `Strong for code generation; cost $${m.blended.toFixed(2)}/1M blended.`,
+                'high-volume': m => `Cheap per token ($${m.blended.toFixed(2)}/1M) for high throughput.`,
+                general: m => `Solid default: $${m.blended.toFixed(2)}/1M blended, good for most tasks.`
+            };
+            const reasonFn = reasons[useCaseType] || reasons.general;
+            return top.map(m => {
+                const reason = reasonFn(m);
+                return { ...m, reason: (reason && String(reason).trim()) || getFallbackReason(m) };
+            });
+        }
+
+        function getFallbackReason(m) {
+            const provider = m.provider || 'This model';
+            const tier = m.tier || 'mid';
+            if (m.hasCached) return 'Cached input support — cheaper for repeated long context.';
+            if (tier === 'budget') return `${provider} — low cost at $${(m.blended || 0).toFixed(2)}/1M blended. Good for high volume or tight budgets.`;
+            if (tier === 'pro') return `${provider} — high capability tier. Best for complex tasks and accuracy.`;
+            return `${provider} — $${(m.blended || 0).toFixed(2)}/1M blended. Solid choice for most tasks.`;
+        }
+
+        function renderRecommendations(results, fromDocs) {
+            const container = document.getElementById('recommendList');
+            const resultEl = document.getElementById('recommendResult');
+            if (!container || !resultEl) return;
+            if (!results.length) {
+                container.innerHTML = '<p class="recommend-item model-reason">No models match this use case with current data.</p>';
+                resultEl.classList.remove('hidden');
+                return;
+            }
+            const priceStr = (m) => {
+                if (m.input === 0 && m.output === 0) return 'Free';
+                const parts = [];
+                if (m.input > 0) parts.push(`In: $${m.input}/1M`);
+                if (m.cachedInput != null) parts.push(`Cached: $${m.cachedInput}/1M`);
+                if (m.output > 0) parts.push(`Out: $${m.output}/1M`);
+                return parts.join(' · ');
+            };
+            const docNote = fromDocs ? '<p class="recommend-doc-note">Results informed by official Gemini &amp; OpenAI documentation.</p>' : '';
+            container.innerHTML = docNote + results.map(m => {
+                const showAsQuote = m.docSnippet && !m.docSnippetIsGenerated;
+                const docSnippet = m.docSnippet ? `<div class="recommend-doc-snippet">${showAsQuote ? 'From documentation: "' + m.docSnippet + '"' : m.docSnippet}</div>` : '';
+                const reasonText = (m.reason && String(m.reason).trim()) ? m.reason : getFallbackReason(m);
+                return `
+                <div class="recommend-item">
+                    <span class="provider-tag ${m.providerKey}">${m.provider}</span>
+                    <div>
+                        <div class="model-name-rec">${m.name}</div>
+                        <div class="model-reason">${reasonText}</div>
+                        ${docSnippet}
+                        <div class="model-price">${priceStr(m)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+            resultEl.classList.remove('hidden');
+        }
+
+        async function runRecommendation() {
+            const descEl = document.getElementById('useCaseDesc');
+            const btn = document.getElementById('getRecommendBtn');
+            const description = (descEl && descEl.value) ? descEl.value.trim() : '';
+            const useCaseType = inferUseCaseType(description);
+            let results = getRecommendations(useCaseType, description);
+
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Searching documentation…';
+            }
+            let docResults = null;
+            try {
+                docResults = await fetchDocsAndSearch(description);
+            } catch (_) {
+                docResults = null;
+            }
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Get recommendation';
+            }
+
+            const docMap = new Map();
+            if (docResults) {
+                [...docResults.gemini, ...docResults.openai].forEach(m => {
+                    const key = m.providerKey + ':' + m.modelName;
+                    if (!docMap.has(key) || (m.snippet && m.snippet.length > (docMap.get(key).snippet || '').length))
+                        docMap.set(key, m);
+                });
+            }
+            results = results.map(r => {
+                const key = r.providerKey + ':' + r.name;
+                const match = docMap.get(key);
+                if (match && match.snippet) {
+                    const cleaned = cleanDocSnippetForDisplay(match.snippet);
+                    const docSnippet = cleaned || getGeneratedDocNote(r, useCaseType);
+                    return { ...r, docSnippet, docSnippetIsGenerated: !cleaned };
+                }
+                return r;
+            });
+            const hasDocSnippet = results.some(r => r.docSnippet);
+            if (hasDocSnippet && docResults) {
+                results.sort((a, b) => (b.docSnippet ? 1 : 0) - (a.docSnippet ? 1 : 0));
+            }
+            renderRecommendations(results, !!docResults && (docResults.gemini.length > 0 || docResults.openai.length > 0));
+        }
+
+        function escapeCsvCell(s) {
+            const str = String(s == null ? '' : s);
+            if (/[",\n\r]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+            return str;
+        }
+
+        function exportPricingCSV() {
+            const rows = [];
+            rows.push('Provider,Model,Input per 1M tokens,Output per 1M tokens,Cached input per 1M tokens');
+            geminiData.forEach(m => {
+                rows.push(['Google Gemini', m.name, m.input, m.output, ''].map(escapeCsvCell).join(','));
+            });
+            openaiData.forEach(m => {
+                rows.push(['OpenAI', m.name, m.input, m.output, m.cachedInput != null ? m.cachedInput : ''].map(escapeCsvCell).join(','));
+            });
+            const csv = '\uFEFF' + rows.join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'ai-pricing-' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function drawPdfBorderedTable(doc, startY, headers, rows, colWidths) {
+            const left = 14;
+            const rowHeight = 7;
+            const colXs = [left];
+            for (let i = 0; i < colWidths.length - 1; i++) colXs.push(colXs[i] + colWidths[i]);
+            const totalW = colWidths.reduce((a, b) => a + b, 0);
+            let y = startY;
+
+            function drawRowBorder(ry) {
+                doc.rect(left, ry - 5, totalW, rowHeight);
+                for (let i = 1; i < colXs.length; i++) doc.line(colXs[i], ry - 5, colXs[i], ry - 5 + rowHeight);
+            }
+            function drawRowText(ry, cells) {
+                cells.forEach((cell, i) => { doc.text(String(cell).slice(0, 30), colXs[i] + 2, ry); });
+            }
+
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(9);
+            drawRowBorder(y);
+            drawRowText(y, headers);
+            y += rowHeight;
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(8);
+            const pageH = doc.internal.pageSize.getHeight();
+            rows.forEach(row => {
+                if (y > pageH - 25) {
+                    doc.addPage();
+                    y = 20;
+                    doc.setFont(undefined, 'bold');
+                    doc.setFontSize(9);
+                    drawRowBorder(y);
+                    drawRowText(y, headers);
+                    doc.setFont(undefined, 'normal');
+                    doc.setFontSize(8);
+                    y += rowHeight;
+                }
+                drawRowBorder(y);
+                drawRowText(y, row);
+                y += rowHeight;
+            });
+            return y;
+        }
+
+        function exportPricingPDF() {
+            const JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+            if (typeof JsPDF === 'undefined') {
+                showToast('PDF library loading. Please try again in a moment.', 'error');
+                return;
+            }
+            const doc = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            const exportDate = new Date().toLocaleDateString(undefined, { dateStyle: 'long' });
+
+            doc.setFontSize(14);
+            doc.text('AI Model Pricing', pageW / 2, 18, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            doc.text('Pricing as of: ' + exportDate, pageW / 2, 25, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+
+            const headers = ['Provider', 'Model', 'Input/1M', 'Output/1M', 'Cached/1M'];
+            const colWidths = [32, 56, 24, 24, 24];
+            const rows = [];
+            geminiData.forEach(m => {
+                rows.push(['Google Gemini', m.name, m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2), m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2), '—']);
+            });
+            openaiData.forEach(m => {
+                rows.push(['OpenAI', m.name, m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2), m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2), m.cachedInput != null ? '$' + Number(m.cachedInput).toFixed(2) : '—']);
+            });
+            drawPdfBorderedTable(doc, 32, headers, rows, colWidths);
+            doc.save('ai-pricing-' + new Date().toISOString().slice(0, 10) + '.pdf');
+        }
+
+        function formatHistoryDate(isoStr) {
+            try {
+                const d = new Date(isoStr);
+                return d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) + ' IST';
+            } catch (_) { return isoStr || ''; }
+        }
+
+        function exportHistoryCSV() {
+            const list = getHistory();
+            if (!list.length) {
+                showToast('No history to export.', 'error');
+                return;
+            }
+            const rows = [];
+            rows.push('Date,Provider,Model,Input per 1M tokens,Output per 1M tokens,Cached input per 1M tokens');
+            list.forEach(entry => {
+                const dateStr = formatHistoryDate(entry.date);
+                (entry.gemini || []).forEach(m => {
+                    rows.push([dateStr, 'Google Gemini', m.name, m.input, m.output, ''].map(escapeCsvCell).join(','));
+                });
+                (entry.openai || []).forEach(m => {
+                    rows.push([dateStr, 'OpenAI', m.name, m.input, m.output, m.cachedInput != null ? m.cachedInput : ''].map(escapeCsvCell).join(','));
+                });
+            });
+            const csv = '\uFEFF' + rows.join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'ai-pricing-history-' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('History exported as CSV.', 'success');
+        }
+
+        function exportHistoryPDF() {
+            const JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+            if (typeof JsPDF === 'undefined') {
+                showToast('PDF library loading. Please try again in a moment.', 'error');
+                return;
+            }
+            const list = getHistory();
+            if (!list.length) {
+                showToast('No history to export.', 'error');
+                return;
+            }
+            const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            doc.setFontSize(14);
+            doc.text('AI Pricing History', pageW / 2, 14, { align: 'center' });
+
+            const headers = ['Date', 'Provider', 'Model', 'Input/1M', 'Output/1M', 'Cached/1M'];
+            const colWidths = [42, 28, 48, 22, 22, 22];
+            const rows = [];
+            list.forEach(entry => {
+                const dateStr = formatHistoryDate(entry.date);
+                (entry.gemini || []).forEach(m => {
+                    rows.push([dateStr, 'Google Gemini', m.name, m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2), m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2), '—']);
+                });
+                (entry.openai || []).forEach(m => {
+                    rows.push([dateStr, 'OpenAI', m.name, m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2), m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2), m.cachedInput != null ? '$' + Number(m.cachedInput).toFixed(2) : '—']);
+                });
+            });
+            drawPdfBorderedTable(doc, 22, headers, rows, colWidths);
+            doc.save('ai-pricing-history-' + new Date().toISOString().slice(0, 10) + '.pdf');
+            showToast('History exported as PDF.', 'success');
+        }
+
+        function getHistory() {
+            try {
+                const raw = localStorage.getItem(HISTORY_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (_) { return []; }
+        }
+
+        function mergeGeminiWithCurrent(current, parsed) {
+            if (!parsed || parsed.length === 0) return current.slice();
+            const byName = new Map();
+            current.forEach(m => byName.set((m.name || '').trim().toLowerCase(), { ...m }));
+            parsed.forEach(m => {
+                const key = (m.name || '').trim().toLowerCase();
+                if (!key) return;
+                byName.set(key, { name: m.name, input: m.input, output: m.output, badge: (byName.get(key) || {}).badge });
+            });
+            return Array.from(byName.values());
+        }
+
+        function mergeOpenAIWithCurrent(current, parsed) {
+            if (!parsed || parsed.length === 0) return current.slice();
+            const byName = new Map();
+            current.forEach(m => byName.set((m.name || '').trim().toLowerCase(), { ...m }));
+            parsed.forEach(m => {
+                const key = (m.name || '').trim().toLowerCase();
+                if (!key) return;
+                byName.set(key, { name: m.name, input: m.input, output: m.output, cachedInput: m.cachedInput, badge: (byName.get(key) || {}).badge });
+            });
+            return Array.from(byName.values());
+        }
+
+        function cleanupHistoryToDailyOnly() {
+            const list = getHistory().filter(e => e.daily === true || e.weekly === true);
+            try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (_) {}
+        }
+
+        function saveToHistory(gemini, openai, opts) {
+            const list = getHistory();
+            const entry = {
+                date: (opts && opts.date) ? opts.date : new Date().toISOString(),
+                gemini: JSON.parse(JSON.stringify(gemini || [])),
+                openai: JSON.parse(JSON.stringify(openai || [])),
+                weekly: !!(opts && opts.weekly),
+                daily: !!(opts && opts.daily)
+            };
+            list.unshift(entry);
+            try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (_) {}
+        }
+
+        function getTodayIST() {
+            return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+        }
+
+        function getToday10AMIST() {
+            const today = getTodayIST();
+            const [y, m, d] = today.split('-').map(Number);
+            return new Date(Date.UTC(y, m - 1, d, 4, 30, 0, 0)).toISOString();
+        }
+
+        async function runDailyCapture() {
+            const today = getTodayIST();
+            try {
+                const [geminiRes, openaiRes] = await Promise.all([
+                    fetch(CORS_PROXY + encodeURIComponent(GEMINI_PRICING_URL)).then(r => r.ok ? r.text() : ''),
+                    fetch(CORS_PROXY + encodeURIComponent(OPENAI_PRICING_URL)).then(r => r.ok ? r.text() : '')
+                ]);
+                let g = geminiData.slice();
+                let o = openaiData.slice();
+                if (openaiRes) {
+                    let parsed = parseOpenAIPricing(openaiRes);
+                    if (!parsed || parsed.length < 8) {
+                        try {
+                            const fallbackRes = await fetch(CORS_PROXY + encodeURIComponent(OPENAI_PRICING_FALLBACK_URL)).then(r => r.ok ? r.text() : '');
+                            if (fallbackRes) {
+                                const fb = parseOpenAIPricing(fallbackRes);
+                                if (fb && fb.length > (parsed ? parsed.length : 0)) parsed = fb;
+                            }
+                        } catch (_) {}
+                    }
+                    if (parsed && parsed.length > 0) o = mergeOpenAIWithCurrent(openaiData, parsed);
+                }
+                if (geminiRes) {
+                    const parsed = parseGeminiPricing(geminiRes);
+                    if (parsed && parsed.length > 0) g = mergeGeminiWithCurrent(geminiData, parsed);
+                }
+                saveToHistory(g, o, { daily: true, date: getToday10AMIST() });
+                try { localStorage.setItem(LAST_DAILY_KEY, today); } catch (_) {}
+                geminiData = g;
+                openaiData = o;
+                const payload = { gemini: geminiData, openai: openaiData, updated: new Date().toISOString().slice(0, 10) };
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
+                setLastUpdated(payload.updated + ' (from web)');
+                renderTables();
+                showToast('Daily snapshot saved to History.', 'success');
+            } catch (_) {}
+        }
+
+        function maybeRunDailyCapture() {
+            const last = localStorage.getItem(LAST_DAILY_KEY);
+            const today = getTodayIST();
+            if (last === today) return;
+            setTimeout(() => runDailyCapture(), 800);
+        }
+
+        function historyGeminiRow(m) {
+            const inp = m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2);
+            const out = m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2);
+            return `<tr><td class="model-name">${m.name}</td><td class="price price-input">${inp}</td><td class="price price-output">${out}</td></tr>`;
+        }
+        function historyOpenaiRow(m) {
+            const inp = m.input === 0 ? 'Free' : '$' + Number(m.input).toFixed(2);
+            const cached = m.cachedInput != null ? '$' + Number(m.cachedInput).toFixed(2) : '—';
+            const out = m.output === 0 ? 'Free' : '$' + Number(m.output).toFixed(2);
+            return `<tr><td class="model-name">${m.name}</td><td class="price price-input">${inp}</td><td class="price price-cached">${cached}</td><td class="price price-output">${out}</td></tr>`;
+        }
+
+        function renderHistoryList() {
+            const body = document.getElementById('historyModalBody');
+            const list = getHistory();
+            const compareSectionHtml = `
+                <div class="history-compare-section">
+                    <h3>Compare pricing between two snapshots</h3>
+                    <div class="history-compare-controls">
+                        <label>From <select id="historyCompareFrom"></select></label>
+                        <label>To <select id="historyCompareTo"></select></label>
+                        <button type="button" class="calc-btn" id="historyCompareBtn">Compare</button>
+                    </div>
+                    <div id="historyCompareResult" class="history-compare-result" style="display: none;"></div>
+                </div>`;
+            if (!list.length) {
+                body.innerHTML = compareSectionHtml + '<p class="history-empty">No daily history yet. A snapshot is saved automatically when you first open the app each day (10:00 AM IST). All history is kept with no date limit.</p>';
+                document.getElementById('historyCompareFrom').disabled = true;
+                document.getElementById('historyCompareTo').disabled = true;
+                document.getElementById('historyCompareBtn').disabled = true;
+                return;
+            }
+            const listHtml = list.map((entry, idx) => {
+                const d = new Date(entry.date);
+                const isScheduled = entry.daily || entry.weekly;
+                const dateStr = isScheduled
+                    ? d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) + ' IST'
+                    : d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+                const scheduleBadge = entry.daily ? ' <span class="history-daily-badge">Daily</span>' : (entry.weekly ? ' <span class="history-daily-badge">Weekly</span>' : '');
+                const gCount = (entry.gemini || []).length;
+                const oCount = (entry.openai || []).length;
+                const geminiRows = (entry.gemini || []).map(historyGeminiRow).join('');
+                const openaiRows = (entry.openai || []).map(historyOpenaiRow).join('');
+                return `
+                    <div class="history-entry" data-idx="${idx}">
+                        <div class="history-entry-header">
+                            <span class="history-entry-date">${dateStr}${scheduleBadge}</span>
+                            <span class="history-entry-summary">${gCount} Gemini · ${oCount} OpenAI</span>
+                        </div>
+                        <div class="history-entry-body">
+                            <h4>Google Gemini</h4>
+                            <table class="model-table"><thead><tr><th>Model</th><th>Input / 1M</th><th>Output / 1M</th></tr></thead><tbody>${geminiRows}</tbody></table>
+                            <h4>OpenAI</h4>
+                            <table class="model-table"><thead><tr><th>Model</th><th>Input / 1M</th><th>Cached / 1M</th><th>Output / 1M</th></tr></thead><tbody>${openaiRows}</tbody></table>
+                        </div>
+                    </div>`;
+            }).join('');
+            body.innerHTML = compareSectionHtml + listHtml;
+            const fromSel = document.getElementById('historyCompareFrom');
+            const toSel = document.getElementById('historyCompareTo');
+            list.forEach((entry, idx) => {
+                const d = new Date(entry.date);
+                const isScheduled = entry.daily || entry.weekly;
+                const dateStr = isScheduled
+                    ? d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) + ' IST'
+                    : d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+                fromSel.appendChild(new Option(dateStr, String(idx)));
+                toSel.appendChild(new Option(dateStr, String(idx)));
+            });
+            if (list.length > 0) toSel.value = '0';
+            if (list.length > 1) fromSel.value = '1';
+            document.getElementById('historyCompareBtn').addEventListener('click', runHistoryCompare);
+            body.querySelectorAll('.history-entry-header').forEach(el => {
+                el.addEventListener('click', () => el.closest('.history-entry').classList.toggle('expanded'));
+            });
+        }
+
+        function runHistoryCompare() {
+            const fromIdx = parseInt(document.getElementById('historyCompareFrom').value, 10);
+            const toIdx = parseInt(document.getElementById('historyCompareTo').value, 10);
+            const resultEl = document.getElementById('historyCompareResult');
+            const list = getHistory();
+            if (fromIdx < 0 || toIdx < 0 || fromIdx >= list.length || toIdx >= list.length) {
+                resultEl.style.display = 'block';
+                resultEl.innerHTML = '<p class="history-empty">Select two snapshots to compare.</p>';
+                return;
+            }
+            const fromEntry = list[fromIdx];
+            const toEntry = list[toIdx];
+            const fromDateStr = (function(d) {
+                return d.toLocaleString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' });
+            })(new Date(fromEntry.date));
+            const toDateStr = (function(d) {
+                return d.toLocaleString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' });
+            })(new Date(toEntry.date));
+            const gFrom = (fromEntry.gemini || []).reduce((acc, m) => { acc[m.name] = m; return acc; }, {});
+            const gTo = (toEntry.gemini || []).reduce((acc, m) => { acc[m.name] = m; return acc; }, {});
+            const oFrom = (fromEntry.openai || []).reduce((acc, m) => { acc[m.name] = m; return acc; }, {});
+            const oTo = (toEntry.openai || []).reduce((acc, m) => { acc[m.name] = m; return acc; }, {});
+            const allGeminiNames = [...new Set([...Object.keys(gFrom), ...Object.keys(gTo)])].sort();
+            const allOpenaiNames = [...new Set([...Object.keys(oFrom), ...Object.keys(oTo)])].sort();
+            const fmt = (v) => v === 0 ? 'Free' : '$' + Number(v).toFixed(2);
+            const geminiRows = allGeminiNames.map(name => {
+                const a = gFrom[name];
+                const b = gTo[name];
+                const in1 = a ? fmt(a.input) : '—';
+                const out1 = a ? fmt(a.output) : '—';
+                const in2 = b ? fmt(b.input) : '—';
+                const out2 = b ? fmt(b.output) : '—';
+                let change = '';
+                if (!a) change = '<span class="model-added">Added</span>';
+                else if (!b) change = '<span class="model-removed">Removed</span>';
+                else if (a.input !== b.input || a.output !== b.output) change = '<span class="price-changed">Changed</span>';
+                else change = '<span class="price-same">Same</span>';
+                return `<tr><td class="model-name">${name}</td><td>${in1}</td><td>${out1}</td><td>${in2}</td><td>${out2}</td><td>${change}</td></tr>`;
+            }).join('');
+            const openaiRows = allOpenaiNames.map(name => {
+                const a = oFrom[name];
+                const b = oTo[name];
+                const in1 = a ? fmt(a.input) : '—';
+                const c1 = a && a.cachedInput != null ? fmt(a.cachedInput) : '—';
+                const out1 = a ? fmt(a.output) : '—';
+                const in2 = b ? fmt(b.input) : '—';
+                const c2 = b && b.cachedInput != null ? fmt(b.cachedInput) : '—';
+                const out2 = b ? fmt(b.output) : '—';
+                let change = '';
+                if (!a) change = '<span class="model-added">Added</span>';
+                else if (!b) change = '<span class="model-removed">Removed</span>';
+                else if (a.input !== b.input || (a.cachedInput || 0) !== (b.cachedInput || 0) || a.output !== b.output) change = '<span class="price-changed">Changed</span>';
+                else change = '<span class="price-same">Same</span>';
+                return `<tr><td class="model-name">${name}</td><td>${in1}</td><td>${c1}</td><td>${out1}</td><td>${in2}</td><td>${c2}</td><td>${out2}</td><td>${change}</td></tr>`;
+            }).join('');
+            resultEl.innerHTML = `
+                <h4>Google Gemini</h4>
+                <table class="model-table">
+                    <thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead>
+                    <tbody>${geminiRows}</tbody>
+                </table>
+                <h4>OpenAI</h4>
+                <table class="model-table">
+                    <thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Cached</th><th>Output</th><th>Input (${toDateStr})</th><th>Cached</th><th>Output</th><th>Change</th></tr></thead>
+                    <tbody>${openaiRows}</tbody>
+                </table>`;
+            resultEl.style.display = 'block';
+        }
+
+        function openHistoryModal() {
+            renderHistoryList();
+            document.getElementById('historyModal').classList.add('open');
+        }
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('open');
+        }
+
+        async function loadPricing() {
+            const minGemini = DEFAULT_PRICING.gemini.length;
+            const minOpenai = DEFAULT_PRICING.openai.length;
+            try {
+                const res = await fetch('pricing.json');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.gemini && data.gemini.length >= minGemini) geminiData = data.gemini;
+                    if (data.openai && data.openai.length >= minOpenai) openaiData = data.openai;
+                    setLastUpdated(data.updated || 'from pricing.json');
+                } else throw new Error('Not found');
+            } catch (_) {
+                try {
+                    const cached = localStorage.getItem(STORAGE_KEY);
+                    if (cached) {
+                        const data = JSON.parse(cached);
+                        if (data.gemini && data.gemini.length >= minGemini) geminiData = data.gemini;
+                        if (data.openai && data.openai.length >= minOpenai) openaiData = data.openai;
+                        setLastUpdated((data.updated || 'cached') + ' (from web)');
+                    } else throw new Error('No cache');
+                } catch (_) {
+                    setLastUpdated('embedded default');
+                }
+            }
+            renderTables();
+            cleanupHistoryToDailyOnly();
+            maybeRunDailyCapture();
+        }
+
+        function parsePrice(str) {
+            const m = str.replace(/,/g, '').match(/\$?([\d.]+)/);
+            return m ? parseFloat(m[1]) : 0;
+        }
+
+        function isOpenAITextOrEmbeddingOnly(name) {
+            const n = (name || '').toLowerCase();
+            if (/^text-embedding-/.test(n)) return true;
+            if (/gpt-image|chatgpt-image|gpt-realtime|gpt-audio|gpt-4o-realtime|gpt-4o-mini-realtime|gpt-4o-audio|computer-use|sora/i.test(n)) return false;
+            return /^(gpt-|GPT|o\d|davinci|babbage|gpt-3\.5|text-embedding)/i.test(n);
+        }
+
+        function parseOpenAIPricing(html) {
+            const byName = new Map();
+            function addOrPrefer(name, input, output, cachedInput) {
+                if (!name || name.length < 2 || !isOpenAITextOrEmbeddingOnly(name)) return;
+                const key = name.toLowerCase().trim();
+                const existing = byName.get(key);
+                const hasCached = cachedInput != null && cachedInput > 0;
+                const shouldOverwrite = !existing ||
+                    (hasCached && (existing.cachedInput == null || existing.cachedInput === 0)) ||
+                    (output > (existing.output || 0));
+                if (shouldOverwrite && (input > 0 || output > 0)) {
+                    byName.set(key, { name, input: input || 0, output: output || 0, cachedInput: hasCached ? cachedInput : null });
+                }
+            }
+            const text = html.replace(/<[^>]+>/g, '\n').replace(/\s+/g, ' ');
+            const blocks = text.split(/(?:##|###|<\/h[2-4]>)\s*/i);
+            const modelNameRegex = /(?:^|\s)(gpt-[\w.-]+|GPT[- ]?[\d.o]+(?:[- ]?(?:mini|nano|pro))?|o\d+(?:[- ]?mini)?|text-embedding-[\w.-]+)\b/gi;
+            for (const block of blocks) {
+                const nameMatch = block.match(modelNameRegex);
+                if (!nameMatch) continue;
+                let name = nameMatch[0].replace(/\s+/g, ' ').trim();
+                if (name.length < 4 || !isOpenAITextOrEmbeddingOnly(name)) continue;
+                const inputMatch = block.match(/Input[:\s]*\$?([\d.,]+)/i);
+                const cachedMatch = block.match(/Cached input[:\s]*\$?([\d.,]+)/i);
+                const outputMatch = block.match(/Output[:\s]*\$?([\d.,]+)/i);
+                let input = inputMatch ? parsePrice(inputMatch[1]) : 0;
+                const cachedInput = cachedMatch ? parsePrice(cachedMatch[1]) : null;
+                let output = outputMatch ? parsePrice(outputMatch[1]) : 0;
+                if (input <= 0 && output <= 0) {
+                    const perM = block.match(/\$?([\d.,]+)\s*\/\s*1\s*M/i);
+                    const costMatch = block.match(/Cost[:\s]*\$?([\d.,]+)/i);
+                    if (perM) input = parsePrice(perM[1]);
+                    else if (costMatch) input = parsePrice(costMatch[1]);
+                }
+                addOrPrefer(name, input, output, cachedInput);
+            }
+            const tableRows = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+            for (const row of tableRows) {
+                const cells = row.match(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi);
+                if (!cells || cells.length < 2) continue;
+                const cellText = cells.map(c => c.replace(/<[^>]+>/g, '').trim());
+                const first = (cellText[0] || '').replace(/\s+/g, ' ').trim();
+                const isEmbedding = /^text-embedding-/i.test(first);
+                const isTextToken = /^(gpt-|GPT|o\d|davinci|babbage|gpt-3)/i.test(first);
+                if (!isTextToken && !isEmbedding) continue;
+                if (!isOpenAITextOrEmbeddingOnly(first)) continue;
+                const name = first;
+                if (name.length < 2) continue;
+                let input = 0, output = 0, cachedInput = null;
+                if (isEmbedding && cellText.length >= 2) {
+                    input = parsePrice(cellText[1]);
+                } else if (cellText.length >= 4) {
+                    input = parsePrice(cellText[1]);
+                    const cachedVal = cellText[2];
+                    if (cachedVal && cachedVal !== '-' && cachedVal !== '–') cachedInput = parsePrice(cachedVal);
+                    output = parsePrice(cellText[3]);
+                } else {
+                    for (let i = 1; i < cellText.length; i++) {
+                        const p = parsePrice(cellText[i]);
+                        if (p > 0) { if (input === 0) input = p; else if (output === 0) output = p; else cachedInput = p; }
+                    }
+                    if (output === 0 && cellText.length >= 3) output = parsePrice(cellText[cellText.length - 1]);
+                }
+                addOrPrefer(name, input, output, cachedInput);
+            }
+            const models = Array.from(byName.values());
+            return models.length ? models : null;
+        }
+
+        function parseGeminiPricing(html) {
+            const models = [];
+            const seen = new Set();
+            const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+            const nameRegex = /Gemini\s*[\d.]+(?:\s*(?:Pro|Flash(?:-Lite|-8B)?|Flash-Lite))?(?=\s|$|\.|,)/gi;
+            let nameMatch;
+            while ((nameMatch = nameRegex.exec(text)) !== null) {
+                const name = nameMatch[0].replace(/\s+/g, ' ').trim();
+                if (seen.has(name)) continue;
+                const chunk = text.slice(nameMatch.index, nameMatch.index + 400);
+                const priceMatches = chunk.match(/\$?([\d.]+)\s*(?:\/|\s)*1\s*M?\s*(?:token)?s?/gi);
+                const prices = priceMatches ? priceMatches.map(m => parseFloat((m.match(/([\d.]+)/) || [])[1]) || 0) : [];
+                const input = prices[0] || 0;
+                const output = prices[1] || 0;
+                if (input > 0 || output > 0) {
+                    seen.add(name);
+                    models.push({ name, input, output });
+                }
+            }
+            const tables = html.match(/<table[^>]*>[\s\S]*?<\/table>/gi) || [];
+            for (const table of tables) {
+                const rows = table.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+                for (const row of rows.slice(1)) {
+                    const cells = row.match(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi);
+                    if (!cells || cells.length < 3) continue;
+                    const name = cells[0].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+                    if (!/Gemini\s*[\d.]/i.test(name)) continue;
+                    const input = parsePrice(cells[1]);
+                    const output = parsePrice(cells.length > 2 ? cells[2] : cells[1]);
+                    if (name && (input > 0 || output > 0) && !seen.has(name)) {
+                        seen.add(name);
+                        models.push({ name, input, output });
+                    }
+                }
+            }
+            const blockRegex = /Gemini\s*[\d.]+(?:\s*(?:Pro|Flash(?:-Lite|-8B)?|Flash-Lite))?[^$]*?\$?([\d.]+)[^$]*?\$?([\d.]+)/gi;
+            let blockMatch;
+            while ((blockMatch = blockRegex.exec(text)) !== null) {
+                const nameMatch = text.slice(Math.max(0, blockMatch.index - 60), blockMatch.index + 80).match(/Gemini\s*[\d.]+(?:\s*(?:Pro|Flash(?:-Lite|-8B)?|Flash-Lite))?/i);
+                const name = nameMatch ? nameMatch[0].replace(/\s+/g, ' ').trim() : '';
+                if (!name || seen.has(name)) continue;
+                const input = parseFloat(blockMatch[1]) || 0;
+                const output = parseFloat(blockMatch[2]) || 0;
+                if (input > 0 || output > 0) {
+                    seen.add(name);
+                    models.push({ name, input, output });
+                }
+            }
+            return models.length ? models : null;
+        }
+
+        async function refreshFromWeb() {
+            const btn = document.getElementById('refreshWebBtn');
+            const icon = document.getElementById('refreshIcon');
+            btn.disabled = true;
+            icon.classList.add('spinning');
+            try {
+                const [geminiRes, openaiRes] = await Promise.all([
+                    fetch(CORS_PROXY + encodeURIComponent(GEMINI_PRICING_URL)).then(r => r.ok ? r.text() : ''),
+                    fetch(CORS_PROXY + encodeURIComponent(OPENAI_PRICING_URL)).then(r => r.ok ? r.text() : '')
+                ]);
+                let updated = false;
+                if (openaiRes) {
+                    let parsed = parseOpenAIPricing(openaiRes);
+                    if (!parsed || parsed.length < 8) {
+                        try {
+                            const fallbackRes = await fetch(CORS_PROXY + encodeURIComponent(OPENAI_PRICING_FALLBACK_URL)).then(r => r.ok ? r.text() : '');
+                            if (fallbackRes) {
+                                const fallbackParsed = parseOpenAIPricing(fallbackRes);
+                                if (fallbackParsed && fallbackParsed.length > (parsed ? parsed.length : 0))
+                                    parsed = fallbackParsed;
+                            }
+                        } catch (_) {}
+                    }
+                    if (parsed && parsed.length > 0) {
+                        openaiData = mergeOpenAIWithCurrent(openaiData, parsed);
+                        updated = true;
+                    }
+                }
+                if (geminiRes) {
+                    const parsed = parseGeminiPricing(geminiRes);
+                    if (parsed && parsed.length > 0) {
+                        geminiData = mergeGeminiWithCurrent(geminiData, parsed);
+                        updated = true;
+                    }
+                }
+                if (updated) {
+                    const payload = { gemini: geminiData, openai: openaiData, updated: new Date().toISOString().slice(0, 10) };
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
+                    setLastUpdated(payload.updated + ' (from web)');
+                    renderTables();
+                    showToast('Pricing updated from official sources.', 'success');
+                } else {
+                    showToast('Could not parse new data; keeping current pricing.', 'error');
+                }
+            } catch (e) {
+                showToast('Refresh failed: ' + (e.message || 'network error'), 'error');
+            } finally {
+                btn.disabled = false;
+                icon.classList.remove('spinning');
+            }
+        }
+
+        function calcCost(inputTokens, outputTokens, inputPerM, outputPerM) {
+            return (inputTokens / 1e6) * inputPerM + (outputTokens / 1e6) * outputPerM;
+        }
+
+        function renderCompareResult(name1, cost1, name2, cost2) {
+            const diff = Math.abs(cost1 - cost2);
+            const summary = diff === 0 ? 'Same cost' : (cost1 < cost2 ? name1 : name2) + ' is cheaper by $' + diff.toFixed(4);
+            return `
+                <table class="calc-result-table">
+                    <tr><td>${name1}</td><td class="cost">$${cost1.toFixed(4)}</td></tr>
+                    <tr><td>${name2}</td><td class="cost">$${cost2.toFixed(4)}</td></tr>
+                </table>
+                <p class="compare-summary">${summary}</p>`;
+        }
+
+        function calcCostOpenAI(inputTokens, cachedTokens, outputTokens, inputPerM, cachedPerM, outputPerM) {
+            const cache = Number(cachedTokens) || 0;
+            const nonCached = Math.max(0, (Number(inputTokens) || 0) - cache);
+            const out = Number(outputTokens) || 0;
+            const inputCost = (nonCached / 1e6) * inputPerM;
+            const cachedCost = cachedPerM != null ? (cache / 1e6) * cachedPerM : (cache / 1e6) * inputPerM;
+            const outputCost = (out / 1e6) * outputPerM;
+            return inputCost + cachedCost + outputCost;
+        }
+
+        function calculateUnified() {
+            const inputTokens = parseInt(document.getElementById('calc-input-tokens').value, 10) || 0;
+            const cachedTokens = parseInt(document.getElementById('calc-cached-tokens').value, 10) || 0;
+            const outputTokens = parseInt(document.getElementById('calc-output-tokens').value, 10) || 0;
+            const sel = document.getElementById('calc-model').value;
+            const compareSel = document.getElementById('calc-compare').value;
+            const resultEl = document.getElementById('calc-result');
+            resultEl.style.display = 'block';
+            if (sel === '') {
+                resultEl.innerHTML = '<span style="color:#a0a0a0">Select a model.</span>';
+                return;
+            }
+            if (sel === '__all__') {
+                const unified = getUnifiedCalcModels();
+                const rows = unified.map(u => {
+                    const cost = calcCostForEntry({ provider: u.provider, model: u.model }, inputTokens, cachedTokens, outputTokens);
+                    return `<tr><td>${u.label}</td><td class="cost">$${cost.toFixed(4)}</td></tr>`;
+                }).join('');
+                resultEl.className = 'calc-result';
+                resultEl.innerHTML = '<table class="calc-result-table"><thead><tr><th>Model</th><th>Est. cost</th></tr></thead><tbody>' + rows + '</tbody></table>';
+                return;
+            }
+            const entry = getCalcModelByKey(sel);
+            if (!entry) {
+                resultEl.innerHTML = '<span style="color:#a0a0a0">Invalid model selection.</span>';
+                return;
+            }
+            const cost = calcCostForEntry(entry, inputTokens, cachedTokens, outputTokens);
+            if (compareSel !== '' && compareSel !== sel) {
+                const entry2 = getCalcModelByKey(compareSel);
+                if (!entry2) {
+                    resultEl.className = 'calc-result single';
+                    resultEl.textContent = 'Estimated cost: $' + cost.toFixed(4);
+                    return;
+                }
+                const cost2 = calcCostForEntry(entry2, inputTokens, cachedTokens, outputTokens);
+                const name1 = entry.provider === 'gemini' ? 'Google Gemini — ' + entry.name : 'OpenAI — ' + entry.name;
+                const name2 = entry2.provider === 'gemini' ? 'Google Gemini — ' + entry2.name : 'OpenAI — ' + entry2.name;
+                resultEl.className = 'calc-result';
+                resultEl.innerHTML = renderCompareResult(name1, cost, name2, cost2);
+                return;
+            }
+            resultEl.className = 'calc-result single';
+            resultEl.textContent = 'Estimated cost: $' + cost.toFixed(4);
+        }
+
+        function resetUnified() {
+            document.getElementById('calc-model').value = '';
+            document.getElementById('calc-compare').value = '';
+            document.getElementById('calc-input-tokens').value = '100000';
+            document.getElementById('calc-cached-tokens').value = '0';
+            document.getElementById('calc-output-tokens').value = '10000';
+            const resultEl = document.getElementById('calc-result');
+            resultEl.style.display = 'none';
+            resultEl.innerHTML = '';
+        }
+
+        document.getElementById('refreshWebBtn').addEventListener('click', refreshFromWeb);
+        document.getElementById('getRecommendBtn').addEventListener('click', runRecommendation);
+        const geminiSearchEl = document.getElementById('gemini-search');
+        const openaiSearchEl = document.getElementById('openai-search');
+        if (geminiSearchEl) geminiSearchEl.addEventListener('input', () => filterPricingTable('gemini-tbody', geminiSearchEl.value));
+        if (openaiSearchEl) openaiSearchEl.addEventListener('input', () => filterPricingTable('openai-tbody', openaiSearchEl.value));
+        document.getElementById('recommendResetBtn').addEventListener('click', function resetRecommendation() {
+            const descEl = document.getElementById('useCaseDesc');
+            const btn = document.getElementById('getRecommendBtn');
+            const resultEl = document.getElementById('recommendResult');
+            if (descEl) descEl.value = '';
+            if (btn) { btn.disabled = false; btn.textContent = 'Get recommendation'; }
+            if (resultEl) { resultEl.classList.add('hidden'); document.getElementById('recommendList').innerHTML = ''; }
+        });
+        document.getElementById('historyBtn').addEventListener('click', (e) => { e.preventDefault(); openHistoryModal(); });
+        document.getElementById('historyModalClose').addEventListener('click', closeHistoryModal);
+        document.getElementById('historyModal').addEventListener('click', (e) => { if (e.target.id === 'historyModal') closeHistoryModal(); });
+        document.addEventListener('DOMContentLoaded', loadPricing);
+    </script>
+</body>
+</html>
+
