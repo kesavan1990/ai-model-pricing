@@ -1343,6 +1343,13 @@
             const el = document.getElementById('lastUpdated');
             if (el) el.textContent = label;
         }
+        function formatTimestampWithTimezone(date) {
+            try {
+                return (date || new Date()).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'medium', timeZoneName: 'short' });
+            } catch (_) {
+                return (date || new Date()).toISOString();
+            }
+        }
 
         const PROVIDER_LABELS = { gemini: 'Google Gemini', openai: 'OpenAI', anthropic: 'Anthropic', mistral: 'Mistral' };
         function comparePrices(last, newPrices) {
@@ -2375,7 +2382,7 @@
                     mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : mistralData;
                     const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: (data.updated || new Date().toISOString().slice(0, 10)), cachedAt: Date.now() };
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
-                    setLastUpdated(payload.updated + ' (from site)');
+                    setLastUpdated(formatTimestampWithTimezone(new Date()) + ' (from site)');
                     renderTables();
                     showToast('Pricing reloaded from site.', 'success');
                 } else {
@@ -2409,14 +2416,15 @@
                     } catch (_) {}
                 }
                 try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
-                setLastUpdated(payload.updated + ' (Vizra)');
+                const updatedAt = new Date();
+                const fullTimestamp = formatTimestampWithTimezone(updatedAt);
+                setLastUpdated(fullTimestamp + ' (Vizra)');
                 renderTables();
                 const summaryEl = document.getElementById('priceChangesSummary');
                 if (summaryEl) {
                     if (drops.length || increases.length) {
                         const fmt = (v) => v === 0 ? 'Free' : '$' + Number(v).toFixed(2);
-                        const updatedAt = new Date();
-                        const timestampStr = updatedAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'medium', timeZoneName: 'short' });
+                        const timestampStr = fullTimestamp;
                         const dropRows = drops.slice(0, 10).map(d => `<tr class="change-drop"><td class="col-direction">\u2193</td><td class="col-provider">${d.provider}</td><td class="col-model">${d.name}</td><td class="col-field">${d.field}</td><td class="col-prices">${fmt(d.oldVal)} \u2192 ${fmt(d.newVal)}</td></tr>`).join('');
                         const riseRows = increases.slice(0, 10).map(d => `<tr class="change-rise"><td class="col-direction">\u2191</td><td class="col-provider">${d.provider}</td><td class="col-model">${d.name}</td><td class="col-field">${d.field}</td><td class="col-prices">${fmt(d.oldVal)} \u2192 ${fmt(d.newVal)}</td></tr>`).join('');
                         const moreD = drops.length > 10 ? `<tr><td colspan="5" class="change-more">\u2193 … and ${drops.length - 10} more drop(s)</td></tr>` : '';
@@ -2442,7 +2450,7 @@
                 mistralData = previous.mistral;
                 const fallbackApplied = await applyFallbackPricingFromFile();
                 if (fallbackApplied) {
-                    setLastUpdated((new Date().toISOString().slice(0, 10)) + ' (fallback)');
+                    setLastUpdated(formatTimestampWithTimezone(new Date()) + ' (fallback)');
                     renderTables();
                     showToast('API unavailable. Using fallback pricing from pricing.json.', 'success');
                 } else {
