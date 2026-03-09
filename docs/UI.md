@@ -13,13 +13,14 @@ The app supports **dark mode** (default) and **light mode**. You can switch betw
 
 ## KPI summary cards
 
-On the **Home** tab, at the top of the page (above the pricing grid), three **KPI cards** give quick insights:
+On the **Home** tab, at the top of the page (above the pricing grid), four **KPI cards** give quick insights across all service providers:
 
 | Card | Content |
 |------|---------|
-| **Total Models** | Total number of models across all providers. Subtitle: **Providers: N** (e.g. 4 for Gemini, OpenAI, Anthropic, Mistral). |
-| **Cheapest Input** | Model name with the lowest input price per 1M tokens (among models that have a non-zero input price). Subtitle: **$X.XX / 1M**. |
-| **Cheapest Output** | Model name with the lowest output price per 1M tokens (among models that have a non-zero output price). Subtitle: **$X.XX / 1M**. |
+| **Total Models** | Total number of models across all providers (Gemini, OpenAI, Anthropic, Mistral). |
+| **Cheapest** | Model with the lowest blended cost (70% input + 30% output per 1M tokens). Subtitle: **$X.XX / 1M blended** or **Free**. |
+| **Costliest** | Model with the highest blended cost per 1M tokens. Subtitle: **$X.XX / 1M blended**. |
+| **Largest context** | Model with the largest context window. Subtitle: context size (e.g. **1M**, **128k**). |
 
 The cards use the same data as the pricing tables and update whenever pricing is loaded or refreshed (e.g. after **Refresh from web** or when applying a history snapshot). Implementation: `updateKPIs(data)` in `src/render.js` is called from `renderTables(data)`; markup is in `index.html` (`.kpi-container`, `.kpi-card`); styles in `css/styles.css` (including `[data-theme="light"]` overrides).
 

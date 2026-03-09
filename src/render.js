@@ -98,28 +98,32 @@ export function renderTables(data) {
 }
 
 /**
- * Update KPI cards: total models, provider count, cheapest input, cheapest output.
+ * Update KPI cards: total models, cheapest (by blended), costliest (by blended), largest context.
  */
 export function updateKPIs(data) {
   const all = getAllModels(data);
   const modelCountEl = document.getElementById('kpiModelCount');
-  const providerCountEl = document.getElementById('kpiProviderCount');
-  const cheapestInputEl = document.getElementById('kpiCheapestInput');
-  const cheapestInputPriceEl = document.getElementById('kpiCheapestInputPrice');
-  const cheapestOutputEl = document.getElementById('kpiCheapestOutput');
-  const cheapestOutputPriceEl = document.getElementById('kpiCheapestOutputPrice');
-  if (modelCountEl) modelCountEl.textContent = String(all.length);
-  const providerCount = new Set(all.map((m) => m.provider)).size;
-  if (providerCountEl) providerCountEl.textContent = `Providers: ${providerCount}`;
+  const cheapestEl = document.getElementById('kpiCheapest');
+  const cheapestPriceEl = document.getElementById('kpiCheapestPrice');
+  const costliestEl = document.getElementById('kpiCostliest');
+  const costliestPriceEl = document.getElementById('kpiCostliestPrice');
+  const largestContextEl = document.getElementById('kpiLargestContext');
+  const largestContextSizeEl = document.getElementById('kpiLargestContextSize');
 
-  const withInput = all.filter((m) => m.input > 0).sort((a, b) => a.input - b.input);
-  const withOutput = all.filter((m) => m.output > 0).sort((a, b) => a.output - b.output);
-  const cheapestIn = withInput[0];
-  const cheapestOut = withOutput[0];
-  if (cheapestInputEl) cheapestInputEl.textContent = cheapestIn ? cheapestIn.name : '—';
-  if (cheapestInputPriceEl) cheapestInputPriceEl.textContent = cheapestIn ? `$${Number(cheapestIn.input).toFixed(2)} / 1M` : '— / 1M';
-  if (cheapestOutputEl) cheapestOutputEl.textContent = cheapestOut ? cheapestOut.name : '—';
-  if (cheapestOutputPriceEl) cheapestOutputPriceEl.textContent = cheapestOut ? `$${Number(cheapestOut.output).toFixed(2)} / 1M` : '— / 1M';
+  if (modelCountEl) modelCountEl.textContent = String(all.length);
+
+  const byBlended = [...all].filter((m) => m.blended >= 0).sort((a, b) => a.blended - b.blended);
+  const cheapest = byBlended[0];
+  const costliest = byBlended.length ? byBlended[byBlended.length - 1] : null;
+  if (cheapestEl) cheapestEl.textContent = cheapest ? cheapest.name : '—';
+  if (cheapestPriceEl) cheapestPriceEl.textContent = cheapest ? (cheapest.blended === 0 ? 'Free' : `$${Number(cheapest.blended).toFixed(2)} / 1M blended`) : '—';
+  if (costliestEl) costliestEl.textContent = costliest ? costliest.name : '—';
+  if (costliestPriceEl) costliestPriceEl.textContent = costliest ? `$${Number(costliest.blended).toFixed(2)} / 1M blended` : '—';
+
+  const byContext = [...all].filter((m) => m.contextTokens > 0).sort((a, b) => b.contextTokens - a.contextTokens);
+  const largestCtx = byContext[0];
+  if (largestContextEl) largestContextEl.textContent = largestCtx ? largestCtx.name : '—';
+  if (largestContextSizeEl) largestContextSizeEl.textContent = largestCtx ? (largestCtx.contextWindow || String(largestCtx.contextTokens)) : '—';
 }
 
 /**
