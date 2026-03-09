@@ -2201,17 +2201,17 @@
                 }
             }
             try {
-                const res = await fetch('https://vizra.ai/api/v1/pricing/ai-models', { cache: 'no-store' });
-                if (!res.ok) return;
+                const res = await fetch(VIZRA_PRICING_URL, { cache: 'no-store' });
+                if (!res.ok) throw new Error('API ' + res.status);
                 let data;
                 try {
                     data = await res.json();
                 } catch (_) {
-                    return;
+                    throw new Error('Invalid JSON');
                 }
-                if (!data || typeof data !== 'object') return;
+                if (!data || typeof data !== 'object') throw new Error('Invalid response');
                 const parsed = parseVizraResponse(data);
-                if (!parsed || !Array.isArray(parsed.anthropic) || !Array.isArray(parsed.mistral)) return;
+                if (!parsed || !Array.isArray(parsed.anthropic) || !Array.isArray(parsed.mistral)) throw new Error('Could not parse');
                 let updated = false;
                 if (anthropicData.length === 0 && parsed.anthropic.length > 0) {
                     anthropicData = parsed.anthropic;
@@ -2226,10 +2226,34 @@
                     const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
                 }
-            } catch (_) {}
+            } catch (err) {
+                console.warn('Vizra API failed, using fallback:', err && err.message);
+                const applied = await applyFallbackPricingFromFile();
+                if (applied) {
+                    renderTables();
+                    const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
+                }
+            }
         }
 
         const VIZRA_PRICING_URL = 'https://vizra.ai/api/v1/pricing/ai-models';
+
+        async function applyFallbackPricingFromFile() {
+            try {
+                const res = await fetch('pricing.json', { cache: 'no-store' });
+                if (!res.ok) return false;
+                const data = await res.json();
+                if (!data || typeof data !== 'object') return false;
+                geminiData = (data.gemini && data.gemini.length) ? data.gemini : geminiData.length ? geminiData : DEFAULT_PRICING.gemini.slice();
+                openaiData = (data.openai && data.openai.length) ? data.openai : openaiData.length ? openaiData : DEFAULT_PRICING.openai.slice();
+                anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : anthropicData.length ? anthropicData : (DEFAULT_PRICING.anthropic || []).slice();
+                mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : mistralData.length ? mistralData : (DEFAULT_PRICING.mistral || []).slice();
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
 
         function normalizeProvider(p) {
             if (p == null || p === '') return '';
@@ -2365,12 +2389,20 @@
                     }
                 }
             } catch (e) {
+                console.warn('Vizra API failed:', e && e.message);
                 geminiData = previous.gemini;
                 openaiData = previous.openai;
                 anthropicData = previous.anthropic;
                 mistralData = previous.mistral;
-                renderTables();
-                showToast('Refresh failed: ' + (e.message || 'network error') + '. Kept current pricing.', 'error');
+                const fallbackApplied = await applyFallbackPricingFromFile();
+                if (fallbackApplied) {
+                    setLastUpdated((new Date().toISOString().slice(0, 10)) + ' (fallback)');
+                    renderTables();
+                    showToast('API unavailable. Using fallback pricing from pricing.json.', 'success');
+                } else {
+                    renderTables();
+                    showToast('Refresh failed: ' + (e.message || 'network error') + '. Kept current pricing.', 'error');
+                }
             } finally {
                 btn.disabled = false;
                 icon.classList.remove('spinning');
