@@ -1825,13 +1825,18 @@
                 try {
                     const vizraRes = await fetch(VIZRA_PRICING_URL);
                     if (vizraRes.ok) {
-                        const vizraData = await vizraRes.json();
-                        const parsed = parseVizraResponse(vizraData);
-                        if (parsed.gemini.length > 0 || parsed.openai.length > 0) {
-                            g = parsed.gemini.length ? parsed.gemini : g;
-                            o = parsed.openai.length ? parsed.openai : o;
-                            a = parsed.anthropic.length ? parsed.anthropic : a;
-                            m = parsed.mistral.length ? parsed.mistral : m;
+                        let vizraData;
+                        try {
+                            vizraData = await vizraRes.json();
+                        } catch (_) {}
+                        if (vizraData && typeof vizraData === 'object') {
+                            const parsed = parseVizraResponse(vizraData);
+                            if (parsed && (parsed.gemini.length > 0 || parsed.openai.length > 0)) {
+                                g = parsed.gemini.length ? parsed.gemini : g;
+                                o = parsed.openai.length ? parsed.openai : o;
+                                a = parsed.anthropic.length ? parsed.anthropic : a;
+                                m = parsed.mistral.length ? parsed.mistral : m;
+                            }
                         }
                     }
                 } catch (_) {}
@@ -2061,28 +2066,37 @@
 
         async function loadPricing() {
             let lastUpdatedStr = null;
+            let usedFallback = null;
             try {
                 const res = await fetch('pricing.json', { cache: 'no-store' });
-                if (res.ok) {
-                    const data = await res.json();
-                    geminiData = (data.gemini && data.gemini.length) ? data.gemini : DEFAULT_PRICING.gemini.slice();
-                    openaiData = (data.openai && data.openai.length) ? data.openai : DEFAULT_PRICING.openai.slice();
-                    anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : (DEFAULT_PRICING.anthropic || []).slice();
-                    mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : (DEFAULT_PRICING.mistral || []).slice();
-                    lastUpdatedStr = data.updated || 'from pricing.json';
-                    setLastUpdated(lastUpdatedStr);
-                } else throw new Error('Not found');
+                if (!res.ok) throw new Error('pricing.json ' + res.status);
+                let data;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    throw new Error('Invalid JSON from pricing.json');
+                }
+                if (!data || typeof data !== 'object') throw new Error('Invalid pricing data');
+                geminiData = (data.gemini && data.gemini.length) ? data.gemini : DEFAULT_PRICING.gemini.slice();
+                openaiData = (data.openai && data.openai.length) ? data.openai : DEFAULT_PRICING.openai.slice();
+                anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : (DEFAULT_PRICING.anthropic || []).slice();
+                mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : (DEFAULT_PRICING.mistral || []).slice();
+                lastUpdatedStr = data.updated || 'from pricing.json';
+                setLastUpdated(lastUpdatedStr);
             } catch (_) {
                 try {
                     const cached = localStorage.getItem(STORAGE_KEY);
                     if (cached) {
                         const data = JSON.parse(cached);
-                        geminiData = (data.gemini && data.gemini.length) ? data.gemini : DEFAULT_PRICING.gemini.slice();
-                        openaiData = (data.openai && data.openai.length) ? data.openai : DEFAULT_PRICING.openai.slice();
-                        anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : (DEFAULT_PRICING.anthropic || []).slice();
-                        mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : (DEFAULT_PRICING.mistral || []).slice();
-                        lastUpdatedStr = (data.updated || 'cached') + ' (from web)';
-                        setLastUpdated(lastUpdatedStr);
+                        if (data && typeof data === 'object') {
+                            geminiData = (data.gemini && data.gemini.length) ? data.gemini : DEFAULT_PRICING.gemini.slice();
+                            openaiData = (data.openai && data.openai.length) ? data.openai : DEFAULT_PRICING.openai.slice();
+                            anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : (DEFAULT_PRICING.anthropic || []).slice();
+                            mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : (DEFAULT_PRICING.mistral || []).slice();
+                            lastUpdatedStr = (data.updated || 'cached') + ' (from web)';
+                            setLastUpdated(lastUpdatedStr);
+                            usedFallback = 'cache';
+                        } else throw new Error('Invalid cache');
                     } else throw new Error('No cache');
                 } catch (_) {
                     geminiData = DEFAULT_PRICING.gemini.slice();
@@ -2090,12 +2104,15 @@
                     anthropicData = (DEFAULT_PRICING.anthropic || []).slice();
                     mistralData = (DEFAULT_PRICING.mistral || []).slice();
                     setLastUpdated('embedded default');
+                    usedFallback = 'default';
                 }
             }
             renderTables();
             cleanupHistoryToDailyOnly();
             maybeRunDailyCapture();
             fillMissingProvidersFromVizra();
+            if (usedFallback === 'cache') showToast('Loaded pricing from local cache (file unavailable).', 'success');
+            if (usedFallback === 'default') showToast('Using embedded default pricing (no file or cache).', 'success');
         }
 
         async function fillMissingProvidersFromVizra() {
@@ -2103,8 +2120,15 @@
             try {
                 const res = await fetch('https://vizra.ai/api/v1/pricing/ai-models', { cache: 'no-store' });
                 if (!res.ok) return;
-                const data = await res.json();
+                let data;
+                try {
+                    data = await res.json();
+                } catch (_) {
+                    return;
+                }
+                if (!data || typeof data !== 'object') return;
                 const parsed = parseVizraResponse(data);
+                if (!parsed || !Array.isArray(parsed.anthropic) || !Array.isArray(parsed.mistral)) return;
                 let updated = false;
                 if (anthropicData.length === 0 && parsed.anthropic.length > 0) {
                     anthropicData = parsed.anthropic;
@@ -2143,18 +2167,28 @@
         async function refreshFromWeb() {
             const btn = document.getElementById('refreshWebBtn');
             const icon = document.getElementById('refreshIcon');
+            const previous = { gemini: geminiData.slice(), openai: openaiData.slice(), anthropic: anthropicData.slice(), mistral: mistralData.slice() };
             btn.disabled = true;
             icon.classList.add('spinning');
             try {
                 const vizraRes = await fetch(VIZRA_PRICING_URL);
                 if (!vizraRes.ok) throw new Error('Vizra API ' + vizraRes.status);
-                const vizraData = await vizraRes.json();
+                let vizraData;
+                try {
+                    vizraData = await vizraRes.json();
+                } catch (e) {
+                    throw new Error('Invalid JSON from API');
+                }
+                if (!vizraData || typeof vizraData !== 'object') throw new Error('Invalid API response');
                 const parsed = parseVizraResponse(vizraData);
+                if (!parsed || typeof parsed !== 'object') throw new Error('Could not parse pricing');
                 if (parsed.gemini.length > 0 || parsed.openai.length > 0) {
                     geminiData = parsed.gemini.length ? parsed.gemini : geminiData;
                     openaiData = parsed.openai.length ? parsed.openai : openaiData;
                     anthropicData = parsed.anthropic.length ? parsed.anthropic : anthropicData;
                     mistralData = parsed.mistral.length ? parsed.mistral : mistralData;
+                } else {
+                    throw new Error('No pricing data in response');
                 }
                 const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: new Date().toISOString().slice(0, 10) };
                 try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
@@ -2162,7 +2196,12 @@
                 renderTables();
                 showToast('Pricing updated from Vizra API.', 'success');
             } catch (e) {
-                showToast('Refresh failed: ' + (e.message || 'network error') + '. Try again or use cached data.', 'error');
+                geminiData = previous.gemini;
+                openaiData = previous.openai;
+                anthropicData = previous.anthropic;
+                mistralData = previous.mistral;
+                renderTables();
+                showToast('Refresh failed: ' + (e.message || 'network error') + '. Kept current pricing.', 'error');
             } finally {
                 btn.disabled = false;
                 icon.classList.remove('spinning');
