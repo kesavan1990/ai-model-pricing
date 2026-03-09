@@ -1,38 +1,516 @@
 {
-  "updated": "2025-03-04",
+  "updated": "2026-03-09",
   "gemini": [
-    { "name": "Gemini 3.1 Pro", "input": 2.00, "output": 12.00, "badge": "Latest" },
-    { "name": "Gemini 3.1 Flash-Lite", "input": 0.25, "output": 1.50, "badge": "Latest" },
-    { "name": "Gemini 3 Flash", "input": 0.50, "output": 3.00 },
-    { "name": "Gemini 2.5 Pro", "input": 1.25, "output": 5.00 },
-    { "name": "Gemini 2.5 Flash", "input": 0.075, "output": 0.30 },
-    { "name": "Gemini 2.0 Flash", "input": 0, "output": 0, "badge": "Free" },
-    { "name": "Gemini 2.0 Flash-Lite", "input": 0, "output": 0, "badge": "Preview" },
-    { "name": "Gemini 1.5 Pro", "input": 1.25, "output": 5.00 },
-    { "name": "Gemini 1.5 Flash", "input": 0.075, "output": 0.30 },
-    { "name": "Gemini 1.5 Flash-8B", "input": 0.0375, "output": 0.15 }
+    {
+      "name": "Gemini 3.1 Flash-Lite",
+      "input": 3.1,
+      "output": 0
+    },
+    {
+      "name": "Gemini 3.1 Pro",
+      "input": 3.1,
+      "output": 3.1
+    },
+    {
+      "name": "Gemini 3.1 Flash",
+      "input": 3.1,
+      "output": 3.1
+    },
+    {
+      "name": "Gemini 3 Pro",
+      "input": 3.1,
+      "output": 0
+    },
+    {
+      "name": "Gemini 2.5 Flash-Lite",
+      "input": 0.1,
+      "output": 0.01
+    },
+    {
+      "name": "Gemini 2.5 Flash",
+      "input": 0.1,
+      "output": 0.01
+    },
+    {
+      "name": "Gemini 2.0 Flash",
+      "input": 0.1,
+      "output": 0
+    },
+    {
+      "name": "Gemini 2.5",
+      "input": 35,
+      "output": 14
+    },
+    {
+      "name": "Gemini 3",
+      "input": 14,
+      "output": 0
+    },
+    {
+      "name": "Custom Tools endpoint (Gemini 3.1 Pro Preview)",
+      "input": 0,
+      "output": 3.1
+    },
+    {
+      "name": "Gemini 3 Flash",
+      "input": 3,
+      "output": 0
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "input": 2.5,
+      "output": 0
+    },
+    {
+      "name": "Gemini 2.0 Flash-Lite",
+      "input": 2,
+      "output": 0
+    }
   ],
   "openai": [
-    { "name": "gpt-5.2", "input": 1.75, "cachedInput": 0.175, "output": 14.00, "badge": "Latest" },
-    { "name": "gpt-5.1", "input": 1.25, "cachedInput": 0.125, "output": 10.00 },
-    { "name": "gpt-5", "input": 1.25, "cachedInput": 0.125, "output": 10.00 },
-    { "name": "gpt-5.2-pro", "input": 21.00, "output": 168.00 },
-    { "name": "gpt-5-pro", "input": 15.00, "output": 120.00 },
-    { "name": "gpt-5-mini", "input": 0.25, "cachedInput": 0.025, "output": 2.00 },
-    { "name": "gpt-5-nano", "input": 0.05, "cachedInput": 0.005, "output": 0.40 },
-    { "name": "gpt-4.1", "input": 2.00, "cachedInput": 0.50, "output": 8.00 },
-    { "name": "gpt-4.1-mini", "input": 0.40, "cachedInput": 0.10, "output": 1.60 },
-    { "name": "gpt-4.1-nano", "input": 0.10, "cachedInput": 0.025, "output": 0.40 },
-    { "name": "gpt-4o", "input": 2.50, "cachedInput": 1.25, "output": 10.00 },
-    { "name": "gpt-4o-mini", "input": 0.15, "cachedInput": 0.075, "output": 0.60 },
-    { "name": "o1", "input": 15.00, "cachedInput": 7.50, "output": 60.00 },
-    { "name": "o1-mini", "input": 1.10, "cachedInput": 0.55, "output": 4.40 },
-    { "name": "o3-pro", "input": 20.00, "output": 80.00 },
-    { "name": "o3", "input": 2.00, "cachedInput": 0.50, "output": 8.00 },
-    { "name": "o3-mini", "input": 1.10, "cachedInput": 0.55, "output": 4.40 },
-    { "name": "o4-mini", "input": 1.10, "cachedInput": 0.275, "output": 4.40 },
-    { "name": "text-embedding-3-small", "input": 0.02, "output": 0 },
-    { "name": "text-embedding-3-large", "input": 0.13, "output": 0 },
-    { "name": "text-embedding-ada-002", "input": 0.10, "output": 0 }
+    {
+      "name": "gpt-5.4 (&lt;272K context length)",
+      "input": 5,
+      "output": 30,
+      "cachedInput": 0.5
+    },
+    {
+      "name": "gpt-5.4-pro (&lt;272K context length)",
+      "input": 30,
+      "output": 180,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-5.2",
+      "input": 3.5,
+      "output": 28,
+      "cachedInput": 0.35
+    },
+    {
+      "name": "gpt-5.1",
+      "input": 2.5,
+      "output": 20,
+      "cachedInput": 0.25
+    },
+    {
+      "name": "gpt-5",
+      "input": 2.5,
+      "output": 20,
+      "cachedInput": 0.25
+    },
+    {
+      "name": "gpt-5-mini",
+      "input": 0.45,
+      "output": 3.6,
+      "cachedInput": 0.045
+    },
+    {
+      "name": "gpt-5-nano",
+      "input": 0.05,
+      "output": 0.4,
+      "cachedInput": 0.005
+    },
+    {
+      "name": "gpt-5.2-pro",
+      "input": 21,
+      "output": 168,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-5-pro",
+      "input": 15,
+      "output": 120,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4.1",
+      "input": 3.5,
+      "output": 14,
+      "cachedInput": 0.875
+    },
+    {
+      "name": "gpt-4.1-mini",
+      "input": 0.7,
+      "output": 2.8,
+      "cachedInput": 0.175
+    },
+    {
+      "name": "gpt-4.1-nano",
+      "input": 0.2,
+      "output": 0.8,
+      "cachedInput": 0.05
+    },
+    {
+      "name": "gpt-4o",
+      "input": 4.25,
+      "output": 17,
+      "cachedInput": 2.125
+    },
+    {
+      "name": "gpt-4o-2024-05-13",
+      "input": 8.75,
+      "output": 26.25,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4o-mini",
+      "input": 0.25,
+      "output": 1,
+      "cachedInput": 0.125
+    },
+    {
+      "name": "o1",
+      "input": 15,
+      "output": 60,
+      "cachedInput": 7.5
+    },
+    {
+      "name": "o1-pro",
+      "input": 150,
+      "output": 600,
+      "cachedInput": null
+    },
+    {
+      "name": "o3-pro",
+      "input": 20,
+      "output": 80,
+      "cachedInput": null
+    },
+    {
+      "name": "o3",
+      "input": 3.5,
+      "output": 14,
+      "cachedInput": 0.875
+    },
+    {
+      "name": "o3-deep-research",
+      "input": 10,
+      "output": 40,
+      "cachedInput": 2.5
+    },
+    {
+      "name": "o4-mini",
+      "input": 2,
+      "output": 8,
+      "cachedInput": 0.5
+    },
+    {
+      "name": "o4-mini-deep-research",
+      "input": 2,
+      "output": 8,
+      "cachedInput": 0.5
+    },
+    {
+      "name": "o3-mini",
+      "input": 1.1,
+      "output": 4.4,
+      "cachedInput": 0.55
+    },
+    {
+      "name": "o1-mini",
+      "input": 1.1,
+      "output": 4.4,
+      "cachedInput": 0.55
+    },
+    {
+      "name": "gpt-5.4 (&gt;272K context length)",
+      "input": 5,
+      "output": 22.5,
+      "cachedInput": 0.5
+    },
+    {
+      "name": "gpt-5.4-pro (&gt;272K context length)",
+      "input": 60,
+      "output": 270,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-5.3-chat-latest",
+      "input": 1.75,
+      "output": 14,
+      "cachedInput": 0.175
+    },
+    {
+      "name": "gpt-5.2-chat-latest",
+      "input": 1.75,
+      "output": 14,
+      "cachedInput": 0.175
+    },
+    {
+      "name": "gpt-5.1-chat-latest",
+      "input": 1.25,
+      "output": 10,
+      "cachedInput": 0.125
+    },
+    {
+      "name": "gpt-5-chat-latest",
+      "input": 1.25,
+      "output": 10,
+      "cachedInput": 0.125
+    },
+    {
+      "name": "gpt-5.3-codex",
+      "input": 3.5,
+      "output": 28,
+      "cachedInput": 0.35
+    },
+    {
+      "name": "gpt-5.2-codex",
+      "input": 3.5,
+      "output": 28,
+      "cachedInput": 0.35
+    },
+    {
+      "name": "gpt-5.1-codex-max",
+      "input": 2.5,
+      "output": 20,
+      "cachedInput": 0.25
+    },
+    {
+      "name": "gpt-5.1-codex",
+      "input": 2.5,
+      "output": 20,
+      "cachedInput": 0.25
+    },
+    {
+      "name": "gpt-5-codex",
+      "input": 2.5,
+      "output": 20,
+      "cachedInput": 0.25
+    },
+    {
+      "name": "gpt-4o-mini-audio-preview",
+      "input": 10,
+      "output": 20,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-5.1-codex-mini",
+      "input": 0.25,
+      "output": 2,
+      "cachedInput": 0.025
+    },
+    {
+      "name": "gpt-5-search-api",
+      "input": 1.25,
+      "output": 10,
+      "cachedInput": 0.125
+    },
+    {
+      "name": "gpt-4o-mini-search-preview",
+      "input": 0.15,
+      "output": 0.6,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4o-search-preview",
+      "input": 2.5,
+      "output": 10,
+      "cachedInput": null
+    },
+    {
+      "name": "o4-mini-2025-04-16",
+      "input": 100,
+      "output": 1,
+      "cachedInput": 4
+    },
+    {
+      "name": "o4-mini-2025-04-16with data sharing",
+      "input": 100,
+      "output": 0.5,
+      "cachedInput": 2
+    },
+    {
+      "name": "gpt-4.1-2025-04-14",
+      "input": 25,
+      "output": 0.75,
+      "cachedInput": 3
+    },
+    {
+      "name": "gpt-4.1-mini-2025-04-14",
+      "input": 5,
+      "output": 0.2,
+      "cachedInput": 0.8
+    },
+    {
+      "name": "gpt-4.1-nano-2025-04-14",
+      "input": 1.5,
+      "output": 0.05,
+      "cachedInput": 0.2
+    },
+    {
+      "name": "gpt-4o-2024-08-06",
+      "input": 25,
+      "output": 1.875,
+      "cachedInput": 3.75
+    },
+    {
+      "name": "gpt-4o-mini-2024-07-18",
+      "input": 3,
+      "output": 0.15,
+      "cachedInput": 0.3
+    },
+    {
+      "name": "gpt-3.5-turbo",
+      "input": 0.5,
+      "output": 1.5,
+      "cachedInput": null
+    },
+    {
+      "name": "davinci-002",
+      "input": 2,
+      "output": 2,
+      "cachedInput": null
+    },
+    {
+      "name": "babbage-002",
+      "input": 0.4,
+      "output": 0.4,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4o-mini-tts",
+      "input": 0,
+      "output": 0.015,
+      "cachedInput": 12
+    },
+    {
+      "name": "gpt-4o-transcribe",
+      "input": 2.5,
+      "output": 0.006,
+      "cachedInput": 10
+    },
+    {
+      "name": "gpt-4o-transcribe-diarize",
+      "input": 2.5,
+      "output": 0.006,
+      "cachedInput": 10
+    },
+    {
+      "name": "gpt-4o-mini-transcribe",
+      "input": 1.25,
+      "output": 0.003,
+      "cachedInput": 5
+    },
+    {
+      "name": "GPT Image 1.5",
+      "input": 0,
+      "output": 0.013,
+      "cachedInput": 0.009
+    },
+    {
+      "name": "GPT Image Latest",
+      "input": 0,
+      "output": 0.013,
+      "cachedInput": 0.009
+    },
+    {
+      "name": "GPT Image 1",
+      "input": 0,
+      "output": 0.016,
+      "cachedInput": 0.011
+    },
+    {
+      "name": "GPT Image 1 Mini",
+      "input": 0,
+      "output": 0.006,
+      "cachedInput": 0.005
+    },
+    {
+      "name": "text-embedding-3-small",
+      "input": 0.02,
+      "output": 0,
+      "cachedInput": null
+    },
+    {
+      "name": "text-embedding-3-large",
+      "input": 0.13,
+      "output": 0,
+      "cachedInput": null
+    },
+    {
+      "name": "text-embedding-ada-002",
+      "input": 0.1,
+      "output": 0,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-turbo-2024-04-09",
+      "input": 10,
+      "output": 30,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-0125-preview",
+      "input": 10,
+      "output": 30,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-1106-preview",
+      "input": 10,
+      "output": 30,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-1106-vision-preview",
+      "input": 10,
+      "output": 30,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-0613",
+      "input": 30,
+      "output": 60,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-0314",
+      "input": 30,
+      "output": 60,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-4-32k",
+      "input": 60,
+      "output": 120,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-3.5-turbo-0125",
+      "input": 0.5,
+      "output": 1.5,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-3.5-turbo-1106",
+      "input": 1,
+      "output": 2,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-3.5-turbo-0613",
+      "input": 1.5,
+      "output": 2,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-3.5-0301",
+      "input": 1.5,
+      "output": 2,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-3.5-turbo-16k-0613",
+      "input": 3,
+      "output": 4,
+      "cachedInput": null
+    },
+    {
+      "name": "gpt-3.5-turbo-instruct",
+      "input": 1.5,
+      "output": 2,
+      "cachedInput": null
+    }
   ]
 }
