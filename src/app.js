@@ -314,9 +314,9 @@ function runHistoryCompare() {
     : '<tr><td class="history-no-data" colspan="6">No Mistral data in selected snapshots</td></tr>';
   resultEl.innerHTML = `
     <h4>Google Gemini</h4>
-    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead><tbody>${geminiRows.join('')}</tbody></table>
+    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead><tbody>${geminiRows}</tbody></table>
     <h4>OpenAI</h4>
-    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Cached</th><th>Output</th><th>Input (${toDateStr})</th><th>Cached</th><th>Output</th><th>Change</th></tr></thead><tbody>${openaiRows.join('')}</tbody></table>
+    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Cached</th><th>Output</th><th>Input (${toDateStr})</th><th>Cached</th><th>Output</th><th>Change</th></tr></thead><tbody>${openaiRows}</tbody></table>
     <h4>Anthropic</h4>
     <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead><tbody>${anthropicRows}</tbody></table>
     <h4>Mistral</h4>
