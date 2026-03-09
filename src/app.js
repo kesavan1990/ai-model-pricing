@@ -304,8 +304,8 @@ function runHistoryCompare() {
       ? `<tr><td class="model-name">${modelName}</td><td>${in1}</td><td>${c1}</td><td>${out1}</td><td>${in2}</td><td>${c2}</td><td>${out2}</td><td>${change}</td></tr>`
       : `<tr><td class="model-name">${modelName}</td><td>${in1}</td><td>${out1}</td><td>${in2}</td><td>${out2}</td><td>${change}</td></tr>`;
   };
-  const geminiRows = allGemini.map((n) => row(n, gFrom[n], gTo[n])).join('');
-  const openaiRows = allOpenai.map((n) => row(n, oFrom[n], oTo[n], true)).join('');
+  const geminiRows = allGemini.map((n) => row(n, gFrom[n], gTo[n]));
+  const openaiRows = allOpenai.map((n) => row(n, oFrom[n], oTo[n], true));
   const anthropicRows = allAnthropic.length
     ? allAnthropic.map((n) => row(n, aFrom[n], aTo[n])).join('')
     : '<tr><td class="history-no-data" colspan="6">No Anthropic data in selected snapshots</td></tr>';
@@ -314,9 +314,9 @@ function runHistoryCompare() {
     : '<tr><td class="history-no-data" colspan="6">No Mistral data in selected snapshots</td></tr>';
   resultEl.innerHTML = `
     <h4>Google Gemini</h4>
-    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead><tbody>${geminiRows}</tbody></table>
+    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead><tbody>${Array.isArray(geminiRows) ? geminiRows.join('') : geminiRows}</tbody></table>
     <h4>OpenAI</h4>
-    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Cached</th><th>Output</th><th>Input (${toDateStr})</th><th>Cached</th><th>Output</th><th>Change</th></tr></thead><tbody>${openaiRows}</tbody></table>
+    <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Cached</th><th>Output</th><th>Input (${toDateStr})</th><th>Cached</th><th>Output</th><th>Change</th></tr></thead><tbody>${Array.isArray(openaiRows) ? openaiRows.join('') : openaiRows}</tbody></table>
     <h4>Anthropic</h4>
     <table class="model-table"><thead><tr><th>Model</th><th>Input (${fromDateStr})</th><th>Output (${fromDateStr})</th><th>Input (${toDateStr})</th><th>Output (${toDateStr})</th><th>Change</th></tr></thead><tbody>${anthropicRows}</tbody></table>
     <h4>Mistral</h4>
