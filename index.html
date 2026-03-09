@@ -170,6 +170,16 @@
         <section class="page-section" id="section-comparison">
             <h2 class="section-title">📋 Model comparison</h2>
             <p class="section-subtitle">All models in one table: Model, Provider, Input and Output per 1M tokens, Context window.</p>
+            <div class="provider-filter-wrap">
+                <span class="provider-filter-label">Filter by provider:</span>
+                <div class="provider-filter-btns" role="group" aria-label="Filter by provider">
+                    <button type="button" class="provider-filter-btn active" data-provider="all" aria-pressed="true">All</button>
+                    <button type="button" class="provider-filter-btn" data-provider="gemini" aria-pressed="false">Google</button>
+                    <button type="button" class="provider-filter-btn" data-provider="openai" aria-pressed="false">OpenAI</button>
+                    <button type="button" class="provider-filter-btn" data-provider="anthropic" aria-pressed="false">Anthropic</button>
+                    <button type="button" class="provider-filter-btn" data-provider="mistral" aria-pressed="false">Mistral</button>
+                </div>
+            </div>
             <div class="pricing-table-scroll">
                 <table class="model-table model-comparison-table" aria-label="Model comparison">
                     <thead>

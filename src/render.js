@@ -92,9 +92,14 @@ export function renderTables(data) {
     const opts = unified.map((u) => `<option value="${u.key}">${u.label}</option>`).join('');
     calcCompareSel.innerHTML = '<option value="">— None —</option>' + opts;
   }
-  renderModelComparisonTable(data);
+  renderModelComparisonTable(data, comparisonProviderFilter);
   renderBenchmarkDashboard(data);
   updateKPIs(data);
+}
+
+let comparisonProviderFilter = 'all';
+export function setComparisonProviderFilter(provider) {
+  comparisonProviderFilter = provider || 'all';
 }
 
 /**
@@ -128,18 +133,27 @@ export function updateKPIs(data) {
 
 /**
  * Render the unified model comparison table: Model | Provider | Input | Output | Context.
+ * Optional providerFilter: 'all' | 'gemini' | 'openai' | 'anthropic' | 'mistral'. Highlights cheapest row by blended cost.
  */
-export function renderModelComparisonTable(data) {
+export function renderModelComparisonTable(data, providerFilter) {
   const tbody = document.getElementById('model-comparison-tbody');
   if (!tbody) return;
-  const all = getAllModels(data);
+  let list = getAllModels(data);
+  if (providerFilter && providerFilter !== 'all') {
+    list = list.filter((m) => m.providerKey === providerFilter);
+  }
   const fmt = (v) => (v === 0 ? 'Free' : '$' + Number(v).toFixed(2));
-  const rows = all
+  const withBlended = list.filter((m) => m.blended >= 0);
+  const cheapestModel = withBlended.length ? withBlended.reduce((min, m) => (m.blended < min.blended ? m : min), withBlended[0]) : null;
+  const rows = list
     .map((m) => {
       const inp = fmt(m.input);
       const out = fmt(m.output);
       const ctx = m.contextWindow || '—';
-      return `<tr><td class="model-name">${m.name}</td><td class="provider-name">${m.provider}</td><td class="price price-input">${inp}</td><td class="price price-output">${out}</td><td class="context-window">${ctx}</td></tr>`;
+      const isCheapest = cheapestModel && m.name === cheapestModel.name && m.providerKey === cheapestModel.providerKey;
+      const nameCell = isCheapest ? `${m.name} <span class="cheapest-badge" aria-label="Cheapest">🟢 Cheapest</span>` : m.name;
+      const rowClass = isCheapest ? 'cheapest' : '';
+      return `<tr class="${rowClass}"><td class="model-name">${nameCell}</td><td class="provider-name">${m.provider}</td><td class="price price-input">${inp}</td><td class="price price-output">${out}</td><td class="context-window">${ctx}</td></tr>`;
     })
     .join('');
   tbody.innerHTML = rows;

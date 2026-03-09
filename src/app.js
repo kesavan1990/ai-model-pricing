@@ -865,6 +865,18 @@ function init() {
       switchTab(link.getAttribute('data-tab'));
     });
   });
+  document.querySelector('.provider-filter-btns')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.provider-filter-btn');
+    if (!btn) return;
+    const provider = btn.getAttribute('data-provider') || 'all';
+    render.setComparisonProviderFilter(provider);
+    document.querySelectorAll('.provider-filter-btn').forEach((b) => {
+      const isActive = b.getAttribute('data-provider') === provider;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+    render.renderModelComparisonTable(getData(), provider);
+  });
   const hash = (location.hash || '').replace(/^#/, '');
   if (hash.startsWith('calc-')) {
     switchTab('calculators');
