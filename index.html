@@ -2268,7 +2268,8 @@
         function normalizePrice(price, unit) {
             if (price == null || typeof price !== 'number' || isNaN(price)) return 0;
             const u = (unit || '').toLowerCase().trim();
-            if (u === '1k_tokens' || u === '1k') return price * 1000;
+            if (u === 'per_1k_tokens' || u === '1k_tokens' || u === '1k') return price * 1000;
+            if (u === 'per_token' || u === 'token' || u === 'per_tokens') return price * 1000000;
             return price;
         }
 
