@@ -2163,15 +2163,28 @@
             return p;
         }
 
+        function normalizePrice(price, unit) {
+            if (price == null || typeof price !== 'number' || isNaN(price)) return 0;
+            const u = (unit || '').toLowerCase().trim();
+            if (u === '1k_tokens' || u === '1k') return price * 1000;
+            return price;
+        }
+
         function normalizePricing(models) {
             if (!Array.isArray(models)) return [];
             return models.map(m => {
                 const raw = m || {};
-                const input = Number(raw.input_price_per_1m ?? raw.input_price_per_million ?? 0) || 0;
-                const output = Number(raw.output_price_per_1m ?? raw.output_price_per_million ?? 0) || 0;
-                const cached = raw.cached_price_per_1m != null || raw.cached_price_per_million != null
+                const inputUnit = raw.input_unit || raw.unit || '1m_tokens';
+                const outputUnit = raw.output_unit || raw.unit || '1m_tokens';
+                const cachedUnit = raw.cached_unit || raw.unit || '1m_tokens';
+                const inputRaw = Number(raw.input_price_per_1m ?? raw.input_price_per_million ?? 0) || 0;
+                const outputRaw = Number(raw.output_price_per_1m ?? raw.output_price_per_million ?? 0) || 0;
+                const cachedRaw = raw.cached_price_per_1m != null || raw.cached_price_per_million != null
                     ? Number(raw.cached_price_per_1m ?? raw.cached_price_per_million ?? 0)
                     : null;
+                const input = normalizePrice(inputRaw, inputUnit);
+                const output = normalizePrice(outputRaw, outputUnit);
+                const cached = cachedRaw != null ? normalizePrice(cachedRaw, cachedUnit) : null;
                 return {
                     name: raw.model || raw.name || '',
                     provider: normalizeProvider(raw.provider),
