@@ -24,7 +24,7 @@ This app is **static** (HTML, CSS, JavaScript only). You can host it on any stat
 2. In the repo: **Settings → Pages → Source**: choose **main** branch, root folder.
 3. Your site will be at: `https://YOUR_USERNAME.github.io/YOUR_REPO/`
 
-**Automatic pricing updates (GitHub only):** The repo includes a GitHub Action (`.github/workflows/update-pricing.yml`) that runs **daily** in the cloud. It fetches the official Gemini and OpenAI pricing pages, parses them, and updates `pricing.json` in the repo. After it pushes, your GitHub Pages site serves the new file—no local Node or manual refresh needed. You can also run it manually from **Actions → Update pricing → Run workflow**.
+**Automatic pricing updates (GitHub only):** The repo includes a GitHub Action (`.github/workflows/update-pricing.yml`) that runs **daily** in the cloud. Flow: AI pricing docs → scraper script → GitHub Action → update `pricing.json` → commit to repo → frontend loads updated data. See [PRICING_UPDATES.md](PRICING_UPDATES.md) for details. You can also run it manually from **Actions → Update pricing → Run workflow**.
 
 ### 2. **Netlify** (drag-and-drop)
 

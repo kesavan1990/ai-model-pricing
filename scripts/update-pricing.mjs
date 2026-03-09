@@ -1,6 +1,7 @@
 /**
- * Fetches official Gemini & OpenAI pricing pages, parses them, and writes pricing.json.
- * Used by GitHub Actions for cloud-based pricing updates (no local Node needed for the site).
+ * Scraper script for the price-update flow:
+ *   AI pricing docs → this script → GitHub Action (daily) → pricing.json → commit → frontend.
+ * Fetches official Gemini & OpenAI pricing pages, parses them, writes pricing.json.
  * Run from repo root: node scripts/update-pricing.mjs
  */
 

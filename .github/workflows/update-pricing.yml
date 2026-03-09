@@ -1,5 +1,6 @@
-# Updates pricing.json by fetching official Gemini & OpenAI pricing pages.
-# Runs daily in the cloud; no local Node needed. Pushed file is used by GitHub Pages.
+# Price update flow: AI pricing docs → Scraper script → this workflow (daily) →
+# Update pricing.json → Commit to repo → Frontend loads updated data.
+# See repo root PRICING_UPDATES.md for full flow.
 name: Update pricing
 
 on:
