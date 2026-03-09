@@ -92,14 +92,18 @@ export function renderTables(data) {
     const opts = unified.map((u) => `<option value="${u.key}">${u.label}</option>`).join('');
     calcCompareSel.innerHTML = '<option value="">— None —</option>' + opts;
   }
-  renderModelComparisonTable(data, comparisonProviderFilter);
+  renderModelComparisonTable(data, comparisonProviderFilter, comparisonSortBy);
   renderBenchmarkDashboard(data);
   updateKPIs(data);
 }
 
 let comparisonProviderFilter = 'all';
+let comparisonSortBy = 'default';
 export function setComparisonProviderFilter(provider) {
   comparisonProviderFilter = provider || 'all';
+}
+export function setComparisonSortBy(sortBy) {
+  comparisonSortBy = sortBy || 'default';
 }
 
 /**
@@ -131,16 +135,36 @@ export function updateKPIs(data) {
   if (largestContextSizeEl) largestContextSizeEl.textContent = largestCtx ? (largestCtx.contextWindow || String(largestCtx.contextTokens)) : '—';
 }
 
+const PROVIDER_ORDER = ['gemini', 'openai', 'anthropic', 'mistral'];
+
 /**
  * Render the unified model comparison table: Model | Provider | Input | Output | Context.
- * Optional providerFilter: 'all' | 'gemini' | 'openai' | 'anthropic' | 'mistral'. Highlights cheapest row by blended cost.
+ * providerFilter: 'all' | 'gemini' | 'openai' | 'anthropic' | 'mistral'.
+ * sortBy: 'default' (group by provider, cheapest first) | 'input' | 'output' | 'context'. Highlights cheapest row when relevant.
  */
-export function renderModelComparisonTable(data, providerFilter) {
+export function renderModelComparisonTable(data, providerFilter, sortByArg) {
   const tbody = document.getElementById('model-comparison-tbody');
   if (!tbody) return;
+  const sortBy = sortByArg ?? comparisonSortBy;
+  const filter = providerFilter ?? comparisonProviderFilter;
   let list = getAllModels(data);
-  if (providerFilter && providerFilter !== 'all') {
-    list = list.filter((m) => m.providerKey === providerFilter);
+  if (filter && filter !== 'all') {
+    list = list.filter((m) => m.providerKey === filter);
+  }
+  const providerIndex = (m) => PROVIDER_ORDER.indexOf(m.providerKey);
+  if (sortBy === 'input') {
+    list = [...list].sort((a, b) => (a.input ?? 0) - (b.input ?? 0));
+  } else if (sortBy === 'output') {
+    list = [...list].sort((a, b) => (a.output ?? 0) - (b.output ?? 0));
+  } else if (sortBy === 'context') {
+    list = [...list].sort((a, b) => (b.contextTokens ?? 0) - (a.contextTokens ?? 0));
+  } else {
+    list = [...list].sort((a, b) => {
+      const groupA = providerIndex(a);
+      const groupB = providerIndex(b);
+      if (groupA !== groupB) return groupA - groupB;
+      return (a.blended ?? 0) - (b.blended ?? 0);
+    });
   }
   const fmt = (v) => (v === 0 ? 'Free' : '$' + Number(v).toFixed(2));
   const withBlended = list.filter((m) => m.blended >= 0);

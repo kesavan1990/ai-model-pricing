@@ -180,6 +180,15 @@
                     <button type="button" class="provider-filter-btn" data-provider="mistral" aria-pressed="false">Mistral</button>
                 </div>
             </div>
+            <div class="comparison-sort-wrap">
+                <label for="comparison-sort-by" class="comparison-sort-label">Sort by:</label>
+                <select id="comparison-sort-by" class="comparison-sort-select" aria-label="Sort comparison table">
+                    <option value="default">Default (group by provider, cheapest first)</option>
+                    <option value="input">Input price (low → high)</option>
+                    <option value="output">Output price (low → high)</option>
+                    <option value="context">Context (largest first)</option>
+                </select>
+            </div>
             <div class="pricing-table-scroll">
                 <table class="model-table model-comparison-table" aria-label="Model comparison">
                     <thead>

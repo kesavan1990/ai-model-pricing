@@ -877,6 +877,11 @@ function init() {
     });
     render.renderModelComparisonTable(getData(), provider);
   });
+  document.getElementById('comparison-sort-by')?.addEventListener('change', function () {
+    const sortBy = this.value || 'default';
+    render.setComparisonSortBy(sortBy);
+    render.renderModelComparisonTable(getData());
+  });
   const hash = (location.hash || '').replace(/^#/, '');
   if (hash.startsWith('calc-')) {
     switchTab('calculators');

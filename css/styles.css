@@ -295,6 +295,32 @@ h1 {
     color: #fff;
 }
 
+.comparison-sort-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.comparison-sort-label {
+    color: var(--theme-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.comparison-sort-select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--theme-text);
+    font-size: 0.9rem;
+    min-width: 220px;
+    cursor: pointer;
+}
+.comparison-sort-select:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
 /* Cheapest row highlight (Compare table) */
 .model-comparison-table tr.cheapest {
     background: rgba(74, 222, 128, 0.12);
@@ -917,6 +943,7 @@ h1 {
 [data-theme="light"] .provider-filter-btn.active { background: rgba(102, 126, 234, 0.2); border-color: rgba(102, 126, 234, 0.4); color: var(--theme-text); }
 [data-theme="light"] .model-comparison-table tr.cheapest { background: #dcfce7; }
 [data-theme="light"] .cheapest-badge { color: #047857; }
+[data-theme="light"] .comparison-sort-select { background: var(--theme-input-bg); border-color: var(--theme-input-border); color: var(--theme-text); }
 [data-theme="light"] .provider-card:hover,
 [data-theme="light"] .calculator-card:hover { box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
 [data-theme="light"] .provider-header,
