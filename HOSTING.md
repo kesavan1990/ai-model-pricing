@@ -60,9 +60,9 @@ surge
 
 - **Pricing on GitHub Pages**: If you use GitHub Pages and keep `.github/workflows/update-pricing.yml` and `scripts/update-pricing.mjs`, pricing is updated automatically every day in the cloud; visitors get fresh `pricing.json` without running anything locally.
 - **Refresh from web**: Uses a public CORS proxy (`corsproxy.io`) from the browser when the user clicks the button. It works when the app is hosted online; no backend needed.
-- **History & cache**: Stored in the browser’s `localStorage`. Each user’s data stays on their device and is not shared across devices or browsers.
+- **History & cache**: Stored in the browser's `localStorage`. Each user's data stays on their device and is not shared across devices or browsers.
 - **HTTPS**: All options above serve over HTTPS, which is required for many browser features.
 
 ## Custom domain (optional)
 
-On Netlify, Vercel, or Cloudflare Pages you can add your own domain (e.g. `pricing.yourdomain.com`) in the project’s domain settings.
+On Netlify, Vercel, or Cloudflare Pages you can add your own domain (e.g. `pricing.yourdomain.com`) in the project's domain settings.

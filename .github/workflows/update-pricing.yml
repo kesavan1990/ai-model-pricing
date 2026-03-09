@@ -1,0 +1,40 @@
+# Updates pricing.json by fetching official Gemini & OpenAI pricing pages.
+# Runs daily in the cloud; no local Node needed. Pushed file is used by GitHub Pages.
+name: Update pricing
+
+on:
+  schedule:
+    # Daily at 14:35 UTC (avoid top-of-hour); adjust for your timezone
+    - cron: '35 14 * * *'
+  workflow_dispatch:
+    # Allow manual run from Actions tab
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and write pricing
+        run: node scripts/update-pricing.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pricing.json
+          if git diff --staged --quiet; then
+            echo "No changes to pricing.json"
+          else
+            git commit -m "chore: update pricing from official docs [automated]"
+            git push
+          fi
