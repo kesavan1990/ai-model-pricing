@@ -2258,7 +2258,7 @@
         function normalizeProvider(p) {
             if (p == null || p === '') return '';
             const s = String(p).toLowerCase().trim();
-            if (s === 'google') return 'gemini';
+            if (s === 'google' || s.startsWith('google')) return 'gemini';
             if (s === 'openai') return 'openai';
             if (s === 'anthropic') return 'anthropic';
             if (s === 'mistral') return 'mistral';
