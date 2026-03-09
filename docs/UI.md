@@ -17,7 +17,7 @@ OpenAI models can also use **Cached input tokens** (tokens served from cache at 
 
 ## Model comparison table
 
-On the **Home** tab, below the per-provider pricing cards, a single **Model comparison** section lists all models in one table for quick scanning and comparison.
+On the **Compare** tab (📋 Compare in the main nav, next to Home, Calculators, Benchmarks, Recommend), a single **Model comparison** table lists all models for quick scanning and comparison.
 
 | Column    | Description |
 |-----------|-------------|

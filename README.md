@@ -43,7 +43,7 @@ In the repo: **Actions → Update pricing → Run workflow**.
 ## What’s in the app
 
 - **Pricing grid** — Gemini, OpenAI, Anthropic, Mistral (input/output/cached per 1M tokens).
-- **Model comparison table** — Single table on the Home tab: **Model | Provider | Input | Output | Context** (all models in one view; context = context window, e.g. 1M, 128k). See [Model comparison table](docs/UI.md#model-comparison-table).
+- **Model comparison table** — On the **Compare** tab: single table **Model | Provider | Input | Output | Context** (all models in one view; context = context window, e.g. 1M, 128k). See [Model comparison table](docs/UI.md#model-comparison-table).
 - **Calculators** — **Cost calculator** (input: Prompt tokens, Output tokens, Model → output: Estimated cost; see [docs/UI.md](docs/UI.md#cost-calculator)), prompt cost from text, context-window check, production cost.
 - **Benchmarks** — MMLU, code, reasoning, arena-style.
 - **Find the right model** — Filter by use case and cost.

@@ -831,7 +831,7 @@ function init() {
     switchTab('calculators');
     const sub = hash.replace('calc-', '');
     if (['pricing', 'prompt', 'context', 'production'].includes(sub)) switchCalcSub(sub);
-  } else if (['pricing', 'calculators', 'benchmarks', 'recommend'].includes(hash)) {
+  } else if (['pricing', 'comparison', 'calculators', 'benchmarks', 'recommend'].includes(hash)) {
     switchTab(hash);
   }
   window.addEventListener('hashchange', () => {
@@ -840,7 +840,7 @@ function init() {
       switchTab('calculators');
       const sub = h.replace('calc-', '');
       if (['pricing', 'prompt', 'context', 'production'].includes(sub)) switchCalcSub(sub);
-    } else if (['pricing', 'calculators', 'benchmarks', 'recommend'].includes(h)) switchTab(h);
+    } else if (['pricing', 'comparison', 'calculators', 'benchmarks', 'recommend'].includes(h)) switchTab(h);
   });
   document.querySelector('.header-home-link')?.addEventListener('click', (e) => {
     e.preventDefault();
