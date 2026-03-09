@@ -22,7 +22,7 @@ App loads pricing.json on open (or cache / embedded default)
 
 2. **"Refresh from web"**: On GitHub Pages, reloads `pricing.json`. Elsewhere, fetches the Vizra API and updates all providers.
 
-3. **pricing.json** is updated automatically by the workflow. You can also run the script locally (see below).
+3. **pricing.json** is updated automatically by the workflow. The workflow **commits and pushes only when the file content has changed** (`git diff --staged --quiet`); otherwise it skips commit and logs "No pricing changes". You can also run the script locally (see below).
 
 ## Running the script locally
 
