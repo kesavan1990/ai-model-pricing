@@ -1,0 +1,6 @@
+# Removed: local pricing API (pricing is updated via GitHub Actions only)
+api/
+
+# OS
+.DS_Store
+Thumbs.db
