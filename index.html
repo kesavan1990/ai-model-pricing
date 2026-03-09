@@ -1903,8 +1903,8 @@
                     if (cache.mistral && cache.mistral.length) m = cache.mistral.slice();
                 } else {
                     try {
-                        const vizraRes = await fetch(VIZRA_PRICING_URL);
-                        if (vizraRes.ok) {
+const vizraRes = await fetch(CORS_PROXY + encodeURIComponent(VIZRA_PRICING_URL), { cache: 'no-store' });
+                    if (vizraRes.ok) {
                             let vizraData;
                             try {
                                 vizraData = await vizraRes.json();
@@ -2214,7 +2214,7 @@
                 }
             }
             try {
-                const res = await fetch(VIZRA_PRICING_URL, { cache: 'no-store' });
+                const res = await fetch(CORS_PROXY + encodeURIComponent(VIZRA_PRICING_URL), { cache: 'no-store' });
                 if (!res.ok) throw new Error('API ' + res.status);
                 let data;
                 try {
@@ -2348,7 +2348,7 @@
             btn.disabled = true;
             icon.classList.add('spinning');
             try {
-                const vizraRes = await fetch(VIZRA_PRICING_URL);
+                const vizraRes = await fetch(CORS_PROXY + encodeURIComponent(VIZRA_PRICING_URL), { cache: 'no-store' });
                 if (!vizraRes.ok) throw new Error('Vizra API ' + vizraRes.status);
                 let vizraData;
                 try {
