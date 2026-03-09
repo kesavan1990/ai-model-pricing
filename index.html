@@ -2095,6 +2095,31 @@
             renderTables();
             cleanupHistoryToDailyOnly();
             maybeRunDailyCapture();
+            fillMissingProvidersFromVizra();
+        }
+
+        async function fillMissingProvidersFromVizra() {
+            if (anthropicData.length > 0 && mistralData.length > 0) return;
+            try {
+                const res = await fetch('https://vizra.ai/api/v1/pricing/ai-models', { cache: 'no-store' });
+                if (!res.ok) return;
+                const data = await res.json();
+                const parsed = parseVizraResponse(data);
+                let updated = false;
+                if (anthropicData.length === 0 && parsed.anthropic.length > 0) {
+                    anthropicData = parsed.anthropic;
+                    updated = true;
+                }
+                if (mistralData.length === 0 && parsed.mistral.length > 0) {
+                    mistralData = parsed.mistral;
+                    updated = true;
+                }
+                if (updated) {
+                    renderTables();
+                    const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: new Date().toISOString().slice(0, 10) };
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
+                }
+            } catch (_) {}
         }
 
         const VIZRA_PRICING_URL = 'https://vizra.ai/api/v1/pricing/ai-models';
