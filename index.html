@@ -1869,6 +1869,17 @@
             } catch (_) { return []; }
         }
 
+        function dedupeModelsByName(arr) {
+            if (!Array.isArray(arr) || arr.length === 0) return arr;
+            const seen = new Map();
+            for (const m of arr) {
+                const key = (m && (m.name != null) ? String(m.name) : '').toLowerCase().trim();
+                if (!key) continue;
+                if (!seen.has(key)) seen.set(key, m);
+            }
+            return Array.from(seen.values());
+        }
+
         function cleanupHistoryToDailyOnly() {
             const list = getHistory().filter(e => e.daily === true || e.weekly === true);
             try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (_) {}
@@ -1878,10 +1889,10 @@
             const list = getHistory();
             const entry = {
                 date: (opts && opts.date) ? opts.date : new Date().toISOString(),
-                gemini: JSON.parse(JSON.stringify(gemini || [])),
-                openai: JSON.parse(JSON.stringify(openai || [])),
-                anthropic: JSON.parse(JSON.stringify((opts && opts.anthropic) || anthropicData || [])),
-                mistral: JSON.parse(JSON.stringify((opts && opts.mistral) || mistralData || [])),
+                gemini: dedupeModelsByName(JSON.parse(JSON.stringify(gemini || []))),
+                openai: dedupeModelsByName(JSON.parse(JSON.stringify(openai || []))),
+                anthropic: dedupeModelsByName(JSON.parse(JSON.stringify((opts && opts.anthropic) || anthropicData || []))),
+                mistral: dedupeModelsByName(JSON.parse(JSON.stringify((opts && opts.mistral) || mistralData || []))),
                 weekly: !!(opts && opts.weekly),
                 daily: !!(opts && opts.daily)
             };
@@ -1983,14 +1994,18 @@
                     ? d.toLocaleString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' }) + ', 12:00 am IST'
                     : d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
                 const scheduleBadge = entry.daily ? ' <span class="history-daily-badge">Daily</span>' : (entry.weekly ? ' <span class="history-daily-badge">Weekly</span>' : '');
-                const gCount = (entry.gemini || []).length;
-                const oCount = (entry.openai || []).length;
-                const aCount = (entry.anthropic || []).length;
-                const mCount = (entry.mistral || []).length;
-                const geminiRows = (entry.gemini || []).map(historyGeminiRow).join('');
-                const openaiRows = (entry.openai || []).map(historyOpenaiRow).join('');
-                const anthropicRows = (entry.anthropic || []).map(historyGeminiRow).join('');
-                const mistralRows = (entry.mistral || []).map(historyGeminiRow).join('');
+                const gList = dedupeModelsByName(entry.gemini || []);
+                const oList = dedupeModelsByName(entry.openai || []);
+                const aList = dedupeModelsByName(entry.anthropic || []);
+                const mList = dedupeModelsByName(entry.mistral || []);
+                const gCount = gList.length;
+                const oCount = oList.length;
+                const aCount = aList.length;
+                const mCount = mList.length;
+                const geminiRows = gList.map(historyGeminiRow).join('');
+                const openaiRows = oList.map(historyOpenaiRow).join('');
+                const anthropicRows = aList.map(historyGeminiRow).join('');
+                const mistralRows = mList.map(historyGeminiRow).join('');
                 const anthropicBody = aCount ? anthropicRows : '<tr><td class="history-no-data" colspan="3">No Anthropic data in this snapshot</td></tr>';
                 const mistralBody = mCount ? mistralRows : '<tr><td class="history-no-data" colspan="3">No Mistral data in this snapshot</td></tr>';
                 const summaryParts = [];
@@ -2164,10 +2179,10 @@
                     throw new Error('Invalid JSON from pricing.json');
                 }
                 if (!data || typeof data !== 'object') throw new Error('Invalid pricing data');
-                geminiData = (data.gemini && data.gemini.length) ? data.gemini : DEFAULT_PRICING.gemini.slice();
-                openaiData = (data.openai && data.openai.length) ? data.openai : DEFAULT_PRICING.openai.slice();
-                anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : (DEFAULT_PRICING.anthropic || []).slice();
-                mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : (DEFAULT_PRICING.mistral || []).slice();
+                geminiData = (data.gemini && data.gemini.length) ? dedupeModelsByName(data.gemini) : DEFAULT_PRICING.gemini.slice();
+                openaiData = (data.openai && data.openai.length) ? dedupeModelsByName(data.openai) : DEFAULT_PRICING.openai.slice();
+                anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? dedupeModelsByName(data.anthropic) : (DEFAULT_PRICING.anthropic || []).slice();
+                mistralData = (data.mistral && Array.isArray(data.mistral)) ? dedupeModelsByName(data.mistral) : (DEFAULT_PRICING.mistral || []).slice();
                 lastUpdatedStr = data.updated || 'from pricing.json';
                 setLastUpdated(lastUpdatedStr);
             } catch (_) {
@@ -2176,10 +2191,10 @@
                     if (cached) {
                         const data = JSON.parse(cached);
                         if (data && typeof data === 'object') {
-                            geminiData = (data.gemini && data.gemini.length) ? data.gemini : DEFAULT_PRICING.gemini.slice();
-                            openaiData = (data.openai && data.openai.length) ? data.openai : DEFAULT_PRICING.openai.slice();
-                            anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : (DEFAULT_PRICING.anthropic || []).slice();
-                            mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : (DEFAULT_PRICING.mistral || []).slice();
+                            geminiData = (data.gemini && data.gemini.length) ? dedupeModelsByName(data.gemini) : DEFAULT_PRICING.gemini.slice();
+                            openaiData = (data.openai && data.openai.length) ? dedupeModelsByName(data.openai) : DEFAULT_PRICING.openai.slice();
+                            anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? dedupeModelsByName(data.anthropic) : (DEFAULT_PRICING.anthropic || []).slice();
+                            mistralData = (data.mistral && Array.isArray(data.mistral)) ? dedupeModelsByName(data.mistral) : (DEFAULT_PRICING.mistral || []).slice();
                             lastUpdatedStr = (data.updated || 'cached') + ' (from web)';
                             setLastUpdated(lastUpdatedStr);
                             usedFallback = 'cache';
@@ -2282,10 +2297,10 @@
                 if (!res.ok) return false;
                 const data = await res.json();
                 if (!data || typeof data !== 'object') return false;
-                geminiData = (data.gemini && data.gemini.length) ? data.gemini : geminiData.length ? geminiData : DEFAULT_PRICING.gemini.slice();
-                openaiData = (data.openai && data.openai.length) ? data.openai : openaiData.length ? openaiData : DEFAULT_PRICING.openai.slice();
-                anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : anthropicData.length ? anthropicData : (DEFAULT_PRICING.anthropic || []).slice();
-                mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : mistralData.length ? mistralData : (DEFAULT_PRICING.mistral || []).slice();
+                geminiData = (data.gemini && data.gemini.length) ? dedupeModelsByName(data.gemini) : geminiData.length ? geminiData : DEFAULT_PRICING.gemini.slice();
+                openaiData = (data.openai && data.openai.length) ? dedupeModelsByName(data.openai) : openaiData.length ? openaiData : DEFAULT_PRICING.openai.slice();
+                anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? dedupeModelsByName(data.anthropic) : anthropicData.length ? anthropicData : (DEFAULT_PRICING.anthropic || []).slice();
+                mistralData = (data.mistral && Array.isArray(data.mistral)) ? dedupeModelsByName(data.mistral) : mistralData.length ? mistralData : (DEFAULT_PRICING.mistral || []).slice();
                 return true;
             } catch (_) {
                 return false;
@@ -2362,6 +2377,10 @@
                     cachedInput: n.cachedInput
                 });
             }
+            out.gemini = dedupeModelsByName(out.gemini);
+            out.openai = dedupeModelsByName(out.openai);
+            out.anthropic = dedupeModelsByName(out.anthropic);
+            out.mistral = dedupeModelsByName(out.mistral);
             return out;
         }
 
@@ -2377,10 +2396,10 @@
                     if (!res.ok) throw new Error('Could not load pricing');
                     const data = await res.json();
                     if (!data || typeof data !== 'object') throw new Error('Invalid pricing data');
-                    geminiData = (data.gemini && data.gemini.length) ? data.gemini : geminiData;
-                    openaiData = (data.openai && data.openai.length) ? data.openai : openaiData;
-                    anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : anthropicData;
-                    mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : mistralData;
+                    geminiData = (data.gemini && data.gemini.length) ? dedupeModelsByName(data.gemini) : geminiData;
+                    openaiData = (data.openai && data.openai.length) ? dedupeModelsByName(data.openai) : openaiData;
+                    anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? dedupeModelsByName(data.anthropic) : anthropicData;
+                    mistralData = (data.mistral && Array.isArray(data.mistral)) ? dedupeModelsByName(data.mistral) : mistralData;
                     const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: (data.updated || new Date().toISOString().slice(0, 10)), cachedAt: Date.now() };
                     const last = localStorage.getItem(STORAGE_KEY);
                     let drops = [], increases = [];
