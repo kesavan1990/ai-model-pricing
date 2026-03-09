@@ -2152,7 +2152,16 @@
         }
 
         const VIZRA_PRICING_URL = 'https://vizra.ai/api/v1/pricing/ai-models';
-        const PROVIDER_KEY_MAP = { google: 'gemini', openai: 'openai', anthropic: 'anthropic', mistral: 'mistral' };
+
+        function normalizeProvider(p) {
+            if (p == null || p === '') return '';
+            const s = String(p).toLowerCase().trim();
+            if (s === 'google') return 'gemini';
+            if (s === 'openai') return 'openai';
+            if (s === 'anthropic') return 'anthropic';
+            if (s === 'mistral') return 'mistral';
+            return p;
+        }
 
         function normalizePricing(models) {
             if (!Array.isArray(models)) return [];
@@ -2165,7 +2174,7 @@
                     : null;
                 return {
                     name: raw.model || raw.name || '',
-                    provider: raw.provider || '',
+                    provider: normalizeProvider(raw.provider),
                     input,
                     output,
                     cachedInput: cached
@@ -2190,8 +2199,8 @@
             }
             const normalized = normalizePricing(rawList);
             for (const n of normalized) {
-                const key = PROVIDER_KEY_MAP[(n.provider || '').toLowerCase()];
-                if (!key) continue;
+                const key = normalizeProvider(n.provider);
+                if (!key || out[key] === undefined) continue;
                 out[key].push({
                     name: n.name.replace(/^gemini\//, '').replace(/^mistral\//, '').replace(/^deepseek\//, ''),
                     input: n.input,
