@@ -44,7 +44,7 @@ In the repo: **Actions → Update pricing → Run workflow**.
 
 - **Pricing grid** — Gemini, OpenAI, Anthropic, Mistral (input/output/cached per 1M tokens).
 - **Model comparison table** — Single table on the Home tab: **Model | Provider | Input | Output | Context** (all models in one view; context = context window, e.g. 1M, 128k). See [Model comparison table](docs/UI.md#model-comparison-table).
-- **Calculators** — Prompt cost, context-window, production cost.
+- **Calculators** — **Cost calculator** (input: Prompt tokens, Output tokens, Model → output: Estimated cost; see [docs/UI.md](docs/UI.md#cost-calculator)), prompt cost from text, context-window check, production cost.
 - **Benchmarks** — MMLU, code, reasoning, arena-style.
 - **Find the right model** — Filter by use case and cost.
 - **Pricing history** — Daily snapshots (12:00 AM IST), compare two dates, export CSV/PDF.
@@ -62,7 +62,7 @@ Front-end logic is split into ES modules under `src/` for clearer code and easie
 | **`src/render.js`** | UI: `renderTables()`, `renderModelComparisonTable()` (Model \| Provider \| Input \| Output \| Context), `renderBenchmarkDashboard()`, `renderHistoryList()`, `renderRecommendations()`, toasts, `setLastUpdated`, CSV/PDF export helpers, `formatHistoryDate`. |
 | **`src/app.js`** | App entry: state (gemini/openai/anthropic/mistral), `loadPricing`, `refreshFromWeb`, daily capture, history compare, calculator handlers, event wiring; imports the modules above. |
 
-`index.html` loads only `<script type="module" src="src/app.js"></script>`. No inline app logic.
+`index.html` contains markup only: it links to **`css/styles.css`** for all styles and to **`src/app.js`** as the app entry (`<script type="module" src="src/app.js"></script>`). No inline CSS or app logic.
 
 ## Hosting
 
@@ -70,6 +70,6 @@ Static only (HTML/CSS/JS). No server or database. See [HOSTING.md](HOSTING.md) f
 
 ## Docs
 
-- [docs/UI.md](docs/UI.md) — UI overview; **Model comparison table** (Model \| Provider \| Input \| Output \| Context).
+- [docs/UI.md](docs/UI.md) — UI overview: **Cost calculator** (Prompt tokens, Output tokens, Model → Estimated cost), **Model comparison table** (Model \| Provider \| Input \| Output \| Context).
 - [docs/PRICING_UPDATES.md](docs/PRICING_UPDATES.md) — Pricing update architecture and flow.
 - [docs/PRICING_SCENARIOS.md](docs/PRICING_SCENARIOS.md) — How pricing is loaded in each scenario (first load, refresh, GitHub vs local).

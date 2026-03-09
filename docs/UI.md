@@ -1,5 +1,20 @@
 # UI overview
 
+## Cost calculator
+
+In **Calculators → 💰 Pricing**, the cost calculator estimates API cost for a chosen model (and optionally compares two models).
+
+| | Description |
+|---|-------------|
+| **Input** | **Prompt tokens** — number of input/prompt tokens. |
+| **Input** | **Output tokens** — number of output/completion tokens. |
+| **Input** | **Model** — select one model (Gemini, OpenAI, Anthropic, Mistral). Optional: **Compare with** a second model. |
+| **Output** | **Estimated cost** — cost in $ for the given prompt + output tokens for the selected model(s). |
+
+OpenAI models can also use **Cached input tokens** (tokens served from cache at a lower rate); use 0 for non-OpenAI. The result shows the estimated cost per request; with "Compare with" you see both models side by side.
+
+---
+
 ## Model comparison table
 
 On the **Home** tab, below the per-provider pricing cards, a single **Model comparison** section lists all models in one table for quick scanning and comparison.
