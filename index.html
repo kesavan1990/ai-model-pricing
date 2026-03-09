@@ -2146,7 +2146,7 @@
             let lastUpdatedStr = null;
             let usedFallback = null;
             try {
-                const res = await fetch('pricing.json', { cache: 'no-store' });
+                const res = await fetch(getPricingJsonUrl(), { cache: 'no-store' });
                 if (!res.ok) throw new Error('pricing.json ' + res.status);
                 let data;
                 try {
@@ -2187,7 +2187,7 @@
             }
             renderTables();
             cleanupHistoryToDailyOnly();
-            await fillMissingProvidersFromVizra();
+            if (!isGitHubPages()) await fillMissingProvidersFromVizra();
             maybeRunDailyCapture();
             if (usedFallback === 'cache') showToast('Loaded pricing from local cache (file unavailable).', 'success');
             if (usedFallback === 'default') showToast('Using embedded default pricing (no file or cache).', 'success');
@@ -2237,6 +2237,16 @@
         }
 
         const VIZRA_PRICING_URL = 'https://vizra.ai/api/v1/pricing/ai-models';
+        function getPricingJsonUrl() {
+            try {
+                return new URL('pricing.json', window.location.href).href;
+            } catch (_) {
+                return 'pricing.json';
+            }
+        }
+        function isGitHubPages() {
+            return typeof window !== 'undefined' && /github\.io$/i.test(window.location.hostname || '');
+        }
         const CORS_PROXIES = [
             (url) => 'https://corsproxy.io/?' + encodeURIComponent(url),
             (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
@@ -2259,7 +2269,7 @@
 
         async function applyFallbackPricingFromFile() {
             try {
-                const res = await fetch('pricing.json', { cache: 'no-store' });
+                const res = await fetch(getPricingJsonUrl(), { cache: 'no-store' });
                 if (!res.ok) return false;
                 const data = await res.json();
                 if (!data || typeof data !== 'object') return false;
@@ -2353,6 +2363,21 @@
             btn.disabled = true;
             icon.classList.add('spinning');
             try {
+                if (isGitHubPages()) {
+                    const res = await fetch(getPricingJsonUrl(), { cache: 'no-store' });
+                    if (!res.ok) throw new Error('Could not load pricing');
+                    const data = await res.json();
+                    if (!data || typeof data !== 'object') throw new Error('Invalid pricing data');
+                    geminiData = (data.gemini && data.gemini.length) ? data.gemini : geminiData;
+                    openaiData = (data.openai && data.openai.length) ? data.openai : openaiData;
+                    anthropicData = (data.anthropic && Array.isArray(data.anthropic)) ? data.anthropic : anthropicData;
+                    mistralData = (data.mistral && Array.isArray(data.mistral)) ? data.mistral : mistralData;
+                    const payload = { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData, updated: (data.updated || new Date().toISOString().slice(0, 10)), cachedAt: Date.now() };
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
+                    setLastUpdated(payload.updated + ' (from site)');
+                    renderTables();
+                    showToast('Pricing reloaded from site.', 'success');
+                } else {
                 const vizraData = await fetchVizraPricing();
                 if (!vizraData || typeof vizraData !== 'object') throw new Error('Vizra API unavailable');
                 const parsed = parseVizraResponse(vizraData);
@@ -2404,6 +2429,7 @@
                     }
                 } else {
                     showToast('Pricing updated from Vizra API.' + changeMsg, 'success');
+                }
                 }
             } catch (e) {
                 console.warn('Vizra API failed:', e && e.message);
