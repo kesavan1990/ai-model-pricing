@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-09",
+  "updated": "2026-03-10",
   "gemini": [
     {
       "name": "gemini-2.0-flash-lite",
@@ -146,18 +146,6 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-2.5-pro",
-      "input": 1.25,
-      "output": 10,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-2.5-flash-image-preview",
       "input": 0.3,
       "output": 30,
@@ -200,36 +188,6 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-2.5-flash-image-preview",
-      "input": 0.3,
-      "output": 30,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-preview-05-20",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-preview-04-17",
-      "input": 0.15,
-      "output": 0.6,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-lite-preview-06-17",
-      "input": 0.1,
-      "output": 0.4,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-lite",
-      "input": 0.1,
-      "output": 0.4,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-2.0-flash-lite-001",
       "input": 0.075,
       "output": 0.3,
@@ -266,54 +224,6 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-2.0-flash-preview-image-generation",
-      "input": 0.1,
-      "output": 0.4,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.0-flash",
-      "input": 0.1,
-      "output": 0.4,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.0-flash-lite",
-      "input": 0.075,
-      "output": 0.3,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.0-flash-001",
-      "input": 0.1,
-      "output": 0.4,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-pro-preview-tts",
-      "input": 1.25,
-      "output": 10,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-pro-preview-06-05",
-      "input": 1.25,
-      "output": 10,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-pro-preview-05-06",
-      "input": 1.25,
-      "output": 10,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-pro-preview-03-25",
-      "input": 1.25,
-      "output": 10,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-2.0-flash-lite-preview-02-05",
       "input": 0.075,
       "output": 0.3,
@@ -332,33 +242,9 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-1.5-flash-002",
-      "input": 0.075,
-      "output": 0.3,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-pro",
-      "input": 0.35,
-      "output": 1.05,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-1.5-pro-002",
-      "input": 3.5,
-      "output": 10.5,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-1.5-pro-exp-0801",
       "input": 3.5,
       "output": 10.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-pro-vision",
-      "input": 0.35,
-      "output": 1.05,
       "cachedInput": null
     },
     {
@@ -386,39 +272,9 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-2.5-flash-lite-preview-09-2025",
-      "input": 0.1,
-      "output": 0.4,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-preview-09-2025",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-2.5-flash-image",
       "input": 0.3,
       "output": 2.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-image",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-embedding-001",
-      "input": 0.15,
-      "output": 0,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-live-2.5-flash-preview-native-audio-09-2025",
-      "input": 0.3,
-      "output": 2,
       "cachedInput": null
     },
     {
@@ -429,18 +285,6 @@
     },
     {
       "name": "gemini-3-pro-preview",
-      "input": 2,
-      "output": 12,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-3-pro-preview",
-      "input": 2,
-      "output": 12,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-3-pro-image-preview",
       "input": 2,
       "output": 12,
       "cachedInput": null
@@ -461,24 +305,6 @@
       "name": "gemini-3-flash-preview",
       "input": 0.5,
       "output": 3,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-3-flash-preview",
-      "input": 0.5,
-      "output": 3,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-computer-use-preview-10-2025",
-      "input": 1.25,
-      "output": 10,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-robotics-er-1.5-preview",
-      "input": 0.3,
-      "output": 2.5,
       "cachedInput": null
     },
     {
@@ -494,12 +320,6 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-2.0-flash-lite-001",
-      "input": 0.075,
-      "output": 0.3,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-2.5-flash-native-audio-preview-09-2025",
       "input": 0.3,
       "output": 2.5,
@@ -507,24 +327,6 @@
     },
     {
       "name": "gemini-2.5-flash-native-audio-preview-12-2025",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-native-audio-preview-09-2025",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-native-audio-preview-12-2025",
-      "input": 0.3,
-      "output": 2.5,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-2.5-flash-preview-tts",
       "input": 0.3,
       "output": 2.5,
       "cachedInput": null
@@ -548,27 +350,9 @@
       "cachedInput": null
     },
     {
-      "name": "gemini-3.1-pro-preview",
-      "input": 2,
-      "output": 12,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-3.1-pro-preview-customtools",
-      "input": 2,
-      "output": 12,
-      "cachedInput": null
-    },
-    {
       "name": "gemini-3.1-flash-image-preview",
       "input": 0.5,
       "output": 3,
-      "cachedInput": null
-    },
-    {
-      "name": "gemini-3.1-flash-lite-preview",
-      "input": 0.25,
-      "output": 1.5,
       "cachedInput": null
     },
     {
@@ -1178,21 +962,9 @@
       "cachedInput": null
     },
     {
-      "name": "mistral-small",
-      "input": 0.06,
-      "output": 0.18,
-      "cachedInput": null
-    },
-    {
       "name": "mistral-medium",
       "input": 2.7,
       "output": 8.1,
-      "cachedInput": null
-    },
-    {
-      "name": "mistral-medium",
-      "input": 0.4,
-      "output": 2,
       "cachedInput": null
     },
     {
