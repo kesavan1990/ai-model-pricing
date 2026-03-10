@@ -169,6 +169,8 @@ On the **Compare** tab, below the Model comparison table, a **Cost vs Performanc
 
 **Controls** — **Performance metric** dropdown: **Arena**, **MMLU**, or **Code** (Y axis). **Filter by provider**: All, Google, OpenAI, Anthropic, Mistral (same idea as the table filter but independent for the chart).
 
+**Chart colors (light and dark theme)** — The chart uses theme-aware colors so it stays readable in both modes. **Dark theme:** axis and legend text `#e2e8f0`; grid `rgba(255,255,255,0.12)`; “All models” dots medium light grey (fill/border) so they remain visible on dark background; frontier line red (`rgba(248,113,113,0.95)`); frontier points colored by provider (blue / emerald / orange / violet) at 0.95 opacity. **Light theme:** axis and legend text `#334155`; grid `rgba(0,0,0,0.1)`; “All models” dots medium grey; frontier line dark red; same provider colors. When you toggle the app theme, the chart is redrawn with the matching palette (see `setTheme()` → `updateValueChartIfVisible()` in `src/app.js`).
+
 **Implementation** — `src/valueChart.js`: `mergeModels()` builds cost + performance per model from `getAllModels(data)` and `getBenchmarkForModelMerged()`; `computeCostPerRequest()` uses (prompt/1e6)×input + (output/1e6)×output; `computeFrontier()` implements the frontier algorithm; `renderQuadrantChart()` uses **Chart.js** (scatter + line). The chart is rendered or updated when the Compare tab is active and when data or filters change; theme (dark/light) is respected. Markup: `#section-value-chart`, `#value-chart-canvas`, `.value-chart-controls` in `index.html`; styles in `css/styles.css` (`.value-chart-section`, `.value-chart-wrap` with fixed height for responsive chart).
 
 ---

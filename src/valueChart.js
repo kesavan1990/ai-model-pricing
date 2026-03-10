@@ -69,11 +69,12 @@ export function computeFrontier(models) {
 
 let chartInstance = null;
 
+// Frontier point colors: work on both light and dark chart backgrounds
 const PROVIDER_COLORS = {
-  gemini: 'rgba(66, 133, 244, 0.9)',
-  openai: 'rgba(16, 185, 129, 0.9)',
-  anthropic: 'rgba(249, 115, 22, 0.9)',
-  mistral: 'rgba(139, 92, 246, 0.9)',
+  gemini: 'rgba(59, 130, 246, 0.95)',   // blue
+  openai: 'rgba(16, 185, 129, 0.95)',   // emerald
+  anthropic: 'rgba(249, 115, 22, 0.95)', // orange
+  mistral: 'rgba(139, 92, 246, 0.95)',  // violet
 };
 
 /**
@@ -101,19 +102,24 @@ export function renderQuadrantChart(canvasOrId, mergedModels, options = {}) {
   const frontierPoints = frontier.map((m) => ({ x: m.cost, y: m.performance, ...m }));
 
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-  const textColor = isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)';
+  // Grid and text: visible in both themes
+  const gridColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)';
+  const textColor = isDark ? '#e2e8f0' : '#334155';
 
   const frontierColors = frontierPoints.map((m) => PROVIDER_COLORS[m.providerKey] || 'rgba(239, 68, 68, 0.9)');
 
   const frontierSortedByCost = [...frontierPoints].sort((a, b) => a.cost - b.cost);
   const lineData = frontierSortedByCost.map((p) => ({ x: p.cost, y: p.performance }));
 
+  // All models: medium grey visible on both light and dark backgrounds
+  const allModelsFill = isDark ? 'rgba(180, 180, 180, 0.5)' : 'rgba(100, 100, 100, 0.35)';
+  const allModelsBorder = isDark ? 'rgba(200, 200, 200, 0.65)' : 'rgba(80, 80, 80, 0.5)';
+
   const datasetAll = {
     label: 'All models',
     data: allPoints.map((p) => ({ x: p.x, y: p.y })),
-    backgroundColor: isDark ? 'rgba(150, 150, 150, 0.35)' : 'rgba(100, 100, 100, 0.25)',
-    borderColor: isDark ? 'rgba(150, 150, 150, 0.5)' : 'rgba(100, 100, 100, 0.4)',
+    backgroundColor: allModelsFill,
+    borderColor: allModelsBorder,
     borderWidth: 1,
     pointRadius: 4,
     pointHoverRadius: 6,
@@ -125,18 +131,21 @@ export function renderQuadrantChart(canvasOrId, mergedModels, options = {}) {
     label: 'Frontier (best value)',
     data: frontierPoints.map((p) => ({ x: p.x, y: p.y })),
     backgroundColor: frontierColors,
-    borderColor: frontierColors.map((c) => c.replace('0.9', '1')),
+    borderColor: frontierColors.map((c) => c.replace(/0\.\d+\)$/, '1)')),
     borderWidth: 2,
     pointRadius: 7,
     pointHoverRadius: 9,
     order: 1,
   };
 
+  // Frontier line: strong red visible in both themes
+  const frontierLineColor = isDark ? 'rgba(248, 113, 113, 0.95)' : 'rgba(185, 28, 28, 0.9)';
+
   const datasetFrontierLine = {
     type: 'line',
     label: 'Frontier line',
     data: lineData,
-    borderColor: isDark ? 'rgba(239, 68, 68, 0.8)' : 'rgba(185, 28, 28, 0.9)',
+    borderColor: frontierLineColor,
     borderWidth: 2,
     fill: false,
     pointRadius: 0,
