@@ -66,6 +66,8 @@ All of this is implemented in a single `@media (max-width: 768px)` block in `css
 
 On the **Home** tab, the **Current pricing** section shows API pricing per 1M tokens from Vizra for all four providers. The section header label lists **Gemini · OpenAI · Anthropic · Mistral** so users see that all providers are included. Below the label and Export (CSV/PDF) toolbar, the **pricing grid** displays four provider cards: Google Gemini, OpenAI, Anthropic, and Mistral, each with a searchable model table. Markup: `.pricing-section-header` with `.section-label` and `.pricing-grid` in `index.html`.
 
+**Export toolbar alignment** — All export (CSV/PDF) toolbars in the app are **right-aligned** for consistency: **Current pricing** (Home), **Model comparison**, **Calculators**, and **Benchmarks**. Implementation: Home uses `justify-content: space-between` on `.pricing-section-header`; Model comparison uses `margin-left: auto` on `.comparison-export-toolbar` inside the sort row; Calculators and Benchmarks use `margin-left: auto` on `.calculators-export-toolbar` and `.benchmark-export-toolbar` with their parent containers (`#tab-calculators`, `#section-benchmark`) set to `display: flex; flex-direction: column` in `css/styles.css`.
+
 ---
 
 ## Calculator tooltips
