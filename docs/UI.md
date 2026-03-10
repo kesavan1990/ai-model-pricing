@@ -163,6 +163,8 @@ The table is filled by `renderModelComparisonTable(data)` in `src/render.js`, us
 
 On the **Benchmarks** tab, the **Model benchmark dashboard** shows one table with columns: **Model**, **MMLU**, **Code**, **Reasoning**, **Arena**, **Cost** (tier from current pricing). Scores are indicative from published results.
 
+**Update frequency** — The **list of models** (rows) and the **Cost tier** column come from pricing data, which is updated **daily** by the update-pricing workflow (same as the rest of the app). The **MMLU, Code, Reasoning, and Arena** scores are **not** fetched from an external API; they are hardcoded in `getBenchmarkForModel()` in `src/calculator.js` and only change when the codebase is updated and redeployed. So: model list and Cost tier ≈ daily; benchmark score numbers = on each app release only.
+
 **Export (CSV / PDF)** — Above the table, **Export: CSV** and **Export: PDF** let you download the full benchmark table. CSV columns: Model, MMLU, Code, Reasoning, Arena, Cost tier. PDF uses the same data in a landscape table. Implementation: `render.getBenchmarkList(data)` in `src/render.js` returns the same rows as the dashboard; `exportBenchmarksCSV()` and `exportBenchmarksPDF()` in `src/app.js` build the files. Buttons live in `.benchmark-export-toolbar` in `index.html`.
 
 ---
