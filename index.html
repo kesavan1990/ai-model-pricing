@@ -17,7 +17,7 @@
     <div class="container">
         <header class="main-header">
             <div class="header-left">
-                <h1><a href="#" class="header-home-link" title="Go to home">🤖</a> AI Model Pricing</h1>
+                <h1><a href="#pricing" class="header-home-link" title="Go to overview">🤖</a> AI Model Pricing Dashboard</h1>
                 <p class="subtitle">Compare pricing for Gemini and OpenAI models — updates automatically from official sources</p>
             </div>
             <div class="header-right-actions">
@@ -31,12 +31,13 @@
                 <a href="#" class="history-btn" id="historyBtn" title="View pricing history">📜 History</a>
             </div>
         </header>
-        <nav class="tab-nav" aria-label="Main sections" role="tablist">
-            <a href="#pricing" class="tab-link tab-link-home active" data-tab="pricing" role="tab" id="tab-btn-pricing" title="Dashboard">🏠 Home</a>
-            <a href="#comparison" class="tab-link" data-tab="comparison" role="tab" id="tab-btn-comparison">📋 Compare</a>
-            <a href="#calculators" class="tab-link" data-tab="calculators" role="tab" id="tab-btn-calculators">💰 Calculators</a>
-            <a href="#benchmarks" class="tab-link" data-tab="benchmarks" role="tab" id="tab-btn-benchmarks">📈 Benchmarks</a>
-            <a href="#recommend" class="tab-link" data-tab="recommend" role="tab" id="tab-btn-recommend">🎯 Recommend</a>
+        <nav class="tab-nav top-nav" aria-label="Main navigation" role="navigation">
+            <a href="#pricing" class="tab-link active" data-tab="pricing" role="tab" id="tab-btn-pricing" title="Overview with KPI cards and pricing grid">Overview</a>
+            <a href="#comparison" class="tab-link" data-tab="comparison" role="tab" id="tab-btn-comparison" title="Compare all models in one table">Model Comparison</a>
+            <a href="#calc-pricing" class="tab-link" data-tab="calculators" data-calc-sub="pricing" role="tab" id="tab-btn-calc-pricing" title="Pricing calculator">Pricing Calculator</a>
+            <a href="#calc-production" class="tab-link" data-tab="calculators" data-calc-sub="production" role="tab" id="tab-btn-calc-production" title="Production cost simulator">Production Cost Simulator</a>
+            <a href="#benchmarks" class="tab-link" data-tab="benchmarks" role="tab" id="tab-btn-benchmarks" title="Benchmark scores and dataset">Dataset</a>
+            <a href="#recommend" class="tab-link" data-tab="recommend" role="tab" id="tab-btn-recommend" title="Find the right model">Recommend</a>
         </nav>
         <div id="toast" class="toast hidden"></div>
 

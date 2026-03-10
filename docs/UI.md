@@ -1,5 +1,22 @@
 # UI overview
 
+## Top navigation bar
+
+Below the header (**AI Model Pricing Dashboard**), a single **top navigation bar** lets users jump between main sections without scrolling. This makes the tool easier to understand and use.
+
+| Link | Destination |
+|------|-------------|
+| **Overview** | KPI cards and current pricing grid (all providers). |
+| **Model Comparison** | Compare tab: filterable/sortable table of all models. |
+| **Pricing Calculator** | Calculators → Pricing: estimate cost for a chosen model. |
+| **Production Cost Simulator** | Calculators → Production cost: simulate cost by users/requests. |
+| **Dataset** | Benchmarks tab: MMLU, code, reasoning, arena scores. |
+| **Recommend** | Find the right model by use case. |
+
+Clicking a link updates the URL hash (e.g. `#pricing`, `#comparison`, `#calc-pricing`, `#calc-production`, `#benchmarks`, `#recommend`) and shows the corresponding panel. The active link is highlighted. For calculator links, the correct sub-panel (Pricing or Production cost) is shown and the matching nav item is active. Markup: `<nav class="tab-nav top-nav">` in `index.html`; behavior in `src/app.js` (`switchTab`, `switchCalcSub`, hashchange listener).
+
+---
+
 ## Dark mode and light mode
 
 The app supports **dark mode** (default) and **light mode**. You can switch between them at any time.

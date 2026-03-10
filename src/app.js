@@ -795,19 +795,24 @@ function switchCalcSub(subId) {
 function switchTab(tabId) {
   const ids = ['pricing', 'comparison', 'calculators', 'benchmarks', 'recommend'];
   if (!ids.includes(tabId)) return;
+  const hash = (location.hash || '#pricing').replace(/^#/, '') || 'pricing';
   document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
   document.querySelectorAll('.tab-link').forEach((l) => l.classList.remove('active'));
   const panel = document.getElementById('tab-' + tabId);
-  const link = document.querySelector('.tab-link[data-tab="' + tabId + '"]');
+  let link = null;
+  if (tabId === 'calculators') {
+    link = document.querySelector('.tab-link[href="#' + hash + '"]') || document.querySelector('.tab-link[data-tab="calculators"]');
+  } else {
+    link = document.querySelector('.tab-link[data-tab="' + tabId + '"]:not([data-calc-sub])');
+  }
   if (panel) panel.classList.add('active');
   if (link) link.classList.add('active');
   if (tabId === 'calculators') {
-    const h = (location.hash || '').replace(/^#/, '');
-    const calcSub = h.startsWith('calc-') ? h.replace('calc-', '') : 'pricing';
+    const calcSub = hash.startsWith('calc-') ? hash.replace('calc-', '') : 'pricing';
     switchCalcSub(['pricing', 'prompt', 'context', 'production'].includes(calcSub) ? calcSub : 'pricing');
   }
   if (history.replaceState && tabId !== 'calculators') history.replaceState(null, '', '#' + tabId);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo(0, 0);
 }
 
 // --- Expose for inline onclick (index.html) ---
@@ -862,7 +867,10 @@ function init() {
   document.querySelectorAll('.tab-link').forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      switchTab(link.getAttribute('data-tab'));
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) location.hash = href.slice(1);
+      const tabId = link.getAttribute('data-tab');
+      if (tabId) switchTab(tabId);
     });
   });
   document.querySelector('.provider-filter-btns')?.addEventListener('click', (e) => {
