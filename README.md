@@ -40,6 +40,17 @@ In the repo: **Actions → Update pricing → Run workflow**.
 
 ---
 
+## Benchmark pipeline (second dataset)
+
+The app loads **two datasets**: `pricing.json` (daily) and `benchmarks.json` (weekly). The UI merges them by **model name** and **provider**. Script: `npm run update-benchmarks`. Workflow: [`.github/workflows/update-benchmarks.yml`](.github/workflows/update-benchmarks.yml) (weekly, Sunday 00:00 UTC). See [docs/BENCHMARKS.md](docs/BENCHMARKS.md). **Update frequency:** Pricing daily; benchmarks weekly.
+
+| Metric     | Update frequency |
+|-----------|-------------------|
+| Pricing   | Daily (06:00 UTC) |
+| Benchmarks| Weekly (Sun 00:00 UTC) |
+
+---
+
 ## What’s in the app
 
 - **Top navigation bar** — Overview, Model Comparison, Calculators (Pricing, Prompt cost, Context window, Production cost), Benchmarks, Recommend. Jump between sections without scrolling. Production cost simulator is under Calculators. See [Top navigation bar](docs/UI.md#top-navigation-bar).
@@ -48,7 +59,7 @@ In the repo: **Actions → Update pricing → Run workflow**.
 - **Dark mode / light mode** — Toggle in the header (☀️/🌙). Preference is saved and respects system `prefers-color-scheme` on first visit. See [docs/UI.md](docs/UI.md#dark-mode-and-light-mode).
 - **Model comparison table** — On the **Compare** tab: single table **Model | Provider | Input | Output | Context** (all models in one view). **Provider filter**: All, Google, OpenAI, Anthropic, Mistral. **Default sort**: grouped by provider with cheapest first in each group. **Sort by**: Default, Input price, Output price, or Context (largest first). **Export**: CSV and PDF of the current table (respects filter and sort). **Cheapest highlight**: row with lowest blended cost has green tint and 🟢 Cheapest badge. See [Model comparison table](docs/UI.md#model-comparison-table).
 - **Calculators** — **Cost calculator** (input: Prompt tokens, Output tokens, Model → output: Estimated cost; see [docs/UI.md](docs/UI.md#cost-calculator)), prompt cost from text, context-window check, **production cost simulator** (per request, daily, monthly, per annum; see [Production cost simulator](docs/UI.md#production-cost-simulator)). **Export**: CSV and PDF of the **current** calculator result (Pricing, Prompt cost, Context window, or Production cost, depending on the active sub-tab). **Hover tooltips (?)**: labels in all calculator sections have a (?) with brief explanations (e.g. prompt tokens, output tokens, context window). See [Calculator tooltips](docs/UI.md#calculator-tooltips).
-- **Benchmarks** — MMLU, code, reasoning, arena-style. **Export**: CSV and PDF of the full benchmark table. See [Model benchmark dashboard](docs/UI.md#model-benchmark-dashboard).
+- **Benchmarks** — MMLU, code, reasoning, arena-style. Data from `benchmarks.json` (weekly pipeline); merged with pricing by model. **Export**: CSV and PDF of the full benchmark table. See [Model benchmark dashboard](docs/UI.md#model-benchmark-dashboard) and [Benchmark pipeline](docs/BENCHMARKS.md).
 - **Find the right model** — Filter by use case and cost.
 - **Pricing history** — Daily snapshots (12:00 AM IST), compare two dates, export CSV/PDF.
 - **Refresh from web** — Reload pricing (from `pricing.json` on GitHub Pages, or from Vizra when run locally).
@@ -74,6 +85,7 @@ Static only (HTML/CSS/JS). No server or database. See [HOSTING.md](HOSTING.md) f
 
 ## Docs
 
-- [docs/UI.md](docs/UI.md) — UI overview: **Dark mode / light mode**, **KPI cards** (layout and alignment), **Export toolbar alignment** (right-aligned CSV/PDF across Home, Model comparison, Calculators, Benchmarks), **Tab panel visibility** (Calculators panel flex only when active so Benchmarks/Recommend show correctly), **Favicon** (inline SVG to avoid 404), **Cost calculator**, **Production cost simulator** (formula, per request/annum), **Calculators export** (CSV/PDF of current result), **Model comparison table** (provider filter, grouping, sort by Input/Output/Context, cheapest highlight, export), **Model benchmark dashboard** (export CSV/PDF).
+- [docs/UI.md](docs/UI.md) — UI overview: **Dark mode / light mode**, **KPI cards** (layout and alignment), **Export toolbar alignment** (right-aligned CSV/PDF across Home, Model comparison, Calculators, Benchmarks), **Tab panel visibility** (Calculators panel flex only when active so Benchmarks/Recommend show correctly), **Favicon** (inline SVG to avoid 404), **Cost calculator**, **Production cost simulator** (formula, per request/annum), **Calculators export** (CSV/PDF of current result), **Model comparison table** (provider filter, grouping, sort by Input/Output/Context, cheapest highlight, export), **Model benchmark dashboard** (benchmark pipeline, update frequency, export CSV/PDF).
+- [docs/BENCHMARKS.md](docs/BENCHMARKS.md) — Benchmark pipeline: `benchmarks.json`, weekly workflow, merge with pricing by model.
 - [docs/PRICING_UPDATES.md](docs/PRICING_UPDATES.md) — Pricing update architecture and flow.
 - [docs/PRICING_SCENARIOS.md](docs/PRICING_SCENARIOS.md) — How pricing is loaded in each scenario (first load, refresh, GitHub vs local).

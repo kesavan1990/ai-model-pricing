@@ -70,6 +70,31 @@ export function getBenchmarkForModel(name, providerKey) {
   return { mmlu: 75, code: 78, reasoning: 80, arena: 82 };
 }
 
+/**
+ * Get benchmark scores for a model: from file (benchmarks.json) if provided and entry exists, else fallback.
+ * @param {string} name - Model name
+ * @param {string} providerKey - gemini | openai | anthropic | mistral
+ * @param {Array<{ model: string, provider: string, mmlu?: number, code?: number, reasoning?: number, arena?: number }>|null} fileBenchmarks - From benchmarks.json
+ * @returns {{ mmlu: number, code: number, reasoning: number, arena: number }}
+ */
+export function getBenchmarkForModelMerged(name, providerKey, fileBenchmarks) {
+  if (Array.isArray(fileBenchmarks) && fileBenchmarks.length > 0) {
+    const n = (name || '').trim().toLowerCase();
+    const entry = fileBenchmarks.find(
+      (e) => e && e.provider === providerKey && String(e.model || '').trim().toLowerCase() === n
+    );
+    if (entry) {
+      return {
+        mmlu: typeof entry.mmlu === 'number' ? entry.mmlu : 0,
+        code: typeof entry.code === 'number' ? entry.code : 0,
+        reasoning: typeof entry.reasoning === 'number' ? entry.reasoning : 0,
+        arena: typeof entry.arena === 'number' ? entry.arena : 0,
+      };
+    }
+  }
+  return getBenchmarkForModel(name, providerKey);
+}
+
 export function getCostTier(blended) {
   if (blended <= 0) return '$';
   if (blended < 2) return '$$';

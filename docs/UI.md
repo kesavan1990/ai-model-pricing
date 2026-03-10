@@ -163,7 +163,9 @@ The table is filled by `renderModelComparisonTable(data)` in `src/render.js`, us
 
 On the **Benchmarks** tab, the **Model benchmark dashboard** shows one table with columns: **Model**, **MMLU**, **Code**, **Reasoning**, **Arena**, **Cost** (tier from current pricing). Scores are indicative from published results.
 
-**Update frequency** — The **list of models** (rows) and the **Cost tier** column come from pricing data, which is updated **daily** by the update-pricing workflow (same as the rest of the app). The **MMLU, Code, Reasoning, and Arena** scores are **not** fetched from an external API; they are hardcoded in `getBenchmarkForModel()` in `src/calculator.js` and only change when the codebase is updated and redeployed. So: model list and Cost tier ≈ daily; benchmark score numbers = on each app release only.
+**Benchmark pipeline** — The UI loads both `pricing.json` and `benchmarks.json`. Benchmarks are merged with pricing by **model name** and **provider** so each row shows file-backed scores when available; otherwise the app falls back to embedded scores from `getBenchmarkForModel()` in `src/calculator.js`. See [Benchmark pipeline](docs/BENCHMARKS.md) for the update flow.
+
+**Update frequency** — In line with typical dashboards: **pricing** updates **daily** (06:00 UTC); **benchmarks** update **weekly** (Sunday 00:00 UTC via `.github/workflows/update-benchmarks.yml`). Arena rankings and benchmark scores don’t change as often as prices. The benchmark workflow reads `pricing.json`, assigns scores per model (embedded lookup; replaceable by a real API later), and writes `benchmarks.json`; the frontend fetches both and merges by model.
 
 **Export (CSV / PDF)** — Above the table, **Export: CSV** and **Export: PDF** let you download the full benchmark table. CSV columns: Model, MMLU, Code, Reasoning, Arena, Cost tier. PDF uses the same data in a landscape table. Implementation: `render.getBenchmarkList(data)` in `src/render.js` returns the same rows as the dashboard; `exportBenchmarksCSV()` and `exportBenchmarksPDF()` in `src/app.js` build the files. Buttons live in `.benchmark-export-toolbar` in `index.html`.
 

@@ -2,7 +2,7 @@
  * Render layer: tables, history modal, toasts, exports. Depends on calculator and pricingService for data shape.
  */
 
-import { getUnifiedCalcModels, getAllModels, getBenchmarkForModel, getCostTierLabel, getFallbackReason } from './calculator.js';
+import { getUnifiedCalcModels, getAllModels, getBenchmarkForModel, getBenchmarkForModelMerged, getCostTierLabel, getFallbackReason } from './calculator.js';
 import { dedupeModelsByName } from './pricingService.js';
 
 export function showToast(msg, type) {
@@ -48,7 +48,7 @@ export function filterPricingTable(tbodyId, query) {
   });
 }
 
-export function renderTables(data) {
+export function renderTables(data, benchmarks = null) {
   const { gemini = [], openai = [], anthropic = [], mistral = [] } = data;
   const geminiRow = (m) => {
     const badge = m.badge ? `<span>${m.badge}</span>` : '';
@@ -93,7 +93,7 @@ export function renderTables(data) {
     calcCompareSel.innerHTML = '<option value="">— None —</option>' + opts;
   }
   renderModelComparisonTable(data, comparisonProviderFilter, comparisonSortBy);
-  renderBenchmarkDashboard(data);
+  renderBenchmarkDashboard(data, benchmarks);
   updateKPIs(data);
 }
 
@@ -199,13 +199,13 @@ export function getComparisonList(data) {
   return list;
 }
 
-export function renderBenchmarkDashboard(data) {
+export function renderBenchmarkDashboard(data, fileBenchmarks = null) {
   const container = document.getElementById('benchmark-dashboard-table');
   if (!container) return;
   const all = getAllModels(data);
   const rows = all
     .map((m) => {
-      const b = getBenchmarkForModel(m.name, m.providerKey);
+      const b = getBenchmarkForModelMerged(m.name, m.providerKey, fileBenchmarks);
       const { tier, desc } = getCostTierLabel(m.blended);
       const blendedStr = m.blended <= 0 ? '0' : m.blended.toFixed(2);
       const costTitle = `Blended: $${blendedStr}/1M tokens (70% input, 30% output) — ${desc}`;
@@ -219,10 +219,10 @@ export function renderBenchmarkDashboard(data) {
 }
 
 /** Return benchmark table rows for export (same data as dashboard). */
-export function getBenchmarkList(data) {
+export function getBenchmarkList(data, fileBenchmarks = null) {
   const all = getAllModels(data);
   return all.map((m) => {
-    const b = getBenchmarkForModel(m.name, m.providerKey);
+    const b = getBenchmarkForModelMerged(m.name, m.providerKey, fileBenchmarks);
     const { tier } = getCostTierLabel(m.blended);
     return { name: m.name, mmlu: b.mmlu, code: b.code, reasoning: b.reasoning, arena: b.arena, costTier: tier };
   });

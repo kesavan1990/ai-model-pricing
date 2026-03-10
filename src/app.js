@@ -31,13 +31,21 @@ let lastPromptCostResult = null;
 let lastContextResult = null;
 let lastProductionResult = null;
 
+// Benchmarks from benchmarks.json (merged with pricing in UI by model + provider)
+let benchmarksData = null;
+
+function getBenchmarksData() {
+  return benchmarksData;
+}
+
 // --- Load & refresh ---
 async function loadPricing() {
   try {
-    const result = await pricing.loadPricing(api.getPricing);
+    const [result, benchPayload] = await Promise.all([pricing.loadPricing(api.getPricing), api.getBenchmarks()]);
     setData(result);
+    benchmarksData = benchPayload?.benchmarks ?? null;
     render.setLastUpdated(result.updated);
-    render.renderTables(getData());
+    render.renderTables(getData(), getBenchmarksData());
     pricing.cleanupHistoryToDailyOnly();
     if (!api.isGitHubPages()) await fillMissingProvidersFromVizra();
     maybeRunDailyCapture();
@@ -51,8 +59,9 @@ async function loadPricing() {
       anthropic: (pricing.DEFAULT_PRICING.anthropic || []).slice(),
       mistral: (pricing.DEFAULT_PRICING.mistral || []).slice(),
     });
+    benchmarksData = null;
     render.setLastUpdated('embedded default');
-    render.renderTables(getData());
+    render.renderTables(getData(), getBenchmarksData());
     render.showToast('Using embedded default pricing.', 'success');
   }
 }
@@ -64,7 +73,7 @@ async function fillMissingProvidersFromVizra() {
     if (anthropicData.length === 0 && cache.anthropic?.length) anthropicData = cache.anthropic.slice();
     if (mistralData.length === 0 && cache.mistral?.length) mistralData = cache.mistral.slice();
     if (anthropicData.length > 0 || mistralData.length > 0) {
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       return;
     }
   }
@@ -83,7 +92,7 @@ async function fillMissingProvidersFromVizra() {
       updated = true;
     }
     if (updated) {
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
       try {
         localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
@@ -93,7 +102,7 @@ async function fillMissingProvidersFromVizra() {
     const applied = await pricing.applyFallbackPricingFromFile(api.getPricing, getData());
     if (applied) {
       setData(applied);
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       try {
         localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify({ ...getData(), updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() }));
       } catch (_) {}
@@ -138,7 +147,7 @@ async function runDailyCapture() {
       localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
     } catch (_) {}
     render.setLastUpdated(payload.updated + ' (from web)');
-    render.renderTables(getData());
+    render.renderTables(getData(), getBenchmarksData());
     render.showToast('Daily snapshot saved to History.', 'success');
   } catch (_) {}
 }
@@ -200,7 +209,7 @@ async function refreshFromWeb() {
         localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
       } catch (_) {}
       render.setLastUpdated(render.formatTimestampWithTimezone(new Date()) + ' (from site)');
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       if (drops.length || increases.length) {
         renderPriceChanges(drops, increases);
         render.showToast('Pricing reloaded. See which models changed below.', 'success');
@@ -235,7 +244,7 @@ async function refreshFromWeb() {
         localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
       } catch (_) {}
       render.setLastUpdated(render.formatTimestampWithTimezone(new Date()) + ' (Vizra)');
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       if (drops.length || increases.length) {
         renderPriceChanges(drops, increases);
         render.showToast('Pricing updated. See which models changed below.', 'success');
@@ -250,10 +259,10 @@ async function refreshFromWeb() {
     if (fallback) {
       setData(fallback);
       render.setLastUpdated(render.formatTimestampWithTimezone(new Date()) + ' (fallback)');
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       render.showToast('API unavailable. Using fallback pricing from pricing.json.', 'success');
     } else {
-      render.renderTables(getData());
+      render.renderTables(getData(), getBenchmarksData());
       render.showToast('Refresh failed: ' + (e?.message || 'network error') + '. Kept current pricing.', 'error');
     }
   } finally {
@@ -418,7 +427,7 @@ function exportComparisonPDF() {
 }
 
 function exportBenchmarksCSV() {
-  const list = render.getBenchmarkList(getData());
+  const list = render.getBenchmarkList(getData(), getBenchmarksData());
   const rows = ['Model,MMLU,Code,Reasoning,Arena,Cost tier'];
   list.forEach((m) => rows.push([m.name, m.mmlu, m.code, m.reasoning, m.arena, m.costTier].map(render.escapeCsvCell).join(',')));
   const csv = '\uFEFF' + rows.join('\r\n');
@@ -436,7 +445,7 @@ function exportBenchmarksPDF() {
     render.showToast('PDF library loading. Please try again in a moment.', 'error');
     return;
   }
-  const list = render.getBenchmarkList(getData());
+  const list = render.getBenchmarkList(getData(), getBenchmarksData());
   const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   doc.setFontSize(14);

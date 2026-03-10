@@ -28,11 +28,39 @@ export function isGitHubPages() {
 }
 
 /**
+ * URL for benchmarks.json with cache-busting (same pattern as pricing).
+ */
+export function getBenchmarksJsonUrl() {
+  try {
+    const u = new URL('benchmarks.json', window.location.href);
+    u.searchParams.set('t', Date.now());
+    return u.href;
+  } catch (_) {
+    return `benchmarks.json?t=${Date.now()}`;
+  }
+}
+
+/**
  * Fetch pricing.json from the current origin (e.g. same host or GitHub Pages).
  * @returns {Promise<object|null>} Parsed JSON or null on failure
  */
 export async function getPricing() {
   const url = getPricingJsonUrl();
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * Fetch benchmarks.json from the current origin. Merged with pricing in the UI by model + provider.
+ * @returns {Promise<{ updated: string, benchmarks: Array }|null>} Parsed JSON or null on failure
+ */
+export async function getBenchmarks() {
+  const url = getBenchmarksJsonUrl();
   try {
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return null;

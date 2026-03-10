@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "benchmarks",
+  "title": "AI benchmarks payload",
+  "description": "Schema for benchmarks.json: benchmark scores (MMLU, Code, Reasoning, Arena) per model. Merged with pricing in the UI by model name and provider.",
+  "type": "object",
+  "required": ["updated", "benchmarks"],
+  "additionalProperties": false,
+  "properties": {
+    "updated": {
+      "type": "string",
+      "description": "Date of last update (YYYY-MM-DD)"
+    },
+    "benchmarks": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/entry" }
+    }
+  },
+  "definitions": {
+    "entry": {
+      "type": "object",
+      "required": ["model", "provider"],
+      "additionalProperties": false,
+      "properties": {
+        "model": { "type": "string", "minLength": 1 },
+        "provider": { "type": "string", "enum": ["gemini", "openai", "anthropic", "mistral"] },
+        "mmlu": { "type": "number", "minimum": 0 },
+        "code": { "type": "number", "minimum": 0 },
+        "reasoning": { "type": "number", "minimum": 0 },
+        "arena": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
