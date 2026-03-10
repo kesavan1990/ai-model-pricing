@@ -1,8 +1,11 @@
 /**
  * Pricing service: load, cache, normalize, compare, history. Uses api for fetch.
+ * Cache read/write is centralized in utils/cacheManager.js.
  */
 
-export const STORAGE_KEY = 'ai_pricing_cache';
+import { getCachedPricing } from './utils/cacheManager.js';
+
+export const STORAGE_KEY = 'ai_pricing_cache'; // legacy; prefer cacheManager.CACHE_KEY
 export const HISTORY_KEY = 'ai_pricing_history';
 export const LAST_DAILY_KEY = 'ai_pricing_last_daily';
 export const CACHE_HOURS = 12;
@@ -176,15 +179,9 @@ export function isCacheFresh(cachedAt) {
   return ageMs >= 0 && ageMs < CACHE_HOURS * 60 * 60 * 1000;
 }
 
+/** Returns cached pricing payload if present and within TTL; otherwise null. Uses utils/cacheManager. */
 export function getCachedPricingPayload() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    return data && typeof data === 'object' ? data : null;
-  } catch (_) {
-    return null;
-  }
+  return getCachedPricing();
 }
 
 export function getHistory() {
@@ -239,7 +236,57 @@ function applyDataFromPayload(data, existing) {
 }
 
 /**
- * Load pricing: try getPricing() (pricing.json), then cache, then default.
+ * Normalize raw data from fetchPricingData() (Vizra API or pricing.json) into app payload shape.
+ * @param {object} raw - Response from API or pricing.json
+ * @returns {{ payload: object, updated: string }} Payload for applyDataFromPayload and updated label.
+ */
+export function normalizeFetchedPricing(raw) {
+  if (!raw || typeof raw !== 'object') return { payload: null, updated: '' };
+  const isAppFormat = Array.isArray(raw.gemini) && Array.isArray(raw.openai);
+  const payload = isAppFormat ? raw : parseVizraResponse(raw);
+  const updated = raw.updated || (isAppFormat ? 'pricing.json' : 'Vizra API');
+  return { payload, updated };
+}
+
+/**
+ * Load pricing from API (Vizra first, then pricing.json fallback). On failure, try cache then default.
+ * @param {() => Promise<object>} fetchPricingData - e.g. () => import('./api/pricingService.js').then(m => m.fetchPricingData())
+ *   or pass the fetchPricingData function from api/pricingService.js
+ * @returns {Promise<{ gemini, openai, anthropic, mistral, updated, usedFallback }>}
+ */
+export async function loadPricingFromApi(fetchPricingData) {
+  const existing = { gemini: [], openai: [], anthropic: [], mistral: [] };
+  let updated = null;
+  let usedFallback = null;
+  try {
+    const raw = await fetchPricingData();
+    const { payload, updated: u } = normalizeFetchedPricing(raw);
+    if (!payload) throw new Error('Invalid data');
+    const out = applyDataFromPayload(payload, existing);
+    updated = u || 'from API';
+    return { ...out, updated, usedFallback };
+  } catch (_) {
+    try {
+      const cached = getCachedPricingPayload();
+      if (cached) {
+        const out = applyDataFromPayload(cached, existing);
+        updated = (cached.updated || 'cached') + ' (from web)';
+        usedFallback = 'cache';
+        return { ...out, updated, usedFallback };
+      }
+    } catch (_) {}
+    const gemini = DEFAULT_PRICING.gemini.slice();
+    const openai = DEFAULT_PRICING.openai.slice();
+    const anthropic = (DEFAULT_PRICING.anthropic || []).slice();
+    const mistral = (DEFAULT_PRICING.mistral || []).slice();
+    updated = 'embedded default';
+    usedFallback = 'default';
+    return { gemini, openai, anthropic, mistral, updated, usedFallback };
+  }
+}
+
+/**
+ * Load pricing: try getPricing() (pricing.json only), then cache, then default.
  * @param {() => Promise<object|null>} getPricing - e.g. api.getPricing
  * @returns {Promise<{ gemini, openai, anthropic, mistral, updated, usedFallback }>}
  */

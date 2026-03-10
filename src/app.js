@@ -1,10 +1,12 @@
 /**
  * Main app: state, load/refresh/history, calculators, UI wiring.
- * Imports: api, pricingService, calculator, render.
+ * Imports: api, api/pricingService, pricingService, calculator, render.
  */
 
 import * as api from './api.js';
+import * as pricingApi from './api/pricingService.js';
 import * as pricing from './pricingService.js';
+import { getCachedPricing, setCachedPricing } from './utils/cacheManager.js';
 import * as calc from './calculator.js';
 import * as render from './render.js';
 import * as valueChart from './valueChart.js';
@@ -54,7 +56,7 @@ function updateValueChartIfVisible() {
 // --- Load & refresh ---
 async function loadPricing() {
   try {
-    const [result, benchPayload] = await Promise.all([pricing.loadPricing(api.getPricing), api.getBenchmarks()]);
+    const [result, benchPayload] = await Promise.all([pricing.loadPricingFromApi(pricingApi.fetchPricingData), api.getBenchmarks()]);
     setData(result);
     benchmarksData = benchPayload?.benchmarks ?? null;
     render.setLastUpdated(result.updated);
@@ -86,7 +88,7 @@ async function loadPricing() {
 async function fillMissingProvidersFromVizra() {
   if (anthropicData.length > 0 && mistralData.length > 0) return;
   const cache = pricing.getCachedPricingPayload();
-  if (cache && pricing.isCacheFresh(cache.cachedAt)) {
+  if (cache) {
     if (anthropicData.length === 0 && cache.anthropic?.length) anthropicData = cache.anthropic.slice();
     if (mistralData.length === 0 && cache.mistral?.length) mistralData = cache.mistral.slice();
     if (anthropicData.length > 0 || mistralData.length > 0) {
@@ -96,9 +98,10 @@ async function fillMissingProvidersFromVizra() {
     }
   }
   try {
-    const data = await api.fetchVizraPricing();
+    const data = await pricingApi.fetchPricingData();
     if (!data || typeof data !== 'object') throw new Error('Invalid response');
-    const parsed = pricing.parseVizraResponse(data);
+    const { payload } = pricing.normalizeFetchedPricing(data);
+    const parsed = payload || { anthropic: [], mistral: [] };
     if (!parsed?.anthropic?.length && !parsed?.mistral?.length) throw new Error('Could not parse');
     let updated = false;
     if (anthropicData.length === 0 && parsed.anthropic?.length) {
@@ -112,10 +115,7 @@ async function fillMissingProvidersFromVizra() {
     if (updated) {
       render.renderTables(getData(), getBenchmarksData());
       updateValueChartIfVisible();
-      const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
-      try {
-        localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
-      } catch (_) {}
+      setCachedPricing({ ...getData(), updated: new Date().toISOString().slice(0, 10) });
     }
   } catch (_) {
     const applied = await pricing.applyFallbackPricingFromFile(api.getPricing, getData());
@@ -123,9 +123,7 @@ async function fillMissingProvidersFromVizra() {
       setData(applied);
       render.renderTables(getData(), getBenchmarksData());
       updateValueChartIfVisible();
-      try {
-        localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify({ ...getData(), updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() }));
-      } catch (_) {}
+      setCachedPricing({ ...getData(), updated: new Date().toISOString().slice(0, 10) });
     }
   }
 }
@@ -138,16 +136,16 @@ async function runDailyCapture() {
       a = anthropicData.slice(),
       m = mistralData.slice();
     const cache = pricing.getCachedPricingPayload();
-    if (cache && pricing.isCacheFresh(cache.cachedAt)) {
+    if (cache) {
       if (cache.gemini?.length) g = cache.gemini.slice();
       if (cache.openai?.length) o = cache.openai.slice();
       if (cache.anthropic?.length) a = cache.anthropic.slice();
       if (cache.mistral?.length) m = cache.mistral.slice();
     } else {
       try {
-        const vizraData = await api.fetchVizraPricing();
-        if (vizraData && typeof vizraData === 'object') {
-          const parsed = pricing.parseVizraResponse(vizraData);
+        const raw = await pricingApi.fetchPricingData();
+        if (raw && typeof raw === 'object') {
+          const { payload: parsed } = pricing.normalizeFetchedPricing(raw);
           if (parsed && (parsed.gemini?.length || parsed.openai?.length)) {
             if (parsed.gemini?.length) g = parsed.gemini;
             if (parsed.openai?.length) o = parsed.openai;
@@ -162,10 +160,8 @@ async function runDailyCapture() {
       localStorage.setItem(pricing.LAST_DAILY_KEY, today);
     } catch (_) {}
     setData({ gemini: g, openai: o, anthropic: a, mistral: m });
-    const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
-    try {
-      localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
-    } catch (_) {}
+    const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10) };
+    setCachedPricing(payload);
     render.setLastUpdated(payload.updated + ' (from web)');
     render.renderTables(getData(), getBenchmarksData());
     render.showToast('Daily snapshot saved to History.', 'success');
@@ -213,21 +209,18 @@ async function refreshFromWeb() {
         anthropic: data.anthropic?.length ? pricing.dedupeModelsByName(data.anthropic) : anthropicData,
         mistral: data.mistral?.length ? pricing.dedupeModelsByName(data.mistral) : mistralData,
       });
-      const payload = { ...getData(), updated: data.updated || new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
+      const payload = { ...getData(), updated: data.updated || new Date().toISOString().slice(0, 10) };
       let drops = [],
         increases = [];
       try {
-        const last = localStorage.getItem(pricing.STORAGE_KEY);
-        if (last) {
-          const lastData = JSON.parse(last);
+        const lastData = getCachedPricing();
+        if (lastData) {
           const diff = pricing.comparePrices(lastData, payload);
           drops = diff.drops;
           increases = diff.increases;
         }
       } catch (_) {}
-      try {
-        localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
-      } catch (_) {}
+      setCachedPricing(payload);
       render.setLastUpdated(render.formatTimestampWithTimezone(new Date()) + ' (from site)');
       render.renderTables(getData(), getBenchmarksData());
       if (drops.length || increases.length) {
@@ -238,9 +231,9 @@ async function refreshFromWeb() {
         render.showToast('Pricing reloaded from site.', 'success');
       }
     } else {
-      const vizraData = await api.fetchVizraPricing();
-      if (!vizraData || typeof vizraData !== 'object') throw new Error('Vizra API unavailable');
-      const parsed = pricing.parseVizraResponse(vizraData);
+      const raw = await pricingApi.fetchPricingData();
+      if (!raw || typeof raw !== 'object') throw new Error('Pricing API unavailable');
+      const { payload: parsed } = pricing.normalizeFetchedPricing(raw);
       if (!parsed || (!parsed.gemini?.length && !parsed.openai?.length)) throw new Error('No pricing data');
       setData({
         gemini: parsed.gemini?.length ? parsed.gemini : geminiData,
@@ -248,21 +241,18 @@ async function refreshFromWeb() {
         anthropic: parsed.anthropic?.length ? parsed.anthropic : anthropicData,
         mistral: parsed.mistral?.length ? parsed.mistral : mistralData,
       });
-      const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10), cachedAt: Date.now() };
+      const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10) };
       let drops = [],
         increases = [];
       try {
-        const last = localStorage.getItem(pricing.STORAGE_KEY);
-        if (last) {
-          const lastData = JSON.parse(last);
+        const lastData = getCachedPricing();
+        if (lastData) {
           const diff = pricing.comparePrices(lastData, payload);
           drops = diff.drops;
           increases = diff.increases;
         }
       } catch (_) {}
-      try {
-        localStorage.setItem(pricing.STORAGE_KEY, JSON.stringify(payload));
-      } catch (_) {}
+      setCachedPricing(payload);
       render.setLastUpdated(render.formatTimestampWithTimezone(new Date()) + ' (Vizra)');
       render.renderTables(getData(), getBenchmarksData());
       if (drops.length || increases.length) {

@@ -72,6 +72,8 @@ In the **Overview** section, the **Current pricing** block shows API pricing per
 
 **Export toolbar alignment** — All export (CSV/PDF) toolbars in the app are **right-aligned** for consistency: **Current pricing** (Overview), **Model comparison** (Models section), **Calculators**, and **Benchmarks**. Implementation: Overview uses `justify-content: space-between` on `.pricing-section-header`; Model comparison uses `margin-left: auto` on `.comparison-export-toolbar`; Calculators and Benchmarks use `margin-left: auto` on `.calculators-export-toolbar` and `.benchmark-export-toolbar` with parent `#calculators` and `#section-benchmark` set to `display: flex; flex-direction: column` in `css/styles.css`.
 
+**Table rendering (DocumentFragment)** — To keep rendering fast and avoid multiple DOM updates, table rows are appended via a **DocumentFragment**. Instead of appending each row to the `tbody` in a loop (which would trigger a reflow per row), the app builds an array of row HTML strings, parses them into a temporary container, moves all `<tr>` nodes into a fragment, and appends the fragment to the `tbody` in a single operation. Benefits: fewer reflows, faster rendering, and better performance for large model lists. Used in **Current pricing** (four provider tables), **Model comparison** table, and **Benchmarks** dashboard. Implementation: `appendRowsWithFragment(tbody, rowHtmlArray)` in `src/render.js`; used by `renderTables()`, `renderModelComparisonTable()`, and `renderBenchmarkDashboard()`.
+
 ---
 
 ## Calculator tooltips

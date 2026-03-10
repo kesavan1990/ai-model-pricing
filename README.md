@@ -60,7 +60,7 @@ External sources
       └── Benchmark sources (Arena, HF) → update-benchmarks.js → benchmarks.json
 
 Frontend (index.html + src/)
-   load pricing.json + benchmarks.json
+   fetchPricingData() (Vizra API → pricing.json fallback) + benchmarks.json
    → mergeModels() (pricing + benchmarks by model/provider)
    → computeCostPerRequest() (e.g. 1k prompt + 500 output tokens)
    → computeFrontier() (best performance at each cost level)
@@ -93,11 +93,13 @@ Front-end logic is split into ES modules under `src/` for clearer code and easie
 
 | File | Role |
 |------|------|
-| **`src/api.js`** | Fetch layer: `getPricing()` uses `getPricingJsonUrl()` which returns `pricing.json?t=${Date.now()}` so the browser does not cache stale pricing (see [Cache-busting](docs/PRICING_UPDATES.md#cache-busting-in-frontend)); `fetchVizraPricing()`, `getPricingJsonUrl()`, `isGitHubPages()`, `fetchWithCors()` for doc search. |
-| **`src/pricingService.js`** | Load, cache, normalize: `loadPricing()`, `DEFAULT_PRICING`, `parseVizraResponse()`, `comparePrices()`, `dedupeModelsByName`, history (getHistory, saveToHistory, cleanupHistoryToDailyOnly), cache helpers. |
+| **`src/api/pricingService.js`** | **Pricing API service:** `fetchPricingData()` tries Vizra API (`https://vizra.ai/api/llm-model-pricing`), then falls back to `pricing.json`. Isolates API logic from UI for easier debugging and API changes. See [docs/API.md](docs/API.md). |
+| **`src/utils/cacheManager.js`** | **Cache manager:** `getCachedPricing()` / `setCachedPricing(data)` with 12-hour TTL. Centralizes pricing cache in one place and reduces API calls. See [docs/CACHE.md](docs/CACHE.md). |
+| **`src/api.js`** | Other fetch layer: `getPricing()` (pricing.json with cache-busting, used for file-only fallbacks), `getBenchmarks()`, `getPricingJsonUrl()`, `isGitHubPages()`, `fetchWithCors()` for doc search. |
+| **`src/pricingService.js`** | Load, cache, normalize: `loadPricingFromApi(fetchPricingData)` (primary), `loadPricing(getPricing)`, `getCachedPricingPayload()` (uses cache manager), `normalizeFetchedPricing()`, `DEFAULT_PRICING`, `parseVizraResponse()`, `comparePrices()`, history. |
 | **`src/calculator.js`** | Pure logic: cost (`calcCost`, `calcCostOpenAI`, `calcCostForEntry`), context windows, benchmarks, model lists (`getUnifiedCalcModels`, `getAllModels`), recommendations (`getRecommendations`, `scoreModelForUseCase`), doc search helpers, `estimatePromptTokens`. |
 | **`src/valueChart.js`** | Cost vs Performance quadrant: `mergeModels()` (pricing + benchmarks), `computeCostPerRequest()`, `computeFrontier()`, `renderQuadrantChart()` (Chart.js scatter), `updateValueChart()`. |
-| **`src/render.js`** | UI: `renderTables()`, `updateKPIs()` (KPI cards), `renderModelComparisonTable()` (Model \| Provider \| Input \| Output \| Context; provider filter, sort by Default/Input/Output/Context, group by provider + cheapest first, cheapest-row highlight), `setComparisonProviderFilter()`, `setComparisonSortBy()`, `renderBenchmarkDashboard()`, `renderHistoryList()`, `renderRecommendations()`, toasts, `setLastUpdated`, CSV/PDF export helpers, `formatHistoryDate`. |
+| **`src/render.js`** | UI: `renderTables()`, `updateKPIs()` (KPI cards), `renderModelComparisonTable()`, `renderBenchmarkDashboard()`, `appendRowsWithFragment()` (DocumentFragment for table rows — fewer reflows, faster rendering for large lists), `renderHistoryList()`, `renderRecommendations()`, toasts, `setLastUpdated`, CSV/PDF export helpers, `formatHistoryDate`. See [Table rendering (DocumentFragment)](docs/UI.md#current-pricing-section). |
 | **`src/app.js`** | App entry: state (gemini/openai/anthropic/mistral), `loadPricing`, `refreshFromWeb`, daily capture, history compare, calculator handlers, event wiring; imports the modules above. |
 
 `index.html` contains markup only: it links to **`css/styles.css`** for all styles and to **`src/app.js`** as the app entry (`<script type="module" src="src/app.js"></script>`). No inline CSS or app logic.
@@ -109,6 +111,8 @@ Static only (HTML/CSS/JS). No server or database. See [HOSTING.md](HOSTING.md) f
 ## Docs
 
 - [docs/UI.md](docs/UI.md) — UI overview: **Dashboard layout and sidebar navigation** (header, sidebar, scrollable main; section order: Overview → Value Analysis → Recommend → Models → Calculators → Benchmarks; responsive sidebar at ≤ 900px), **Dark mode / light mode**, **KPI cards**, **Current pricing** (grid, search, export), **Calculator tooltips** (?), **Cost calculator** (Pricing), **Prompt cost estimator** (paste/import, token count, cost per model), **Context window calculator**, **Production cost simulator** (formula, per request/annum; **simulator note**: flat token pricing, no tiered discounts or prompt caching), **Calculators export** (CSV/PDF of current result), **Export toolbar alignment** (right-aligned), **Model comparison table** (provider filter, sort, cheapest highlight, export), **Cost vs Performance quadrant** (scatter, fixed baseline 1k/500 tokens, frontier, Arena/MMLU/Code, provider filter; theme-aware colors; mobile/responsive; lazy rendering and filtering for large datasets; frontier tooltips: subtitle (?), legend-hint (?) native title, point hover), **Model benchmark dashboard** (pipeline, export), **Recommend module** (all four providers, diversity, doc search), **Pricing history** (modal, compare two dates, export; recent price changes), **Data status (footer)** (Pricing and Benchmarks last-updated dates), **Favicon** (inline SVG).
+- [docs/API.md](docs/API.md) — **Pricing API service:** `fetchPricingData()`, Vizra → pricing.json fallback, how the UI uses it, and how to change the API.
+- [docs/CACHE.md](docs/CACHE.md) — **Cache manager:** `getCachedPricing()` / `setCachedPricing()`, 12-hour TTL, centralizes cache logic and reduces API calls.
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md) — Benchmark pipeline: `benchmarks.json`, weekly workflow, merge with pricing by model.
 - [docs/PRICING_UPDATES.md](docs/PRICING_UPDATES.md) — Pricing update architecture and flow.
 - [docs/PRICING_SCENARIOS.md](docs/PRICING_SCENARIOS.md) — How pricing is loaded in each scenario (first load, refresh, GitHub vs local).

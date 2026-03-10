@@ -53,6 +53,23 @@ export function filterPricingTable(tbodyId, query) {
   });
 }
 
+/**
+ * Append table rows to tbody using a DocumentFragment for fewer reflows and faster rendering.
+ * @param {HTMLTableSectionElement} tbody - Target tbody element.
+ * @param {string[]} rowHtmlArray - Array of full <tr>...</tr> HTML strings.
+ */
+function appendRowsWithFragment(tbody, rowHtmlArray) {
+  if (!rowHtmlArray || rowHtmlArray.length === 0) {
+    tbody.innerHTML = '';
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  const temp = document.createElement('tbody');
+  temp.innerHTML = rowHtmlArray.join('');
+  while (temp.firstChild) fragment.appendChild(temp.firstChild);
+  tbody.appendChild(fragment);
+}
+
 export function renderTables(data, benchmarks = null) {
   const { gemini = [], openai = [], anthropic = [], mistral = [] } = data;
   const geminiRow = (m) => {
@@ -78,10 +95,10 @@ export function renderTables(data, benchmarks = null) {
   const openaiTbody = document.getElementById('openai-tbody');
   const anthropicTbody = document.getElementById('anthropic-tbody');
   const mistralTbody = document.getElementById('mistral-tbody');
-  if (geminiTbody) geminiTbody.innerHTML = gemini.map(geminiRow).join('');
-  if (openaiTbody) openaiTbody.innerHTML = openai.map(openaiRow).join('');
-  if (anthropicTbody) anthropicTbody.innerHTML = anthropic.map(simpleRow).join('');
-  if (mistralTbody) mistralTbody.innerHTML = mistral.map(simpleRow).join('');
+  if (geminiTbody) appendRowsWithFragment(geminiTbody, gemini.map(geminiRow));
+  if (openaiTbody) appendRowsWithFragment(openaiTbody, openai.map(openaiRow));
+  if (anthropicTbody) appendRowsWithFragment(anthropicTbody, anthropic.map(simpleRow));
+  if (mistralTbody) appendRowsWithFragment(mistralTbody, mistral.map(simpleRow));
   filterPricingTable('gemini-tbody', document.getElementById('gemini-search')?.value);
   filterPricingTable('openai-tbody', document.getElementById('openai-search')?.value);
   filterPricingTable('anthropic-tbody', document.getElementById('anthropic-search')?.value);
@@ -174,18 +191,16 @@ export function renderModelComparisonTable(data, providerFilter, sortByArg) {
   const fmt = (v) => (v === 0 ? 'Free' : '$' + Number(v).toFixed(2));
   const withBlended = list.filter((m) => m.blended >= 0);
   const cheapestModel = withBlended.length ? withBlended.reduce((min, m) => (m.blended < min.blended ? m : min), withBlended[0]) : null;
-  const rows = list
-    .map((m) => {
-      const inp = fmt(m.input);
-      const out = fmt(m.output);
-      const ctx = m.contextWindow || '—';
-      const isCheapest = cheapestModel && m.name === cheapestModel.name && m.providerKey === cheapestModel.providerKey;
-      const nameCell = isCheapest ? `${m.name} <span class="cheapest-badge" aria-label="Cheapest">🟢 Cheapest</span>` : m.name;
-      const rowClass = isCheapest ? 'cheapest' : '';
-      return `<tr class="${rowClass}"><td class="model-name">${nameCell}</td><td class="provider-name">${m.provider}</td><td class="price price-input">${inp}</td><td class="price price-output">${out}</td><td class="context-window">${ctx}</td></tr>`;
-    })
-    .join('');
-  tbody.innerHTML = rows;
+  const rows = list.map((m) => {
+    const inp = fmt(m.input);
+    const out = fmt(m.output);
+    const ctx = m.contextWindow || '—';
+    const isCheapest = cheapestModel && m.name === cheapestModel.name && m.providerKey === cheapestModel.providerKey;
+    const nameCell = isCheapest ? `${m.name} <span class="cheapest-badge" aria-label="Cheapest">🟢 Cheapest</span>` : m.name;
+    const rowClass = isCheapest ? 'cheapest' : '';
+    return `<tr class="${rowClass}"><td class="model-name">${nameCell}</td><td class="provider-name">${m.provider}</td><td class="price price-input">${inp}</td><td class="price price-output">${out}</td><td class="context-window">${ctx}</td></tr>`;
+  });
+  appendRowsWithFragment(tbody, rows);
 }
 
 /**
@@ -208,19 +223,21 @@ export function renderBenchmarkDashboard(data, fileBenchmarks = null) {
   const container = document.getElementById('benchmark-dashboard-table');
   if (!container) return;
   const all = getAllModels(data);
-  const rows = all
-    .map((m) => {
-      const b = getBenchmarkForModelMerged(m.name, m.providerKey, fileBenchmarks);
-      const { tier, desc } = getCostTierLabel(m.blended);
-      const blendedStr = m.blended <= 0 ? '0' : m.blended.toFixed(2);
-      const costTitle = `Blended: $${blendedStr}/1M tokens (70% input, 30% output) — ${desc}`;
-      return `<tr><td class="model-name">${m.name}</td><td class="benchmark-score">${b.mmlu}</td><td class="benchmark-score">${b.code}</td><td class="benchmark-score">${b.reasoning}</td><td class="benchmark-score">${b.arena}</td><td class="cost-tier" title="${costTitle}">${tier}</td></tr>`;
-    })
-    .join('');
-  container.innerHTML =
-    '<table class="model-table"><thead><tr><th>Model</th><th title="Massive Multitask Language Understanding — broad knowledge across 57 subjects (STEM, humanities, etc.). Higher = better.">MMLU</th><th title="HumanEval — code generation benchmark (Python). Higher = better.">Code</th><th title="GSM8K — grade-school math word problems; measures reasoning. Higher = better.">Reasoning</th><th title="Arena / leaderboard-style ranking (e.g. LMSys Chatbot Arena). Higher = better overall preference.">Arena</th><th title="Based on blended price per 1M tokens (70% input + 30% output). $ = free/low, $$ = budget, $$$ = premium.">Cost</th></tr></thead><tbody>' +
-    rows +
-    '</tbody></table>';
+  const rowHtmlArray = all.map((m) => {
+    const b = getBenchmarkForModelMerged(m.name, m.providerKey, fileBenchmarks);
+    const { tier, desc } = getCostTierLabel(m.blended);
+    const blendedStr = m.blended <= 0 ? '0' : m.blended.toFixed(2);
+    const costTitle = `Blended: $${blendedStr}/1M tokens (70% input, 30% output) — ${desc}`;
+    return `<tr><td class="model-name">${m.name}</td><td class="benchmark-score">${b.mmlu}</td><td class="benchmark-score">${b.code}</td><td class="benchmark-score">${b.reasoning}</td><td class="benchmark-score">${b.arena}</td><td class="cost-tier" title="${costTitle}">${tier}</td></tr>`;
+  });
+  const table = document.createElement('table');
+  table.className = 'model-table';
+  table.innerHTML =
+    '<thead><tr><th>Model</th><th title="Massive Multitask Language Understanding — broad knowledge across 57 subjects (STEM, humanities, etc.). Higher = better.">MMLU</th><th title="HumanEval — code generation benchmark (Python). Higher = better.">Code</th><th title="GSM8K — grade-school math word problems; measures reasoning. Higher = better.">Reasoning</th><th title="Arena / leaderboard-style ranking (e.g. LMSys Chatbot Arena). Higher = better overall preference.">Arena</th><th title="Based on blended price per 1M tokens (70% input + 30% output). $ = free/low, $$ = budget, $$$ = premium.">Cost</th></tr></thead><tbody></tbody>';
+  const tbody = table.querySelector('tbody');
+  appendRowsWithFragment(tbody, rowHtmlArray);
+  container.innerHTML = '';
+  container.appendChild(table);
 }
 
 /** Return benchmark table rows for export (same data as dashboard). */
