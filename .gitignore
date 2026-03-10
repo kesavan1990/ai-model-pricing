@@ -1,5 +1,6 @@
 # Removed: local pricing API (pricing is updated via GitHub Actions only)
-api/
+# Only ignore root-level api/; src/api/ is the frontend pricing API service module
+/api/
 
 # OS
 .DS_Store
