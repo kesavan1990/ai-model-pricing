@@ -42,7 +42,7 @@ In the repo: **Actions → Update pricing → Run workflow**.
 
 ## What’s in the app
 
-- **Top navigation bar** — Overview, Model Comparison, Pricing Calculator, Production Cost Simulator, Dataset, Recommend. Jump between sections without scrolling. See [Top navigation bar](docs/UI.md#top-navigation-bar).
+- **Top navigation bar** — Overview, Model Comparison, Calculators (Pricing, Prompt cost, Context window, Production cost), Benchmarks, Recommend. Jump between sections without scrolling. Production cost simulator is under Calculators. See [Top navigation bar](docs/UI.md#top-navigation-bar).
 - **KPI summary cards** — On Home: total models, cheapest (by blended cost), costliest, largest context. See [KPI summary cards](docs/UI.md#kpi-summary-cards).
 - **Pricing grid** — Gemini, OpenAI, Anthropic, Mistral (input/output/cached per 1M tokens).
 - **Dark mode / light mode** — Toggle in the header (☀️/🌙). Preference is saved and respects system `prefers-color-scheme` on first visit. See [docs/UI.md](docs/UI.md#dark-mode-and-light-mode).

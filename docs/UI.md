@@ -8,12 +8,11 @@ Below the header (**AI Model Pricing Dashboard**), a single **top navigation bar
 |------|-------------|
 | **Overview** | KPI cards and current pricing grid (all providers). |
 | **Model Comparison** | Compare tab: filterable/sortable table of all models. |
-| **Pricing Calculator** | Calculators → Pricing: estimate cost for a chosen model. |
-| **Production Cost Simulator** | Calculators → Production cost: simulate cost by users/requests. |
-| **Dataset** | Benchmarks tab: MMLU, code, reasoning, arena scores. |
+| **Calculators** | Calculators tab (Pricing, Prompt cost, Context window, **Production cost**). Use the sub-nav inside the tab to open the Production cost simulator or other tools. |
+| **Benchmarks** | Benchmarks tab: MMLU, code, reasoning, arena scores. |
 | **Recommend** | Find the right model by use case. |
 
-Clicking a link updates the URL hash (e.g. `#pricing`, `#comparison`, `#calc-pricing`, `#calc-production`, `#benchmarks`, `#recommend`) and shows the corresponding panel. The active link is highlighted. For calculator links, the correct sub-panel (Pricing or Production cost) is shown and the matching nav item is active. Markup: `<nav class="tab-nav top-nav">` in `index.html`; behavior in `src/app.js` (`switchTab`, `switchCalcSub`, hashchange listener).
+Clicking a link updates the URL hash (e.g. `#pricing`, `#comparison`, `#calc-pricing`, `#benchmarks`, `#recommend`) and shows the corresponding panel. The active link is highlighted. The **Production cost simulator** is not a separate top-level link; it is available inside **Calculators** via the “Production cost” sub-tab. Markup: `<nav class="tab-nav top-nav">` in `index.html`; behavior in `src/app.js` (`switchTab`, `switchCalcSub`, hashchange listener).
 
 ---
 
