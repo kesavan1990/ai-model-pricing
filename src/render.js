@@ -292,7 +292,7 @@ export function renderRecommendations(results, fromDocs) {
     if (m.output > 0) parts.push(`Out: $${m.output}/1M`);
     return parts.join(' · ');
   };
-  const docNote = fromDocs ? '<p class="recommend-doc-note">Results informed by official Gemini &amp; OpenAI documentation.</p>' : '';
+  const docNote = fromDocs ? '<p class="recommend-doc-note">Results informed by official Gemini, OpenAI, Anthropic, and Mistral documentation.</p>' : '';
   container.innerHTML =
     docNote +
     results

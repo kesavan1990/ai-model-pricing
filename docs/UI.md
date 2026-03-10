@@ -171,6 +171,25 @@ On the **Benchmarks** tab, the **Model benchmark dashboard** shows one table wit
 
 ---
 
+## Recommend module
+
+The **Recommend** tab helps users find a suitable model by describing their use case (e.g. “cheap summarization”, “best quality for code”, “long documents”). It considers **all four service providers**: **Google Gemini**, **OpenAI**, **Anthropic**, and **Mistral**.
+
+**Model pool** — Recommendations are built from every model in the current pricing data. `getAllModels(data)` in `src/calculator.js` aggregates models from `data.gemini`, `data.openai`, `data.anthropic`, and `data.mistral`, so no provider is excluded. Each model is scored (cost, reasoning, context, performance) and the top results are shown.
+
+**Documentation search** — When the user clicks **Get recommendation**, the app also fetches official documentation pages and searches them for the user’s keywords. Doc search runs for **all four providers**:
+
+| Provider   | Documentation URL(s) used |
+|------------|----------------------------|
+| Google Gemini | `ai.google.dev` (pricing + models) |
+| OpenAI    | `developers.openai.com` + `platform.openai.com` (pricing + models) |
+| Anthropic  | `docs.anthropic.com` (model cards) |
+| Mistral    | `docs.mistral.ai` (models) |
+
+Matching snippets from any of these sources are attached to the recommended models when available. The note under the results says: “Results informed by official Gemini, OpenAI, Anthropic, and Mistral documentation.” Implementation: `fetchDocsAndSearch()` in `src/app.js` fetches all four in parallel, runs `calc.searchDocContent()` per provider with that provider’s model names, and merges matches into a single doc map keyed by `providerKey:modelName`. `runRecommendation()` then enriches each recommendation with doc snippets and passes the “fromDocs” flag to `render.renderRecommendations()` so the note is shown when any provider’s docs were searched.
+
+---
+
 ## Favicon
 
 The app provides a **favicon** so the browser does not request `/favicon.ico` (which would 404 on static hosts like GitHub Pages). The favicon is an inline SVG (🤖) in the document head via a `data:` URL: `<link rel="icon" href="data:image/svg+xml,..." type="image/svg+xml">` in `index.html`. No separate favicon file is required.

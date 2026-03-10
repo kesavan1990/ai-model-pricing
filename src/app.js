@@ -912,20 +912,36 @@ const GEMINI_PRICING_URL = 'https://ai.google.dev/gemini-api/docs/pricing';
 const GEMINI_DOC_URL = 'https://ai.google.dev/gemini-api/docs/models/gemini';
 const OPENAI_PRICING_URL = 'https://developers.openai.com/api/docs/pricing';
 const OPENAI_DOC_URL = 'https://platform.openai.com/docs/models';
+const ANTHROPIC_DOC_URL = 'https://docs.anthropic.com/en/docs/build-with-claude/model-cards';
+const MISTRAL_DOC_URL = 'https://docs.mistral.ai/models/';
 
 async function fetchDocsAndSearch(description) {
   const keywords = calc.extractKeywords(description);
   const geminiNames = geminiData.map((m) => m.name);
   const openaiNames = openaiData.map((m) => m.name);
-  const [g1, g2] = await Promise.allSettled([api.fetchWithCors(GEMINI_PRICING_URL), api.fetchWithCors(GEMINI_DOC_URL)]);
-  const [o1, o2] = await Promise.allSettled([api.fetchWithCors(OPENAI_PRICING_URL), api.fetchWithCors(OPENAI_DOC_URL)]);
+  const anthropicNames = anthropicData.map((m) => m.name);
+  const mistralNames = mistralData.map((m) => m.name);
+  const [g1, g2, o1, o2, a1, m1] = await Promise.allSettled([
+    api.fetchWithCors(GEMINI_PRICING_URL),
+    api.fetchWithCors(GEMINI_DOC_URL),
+    api.fetchWithCors(OPENAI_PRICING_URL),
+    api.fetchWithCors(OPENAI_DOC_URL),
+    api.fetchWithCors(ANTHROPIC_DOC_URL),
+    api.fetchWithCors(MISTRAL_DOC_URL),
+  ]);
   let geminiHtml = (g1.status === 'fulfilled' && g1.value ? g1.value : '') + (g2.status === 'fulfilled' && g2.value ? g2.value : '');
   let openaiHtml = (o1.status === 'fulfilled' && o1.value ? o1.value : '') + (o2.status === 'fulfilled' && o2.value ? o2.value : '');
+  const anthropicHtml = a1.status === 'fulfilled' && a1.value ? a1.value : '';
+  const mistralHtml = m1.status === 'fulfilled' && m1.value ? m1.value : '';
   const geminiMatches = geminiHtml.trim() ? calc.searchDocContent(geminiHtml, geminiNames, keywords) : [];
   const openaiMatches = openaiHtml.trim() ? calc.searchDocContent(openaiHtml, openaiNames, keywords) : [];
+  const anthropicMatches = anthropicHtml.trim() ? calc.searchDocContent(anthropicHtml, anthropicNames, keywords) : [];
+  const mistralMatches = mistralHtml.trim() ? calc.searchDocContent(mistralHtml, mistralNames, keywords) : [];
   return {
     gemini: geminiMatches.map((m) => ({ ...m, providerKey: 'gemini', provider: 'Google Gemini' })),
     openai: openaiMatches.map((m) => ({ ...m, providerKey: 'openai', provider: 'OpenAI' })),
+    anthropic: anthropicMatches.map((m) => ({ ...m, providerKey: 'anthropic', provider: 'Anthropic' })),
+    mistral: mistralMatches.map((m) => ({ ...m, providerKey: 'mistral', provider: 'Mistral' })),
   };
 }
 
@@ -949,7 +965,13 @@ async function runRecommendation() {
   }
   const docMap = new Map();
   if (docResults) {
-    [...docResults.gemini, ...docResults.openai].forEach((m) => {
+    const allDocMatches = [
+      ...(docResults.gemini || []),
+      ...(docResults.openai || []),
+      ...(docResults.anthropic || []),
+      ...(docResults.mistral || []),
+    ];
+    allDocMatches.forEach((m) => {
       const key = m.providerKey + ':' + m.modelName;
       if (!docMap.has(key) || (m.snippet && m.snippet.length > (docMap.get(key).snippet || '').length)) docMap.set(key, m);
     });
@@ -966,7 +988,8 @@ async function runRecommendation() {
   });
   const hasDocSnippet = results.some((r) => r.docSnippet);
   if (hasDocSnippet && docResults) results.sort((a, b) => (b.docSnippet ? 1 : 0) - (a.docSnippet ? 1 : 0));
-  render.renderRecommendations(results, !!(docResults && (docResults.gemini?.length || docResults.openai?.length)));
+  const hasAnyDoc = docResults && (docResults.gemini?.length || docResults.openai?.length || docResults.anthropic?.length || docResults.mistral?.length);
+  render.renderRecommendations(results, !!hasAnyDoc);
 }
 
 // --- Tabs & nav ---
