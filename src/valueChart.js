@@ -108,9 +108,6 @@ export function renderQuadrantChart(canvasOrId, mergedModels, options = {}) {
 
   const frontierColors = frontierPoints.map((m) => PROVIDER_COLORS[m.providerKey] || 'rgba(239, 68, 68, 0.9)');
 
-  const frontierSortedByCost = [...frontierPoints].sort((a, b) => a.cost - b.cost);
-  const lineData = frontierSortedByCost.map((p) => ({ x: p.cost, y: p.performance }));
-
   // All models: medium grey visible on both light and dark backgrounds
   const allModelsFill = isDark ? 'rgba(180, 180, 180, 0.5)' : 'rgba(100, 100, 100, 0.35)';
   const allModelsBorder = isDark ? 'rgba(200, 200, 200, 0.65)' : 'rgba(80, 80, 80, 0.5)';
@@ -138,27 +135,12 @@ export function renderQuadrantChart(canvasOrId, mergedModels, options = {}) {
     order: 1,
   };
 
-  // Frontier line: strong red visible in both themes
-  const frontierLineColor = isDark ? 'rgba(248, 113, 113, 0.95)' : 'rgba(185, 28, 28, 0.9)';
-
-  const datasetFrontierLine = {
-    type: 'line',
-    label: 'Frontier line',
-    data: lineData,
-    borderColor: frontierLineColor,
-    borderWidth: 2,
-    fill: false,
-    pointRadius: 0,
-    pointHoverRadius: 0,
-    order: 0,
-  };
-
   const metricLabel = performanceMetric === 'arena' ? 'Arena' : performanceMetric === 'mmlu' ? 'MMLU' : 'Code';
 
   const config = {
     type: 'scatter',
     data: {
-      datasets: [datasetAll, datasetFrontier, datasetFrontierLine],
+      datasets: [datasetAll, datasetFrontier],
     },
     options: {
       responsive: true,
@@ -172,12 +154,15 @@ export function renderQuadrantChart(canvasOrId, mergedModels, options = {}) {
               const m = allPoints.find((a) => a.x === p.x && a.y === p.y) || frontierPoints.find((a) => a.x === p.x && a.y === p.y);
               if (!m) return `${p.x?.toFixed(4)} $, ${p.y}`;
               const onFrontier = frontierSet.has(m.providerKey + ':' + m.name);
-              return [
+              const lines = [
                 m.name + ' · ' + m.provider,
                 `Cost/request: $${(m.cost || 0).toFixed(4)}`,
                 `${metricLabel}: ${m.performance}`,
-                onFrontier ? '✓ Frontier' : '',
-              ].filter(Boolean);
+              ];
+              if (onFrontier) {
+                lines.push('✓ Frontier — best value at this cost (no cheaper model has higher performance).');
+              }
+              return lines;
             },
           },
         },

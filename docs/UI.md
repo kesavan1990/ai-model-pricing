@@ -7,7 +7,7 @@ Below the header (**AI Model Pricing Dashboard**), a single **top navigation bar
 | Link | Destination |
 |------|-------------|
 | **Overview** | KPI cards and current pricing grid (all providers). |
-| **Model Comparison** | Compare tab: filterable/sortable table of all models. |
+| **Model Comparison** | Compare tab: filterable/sortable table of all models and Cost vs Performance scatter chart. |
 | **Calculators** | Calculators tab (Pricing, Prompt cost, Context window, **Production cost**). Use the sub-nav inside the tab to open the Production cost simulator or other tools. |
 | **Benchmarks** | Benchmarks tab: MMLU, code, reasoning, arena scores. |
 | **Recommend** | Find the right model by use case. |
@@ -101,6 +101,18 @@ OpenAI models can also use **Cached input tokens** (tokens served from cache at 
 
 ---
 
+## Prompt cost estimator
+
+In **Calculators → 📝 Prompt cost**, you can paste text (or **Import file**: TXT, CSV, PDF, MD, JSON) to get an estimated **prompt token count** (using gpt-tokenizer / cl100k_base when available, else ≈4 chars per token). You set **Estimated output tokens**; then **Estimate cost** shows cost per model across Gemini, OpenAI, Anthropic, and Mistral (embedding-only models excluded). Use **Reset** to clear. The result can be exported via the Calculators export toolbar when this sub-tab is active.
+
+---
+
+## Context window calculator
+
+In **Calculators → 📐 Context window**, you enter **Prompt tokens** and **Output tokens**; **Check context** shows which models can fit that input+output within their context limit (and which cannot). The result table lists each model with its context window and whether your prompt + output fits. Use **Reset** to restore defaults. The result can be exported via the Calculators export toolbar when this sub-tab is active.
+
+---
+
 ## Production cost simulator
 
 In **Calculators → 🏭 Production cost**, the production cost simulator estimates API cost across all models for a given usage scenario.
@@ -161,7 +173,7 @@ The table is filled by `renderModelComparisonTable(data)` in `src/render.js`, us
 
 ## Cost vs Performance quadrant chart
 
-On the **Compare** tab, below the Model comparison table, a **Cost vs Performance** scatter chart helps you see value at a glance: cost per request (X) vs a chosen performance metric (Y). All models appear as grey dots; **frontier** models (best performance at each cost level) are colored by provider and connected by a red frontier line. Hover any point for model name, cost per request, and performance score.
+On the **Compare** tab, below the Model comparison table, a **Cost vs Performance** scatter chart helps you see value at a glance: cost per request (X) vs a chosen performance metric (Y). All models appear as grey dots; **frontier** models (best performance at each cost level) are colored by provider. Hover any point for model name, cost per request, and performance score.
 
 **Data** — The chart uses the same merged dataset as the rest of the app: **pricing** (input/output per 1M tokens) and **benchmarks** (Arena, MMLU, Code). Cost per request is computed with fixed token counts: **1,000 prompt tokens** and **500 output tokens** by default, so models are comparable on a “typical” request.
 
@@ -169,9 +181,11 @@ On the **Compare** tab, below the Model comparison table, a **Cost vs Performanc
 
 **Controls** — **Performance metric** dropdown: **Arena**, **MMLU**, or **Code** (Y axis). **Filter by provider**: All, Google, OpenAI, Anthropic, Mistral (same idea as the table filter but independent for the chart).
 
-**Chart colors (light and dark theme)** — The chart uses theme-aware colors so it stays readable in both modes. **Dark theme:** axis and legend text `#e2e8f0`; grid `rgba(255,255,255,0.12)`; “All models” dots medium light grey (fill/border) so they remain visible on dark background; frontier line red (`rgba(248,113,113,0.95)`); frontier points colored by provider (blue / emerald / orange / violet) at 0.95 opacity. **Light theme:** axis and legend text `#334155`; grid `rgba(0,0,0,0.1)`; “All models” dots medium grey; frontier line dark red; same provider colors. When you toggle the app theme, the chart is redrawn with the matching palette (see `setTheme()` → `updateValueChartIfVisible()` in `src/app.js`).
+**Frontier tooltips** — Two places explain what “frontier” means. (1) **Section subtitle:** A **(?)** icon next to “frontier (best value at each cost level)” uses the same pattern as the calculator labels; hover it to see: “Frontier = models with best performance at their cost; no cheaper model scores higher on the selected metric.” (2) **Chart point tooltip:** When you hover a frontier (colored) point, the tooltip shows model name, provider, cost per request, performance score, and the line “✓ Frontier — best value at this cost (no cheaper model has higher performance).” Non-frontier points show only the first three lines. Implementation: `title` on `<span class="calc-tooltip-icon">(?)</span>` in the section subtitle in `index.html`; tooltip callback in `renderQuadrantChart()` in `src/valueChart.js` adds the frontier line when `onFrontier` is true.
 
-**Implementation** — `src/valueChart.js`: `mergeModels()` builds cost + performance per model from `getAllModels(data)` and `getBenchmarkForModelMerged()`; `computeCostPerRequest()` uses (prompt/1e6)×input + (output/1e6)×output; `computeFrontier()` implements the frontier algorithm; `renderQuadrantChart()` uses **Chart.js** (scatter + line). The chart is rendered or updated when the Compare tab is active and when data or filters change; theme (dark/light) is respected. Markup: `#section-value-chart`, `#value-chart-canvas`, `.value-chart-controls` in `index.html`; styles in `css/styles.css` (`.value-chart-section`, `.value-chart-wrap` with fixed height for responsive chart).
+**Chart colors (light and dark theme)** — The chart uses theme-aware colors so it stays readable in both modes. **Dark theme:** axis and legend text `#e2e8f0`; grid `rgba(255,255,255,0.12)`; “All models” dots medium light grey (fill/border) so they remain visible on dark background; frontier points colored by provider (blue / emerald / orange / violet) at 0.95 opacity. **Light theme:** axis and legend text `#334155`; grid `rgba(0,0,0,0.1)`; “All models” dots medium grey; same provider colors. When you toggle the app theme, the chart is redrawn with the matching palette (see `setTheme()` → `updateValueChartIfVisible()` in `src/app.js`).
+
+**Implementation** — `src/valueChart.js`: `mergeModels()` builds cost + performance per model from `getAllModels(data)` and `getBenchmarkForModelMerged()`; `computeCostPerRequest()` uses (prompt/1e6)×input + (output/1e6)×output; `computeFrontier()` implements the frontier algorithm; `renderQuadrantChart()` uses **Chart.js** (scatter only: all models + frontier points). The chart is rendered or updated when the Compare tab is active and when data or filters change; theme (dark/light) is respected. Markup: `#section-value-chart`, `#value-chart-canvas`, `.value-chart-controls` in `index.html`; styles in `css/styles.css` (`.value-chart-section`, `.value-chart-wrap` with fixed height for responsive chart).
 
 ---
 
@@ -205,6 +219,12 @@ The **Recommend** tab helps users find a suitable model by describing their use 
 | Mistral    | `docs.mistral.ai` (models) |
 
 Matching snippets from any of these sources are attached to the recommended models when available. The note under the results says: “Results informed by official Gemini, OpenAI, Anthropic, and Mistral documentation.” Implementation: `fetchDocsAndSearch()` in `src/app.js` fetches all four in parallel, runs `calc.searchDocContent()` per provider with that provider’s model names, and merges matches into a single doc map keyed by `providerKey:modelName`. `runRecommendation()` then enriches each recommendation with doc snippets and passes the “fromDocs” flag to `render.renderRecommendations()` so the note is shown when any provider’s docs were searched.
+
+---
+
+## Pricing history
+
+The **📜 History** button in the header opens a **Pricing history** modal. Daily snapshots (12:00 AM IST) are saved when you first open the app each day; one snapshot per day is kept. History is stored in this browser only (separate for local file vs GitHub Pages). In the modal you can **compare two dates**: select two snapshots and see which models had price changes (drops and increases) between those dates. **Export CSV** and **Export PDF** download the full history list. After you click **Refresh from web**, a **Recent price changes** summary may appear in the footer showing which provider/model/field dropped or increased compared with the previous snapshot.
 
 ---
 
