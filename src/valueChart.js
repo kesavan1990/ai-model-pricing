@@ -145,9 +145,15 @@ export function renderQuadrantChart(canvasOrId, mergedModels, options = {}) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { intersect: true },
       plugins: {
         legend: { display: true, position: 'top', labels: { color: textColor } },
         tooltip: {
+          filter: (tooltipItem) => {
+            const raw = tooltipItem?.raw;
+            if (raw == null || typeof raw.x !== 'number' || typeof raw.y !== 'number') return false;
+            return allPoints.some((a) => a.x === raw.x && a.y === raw.y) || frontierPoints.some((a) => a.x === raw.x && a.y === raw.y);
+          },
           callbacks: {
             label(context) {
               const p = context.raw;
