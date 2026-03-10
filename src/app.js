@@ -1112,9 +1112,9 @@ function init() {
       const href = link.getAttribute('href');
       if (sectionId && href?.startsWith('#')) {
         e.preventDefault();
-        const targetId = href.slice(1);
-        showSection(targetId);
-        if (history.replaceState) history.replaceState(null, '', '#' + targetId);
+        const hash = href.slice(1);
+        showSection(sectionId);
+        if (history.replaceState) history.replaceState(null, '', '#' + hash);
       }
     });
   });
