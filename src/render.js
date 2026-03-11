@@ -75,10 +75,8 @@ export function filterPricingTable(tbodyId, query) {
  * @param {string[]} rowHtmlArray - Array of full <tr>...</tr> HTML strings.
  */
 function appendRowsWithFragment(tbody, rowHtmlArray) {
-  if (!rowHtmlArray || rowHtmlArray.length === 0) {
-    tbody.innerHTML = '';
-    return;
-  }
+  tbody.innerHTML = '';
+  if (!rowHtmlArray || rowHtmlArray.length === 0) return;
   const fragment = document.createDocumentFragment();
   const temp = document.createElement('tbody');
   temp.innerHTML = rowHtmlArray.join('');
@@ -139,6 +137,9 @@ let comparisonProviderFilter = 'all';
 let comparisonSortBy = 'default';
 export function setComparisonProviderFilter(provider) {
   comparisonProviderFilter = provider || 'all';
+}
+export function getComparisonProviderFilter() {
+  return comparisonProviderFilter;
 }
 export function setComparisonSortBy(sortBy) {
   comparisonSortBy = sortBy || 'default';
