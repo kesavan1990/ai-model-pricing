@@ -8,6 +8,7 @@ import * as pricingApi from './api/pricingService.js';
 import * as pricing from './pricingService.js';
 import { mergeTiersIntoPayload } from './data/pricingTiersOverlay.js';
 import { getCachedPricing, setCachedPricing } from './utils/cacheManager.js';
+import { isRetiredGeminiModel, isRetiredOpenAIModel, isRetiredAnthropicModel, isRetiredMistralModel } from './utils/retiredModels.js';
 import * as calc from './calculator.js';
 import * as render from './render.js';
 import * as valueChart from './valueChart.js';
@@ -27,10 +28,10 @@ function filterRetiredModels(data) {
   if (!data || typeof data !== 'object') return data;
   return {
     ...data,
-    gemini: Array.isArray(data.gemini) ? data.gemini.filter((m) => m && !render.isRetiredGeminiModel(m.name)) : data.gemini,
-    openai: Array.isArray(data.openai) ? data.openai.filter((m) => m && !render.isRetiredOpenAIModel(m.name)) : data.openai,
-    anthropic: Array.isArray(data.anthropic) ? data.anthropic.filter((m) => m && !render.isRetiredAnthropicModel(m.name)) : data.anthropic,
-    mistral: Array.isArray(data.mistral) ? data.mistral.filter((m) => m && !render.isRetiredMistralModel(m.name)) : data.mistral,
+    gemini: Array.isArray(data.gemini) ? data.gemini.filter((m) => m && !isRetiredGeminiModel(m.name)) : data.gemini,
+    openai: Array.isArray(data.openai) ? data.openai.filter((m) => m && !isRetiredOpenAIModel(m.name)) : data.openai,
+    anthropic: Array.isArray(data.anthropic) ? data.anthropic.filter((m) => m && !isRetiredAnthropicModel(m.name)) : data.anthropic,
+    mistral: Array.isArray(data.mistral) ? data.mistral.filter((m) => m && !isRetiredMistralModel(m.name)) : data.mistral,
   };
 }
 

@@ -4,6 +4,8 @@
 
 import { getUnifiedCalcModels, getAllModels, getBenchmarkForModel, getBenchmarkForModelMerged, getCostTierLabel, getFallbackReason } from './calculator.js';
 import { dedupeModelsByName } from './pricingService.js';
+import { isRetiredGeminiModel, isRetiredOpenAIModel, isRetiredAnthropicModel, isRetiredMistralModel } from './utils/retiredModels.js';
+export { isRetiredGeminiModel, isRetiredOpenAIModel, isRetiredAnthropicModel, isRetiredMistralModel };
 
 export function showToast(msg, type) {
   const el = document.getElementById('toast');
@@ -82,46 +84,6 @@ function appendRowsWithFragment(tbody, rowHtmlArray) {
   temp.innerHTML = rowHtmlArray.join('');
   while (temp.firstChild) fragment.appendChild(temp.firstChild);
   tbody.appendChild(fragment);
-}
-
-/** True if the Gemini model is retired/deprecated (e.g. Gemini 1.0). Used for UI badge. */
-export function isRetiredGeminiModel(name) {
-  if (!name || typeof name !== 'string') return false;
-  const n = name.toLowerCase();
-  return n.includes('1.0') || /^gemini-1\.0-/.test(n) || n === 'gemini-pro';
-}
-
-/** True if the OpenAI model is retired/deprecated (e.g. older GPT-4/3.5 versions). Used for UI badge. */
-export function isRetiredOpenAIModel(name) {
-  if (!name || typeof name !== 'string') return false;
-  const n = name.toLowerCase();
-  return (
-    n === 'babbage-002' || n === 'davinci-002' ||
-    n === 'text-embedding-ada-002' ||
-    /gpt-4-0314|gpt-4-32k-0314|gpt-4-32k-0613|gpt-4-1106-preview|gpt-4-0125-preview|gpt-4-turbo-preview/.test(n) ||
-    /gpt-3\.5-turbo-0301|gpt-3\.5-turbo-0613|gpt-3\.5-turbo-1106|gpt-3\.5-turbo-instruct/.test(n)
-  );
-}
-
-/** True if the Anthropic model is retired/deprecated (e.g. Claude 3 Opus, 3.5 Haiku, 3.7 Sonnet). Used for UI badge. */
-export function isRetiredAnthropicModel(name) {
-  if (!name || typeof name !== 'string') return false;
-  const n = name.toLowerCase();
-  return (
-    n === 'claude-3-opus' || n === 'claude-3-haiku' ||
-    /claude-3-5-haiku|claude-3-7-sonnet|claude-3\.5-sonnet|claude-3\.7-sonnet/.test(n) ||
-    /claude-3-haiku-20240307|claude-3-5-haiku-20241022|claude-3-7-sonnet-20250219/.test(n)
-  );
-}
-
-/** True if the Mistral model is retired/deprecated (e.g. legacy Mistral Large/Small, Nemo). Used for UI badge. */
-export function isRetiredMistralModel(name) {
-  if (!name || typeof name !== 'string') return false;
-  const n = name.toLowerCase();
-  return (
-    n === 'mistral-large' || n === 'mistral-small' ||
-    n === 'mistral-medium-2312' || /^open-mistral-nemo(-|$)/.test(n)
-  );
 }
 
 function geminiRows(m) {
