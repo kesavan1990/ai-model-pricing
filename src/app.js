@@ -11,6 +11,17 @@ import { mergeOpenAIOfficialIntoPayload } from './data/openaiOfficialOverlay.js'
 import { mergeGeminiOfficialIntoPayload } from './data/geminiOfficialOverlay.js';
 import { mergeAnthropicOfficialIntoPayload } from './data/anthropicOfficialOverlay.js';
 import { mergeMistralOfficialIntoPayload } from './data/mistralOfficialOverlay.js';
+
+/** Apply all provider official overlays so Overview, Models, Value Analysis, Calculators, Benchmarks, and Recommend see the same merged data. */
+function applyOfficialOverlays(payload) {
+  if (!payload || typeof payload !== 'object') return payload;
+  let out = payload;
+  out = mergeOpenAIOfficialIntoPayload(out);
+  out = mergeGeminiOfficialIntoPayload(out);
+  out = mergeAnthropicOfficialIntoPayload(out);
+  out = mergeMistralOfficialIntoPayload(out);
+  return out;
+}
 import { getCachedPricing, setCachedPricing } from './utils/cacheManager.js';
 import { isRetiredGeminiModel, isRetiredOpenAIModel, isRetiredAnthropicModel, isRetiredMistralModel } from './utils/retiredModels.js';
 import { isAllowedModel } from './data/allowedModels.js';
@@ -117,10 +128,7 @@ function updateValueChartIfVisible() {
 async function loadPricing() {
   try {
     let [result, benchPayload] = await Promise.all([pricing.loadPricingFromApi(pricingApi.fetchPricingData), api.getBenchmarks()]);
-    result = mergeOpenAIOfficialIntoPayload(result);
-    result = mergeGeminiOfficialIntoPayload(result);
-    result = mergeAnthropicOfficialIntoPayload(result);
-    result = mergeMistralOfficialIntoPayload(result);
+    result = applyOfficialOverlays(result);
     mergeTiersIntoPayload(result);
     setData(result);
     benchmarksData = benchPayload?.benchmarks ?? null;
@@ -141,10 +149,7 @@ async function loadPricing() {
       anthropic: (pricing.DEFAULT_PRICING.anthropic || []).slice(),
       mistral: (pricing.DEFAULT_PRICING.mistral || []).slice(),
     };
-    fallback = mergeOpenAIOfficialIntoPayload(fallback);
-    fallback = mergeGeminiOfficialIntoPayload(fallback);
-    fallback = mergeAnthropicOfficialIntoPayload(fallback);
-    fallback = mergeMistralOfficialIntoPayload(fallback);
+    fallback = applyOfficialOverlays(fallback);
     mergeTiersIntoPayload(fallback);
     setData(fallback);
     benchmarksData = null;
@@ -160,9 +165,20 @@ async function fillMissingProvidersFromVizra() {
   if (anthropicData.length > 0 && mistralData.length > 0) return;
   const cache = pricing.getCachedPricingPayload();
   if (cache) {
-    if (anthropicData.length === 0 && cache.anthropic?.length) anthropicData = cache.anthropic.slice();
-    if (mistralData.length === 0 && cache.mistral?.length) mistralData = cache.mistral.slice();
-    if (anthropicData.length > 0 || mistralData.length > 0) {
+    const current = getData();
+    let filled = false;
+    const next = {
+      gemini: current.gemini?.slice() ?? [],
+      openai: current.openai?.slice() ?? [],
+      anthropic: anthropicData.length === 0 && cache.anthropic?.length ? cache.anthropic.slice() : (current.anthropic?.slice() ?? []),
+      mistral: mistralData.length === 0 && cache.mistral?.length ? cache.mistral.slice() : (current.mistral?.slice() ?? []),
+    };
+    if (anthropicData.length === 0 && cache.anthropic?.length) filled = true;
+    if (mistralData.length === 0 && cache.mistral?.length) filled = true;
+    if (filled) {
+      const merged = applyOfficialOverlays(next);
+      mergeTiersIntoPayload(merged);
+      setData(merged);
       render.renderTables(getData(), getBenchmarksData());
       updateValueChartIfVisible();
       return;
@@ -175,15 +191,19 @@ async function fillMissingProvidersFromVizra() {
     const parsed = payload || { anthropic: [], mistral: [] };
     if (!parsed?.anthropic?.length && !parsed?.mistral?.length) throw new Error('Could not parse');
     let updated = false;
-    if (anthropicData.length === 0 && parsed.anthropic?.length) {
-      anthropicData = parsed.anthropic;
-      updated = true;
-    }
-    if (mistralData.length === 0 && parsed.mistral?.length) {
-      mistralData = parsed.mistral;
-      updated = true;
-    }
+    const current = getData();
+    let nextPayload = {
+      gemini: current.gemini?.slice() ?? [],
+      openai: current.openai?.slice() ?? [],
+      anthropic: anthropicData.length === 0 && parsed.anthropic?.length ? parsed.anthropic : (current.anthropic?.slice() ?? []),
+      mistral: mistralData.length === 0 && parsed.mistral?.length ? parsed.mistral : (current.mistral?.slice() ?? []),
+    };
+    if (anthropicData.length === 0 && parsed.anthropic?.length) updated = true;
+    if (mistralData.length === 0 && parsed.mistral?.length) updated = true;
     if (updated) {
+      nextPayload = applyOfficialOverlays(nextPayload);
+      mergeTiersIntoPayload(nextPayload);
+      setData(nextPayload);
       render.renderTables(getData(), getBenchmarksData());
       updateValueChartIfVisible();
       setCachedPricing({ ...getData(), updated: new Date().toISOString().slice(0, 10) });
@@ -191,8 +211,9 @@ async function fillMissingProvidersFromVizra() {
   } catch (_) {
     const applied = await pricing.applyFallbackPricingFromFile(api.getPricing, getData());
     if (applied) {
-      mergeTiersIntoPayload(applied);
-      setData(applied);
+      const merged = applyOfficialOverlays(applied);
+      mergeTiersIntoPayload(merged);
+      setData(merged);
       render.renderTables(getData(), getBenchmarksData());
       updateValueChartIfVisible();
       setCachedPricing({ ...getData(), updated: new Date().toISOString().slice(0, 10) });
@@ -231,7 +252,7 @@ async function runDailyCapture() {
     try {
       localStorage.setItem(pricing.LAST_DAILY_KEY, today);
     } catch (_) {}
-    const dailyPayload = { gemini: g, openai: o, anthropic: a, mistral: m };
+    let dailyPayload = applyOfficialOverlays({ gemini: g, openai: o, anthropic: a, mistral: m });
     mergeTiersIntoPayload(dailyPayload);
     setData(dailyPayload);
     const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10) };
@@ -277,12 +298,13 @@ async function refreshFromWeb() {
     if (api.isGitHubPages()) {
       const data = await api.getPricing();
       if (!data || typeof data !== 'object') throw new Error('Could not load pricing');
-      const refreshed = {
+      let refreshed = {
         gemini: data.gemini?.length ? pricing.dedupeModelsByName(data.gemini) : geminiData,
         openai: data.openai?.length ? pricing.dedupeModelsByName(data.openai) : openaiData,
         anthropic: data.anthropic?.length ? pricing.dedupeModelsByName(data.anthropic) : anthropicData,
         mistral: data.mistral?.length ? pricing.dedupeModelsByName(data.mistral) : mistralData,
       };
+      refreshed = applyOfficialOverlays(refreshed);
       mergeTiersIntoPayload(refreshed);
       setData(refreshed);
       const payload = { ...getData(), updated: data.updated || new Date().toISOString().slice(0, 10) };
@@ -311,12 +333,13 @@ async function refreshFromWeb() {
       if (!raw || typeof raw !== 'object') throw new Error('Pricing API unavailable');
       const { payload: parsed } = pricing.normalizeFetchedPricing(raw);
       if (!parsed || (!parsed.gemini?.length && !parsed.openai?.length)) throw new Error('No pricing data');
-      const refreshedVizra = {
+      let refreshedVizra = {
         gemini: parsed.gemini?.length ? parsed.gemini : geminiData,
         openai: parsed.openai?.length ? parsed.openai : openaiData,
         anthropic: parsed.anthropic?.length ? parsed.anthropic : anthropicData,
         mistral: parsed.mistral?.length ? parsed.mistral : mistralData,
       };
+      refreshedVizra = applyOfficialOverlays(refreshedVizra);
       mergeTiersIntoPayload(refreshedVizra);
       setData(refreshedVizra);
       const payload = { ...getData(), updated: new Date().toISOString().slice(0, 10) };
@@ -345,8 +368,9 @@ async function refreshFromWeb() {
     setData(prev);
     const fallback = await pricing.applyFallbackPricingFromFile(api.getPricing, getData());
     if (fallback) {
-      mergeTiersIntoPayload(fallback);
-      setData(fallback);
+      const mergedFallback = applyOfficialOverlays(fallback);
+      mergeTiersIntoPayload(mergedFallback);
+      setData(mergedFallback);
       render.setLastUpdated(render.formatTimestampWithTimezone(new Date()) + ' (fallback)');
       render.renderTables(getData(), getBenchmarksData());
       render.showToast('API unavailable. Using fallback pricing from pricing.json.', 'success');

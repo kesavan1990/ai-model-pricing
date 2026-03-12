@@ -18,7 +18,7 @@ The app **displays only models that are listed as available** on each provider�
 
 ## Official models overlays (all providers)
 
-So that all models on each provider’s official pricing/models page appear even when the API or `pricing.json` omits them, the app merges in **official overlays** on load. Each overlay adds any listed model not already in the loaded payload (by name). Deprecated models are excluded via [RETIRED_MODELS.md](RETIRED_MODELS.md) (which is also aligned with official deprecation pages).
+So that all models on each provider’s official pricing/models page appear even when the API or `pricing.json` omits them, the app merges in **official overlays** whenever pricing data is set. A single helper `applyOfficialOverlays(payload)` is used on every code path that feeds `setData()` (initial load, fallback, refresh from web, daily capture, fill-missing-providers from API or cache), so **Overview**, **Models**, **Value Analysis**, **Calculators**, **Benchmarks**, and **Recommend** all see the same merged data. Each overlay adds any listed model not already in the loaded payload (by name). Deprecated models are excluded via [RETIRED_MODELS.md](RETIRED_MODELS.md) (which is also aligned with official deprecation pages).
 
 | Provider   | Overlay file | Source (pricing / models page) |
 |-----------|--------------|---------------------------------|
