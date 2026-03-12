@@ -9,6 +9,7 @@ import * as pricing from './pricingService.js';
 import { mergeTiersIntoPayload } from './data/pricingTiersOverlay.js';
 import { getCachedPricing, setCachedPricing } from './utils/cacheManager.js';
 import { isRetiredGeminiModel, isRetiredOpenAIModel, isRetiredAnthropicModel, isRetiredMistralModel } from './utils/retiredModels.js';
+import { isAllowedModel } from './data/allowedModels.js';
 import * as calc from './calculator.js';
 import * as render from './render.js';
 import * as valueChart from './valueChart.js';
@@ -23,7 +24,19 @@ function getData() {
   return { gemini: geminiData, openai: openaiData, anthropic: anthropicData, mistral: mistralData };
 }
 
-/** Filter out retired/deprecated models so they are not shown anywhere in the app. */
+/** Keep only models that are listed as available on each provider's official page. */
+function filterToAllowedModels(data) {
+  if (!data || typeof data !== 'object') return data;
+  return {
+    ...data,
+    gemini: Array.isArray(data.gemini) ? data.gemini.filter((m) => m && isAllowedModel('gemini', m.name)) : data.gemini,
+    openai: Array.isArray(data.openai) ? data.openai.filter((m) => m && isAllowedModel('openai', m.name)) : data.openai,
+    anthropic: Array.isArray(data.anthropic) ? data.anthropic.filter((m) => m && isAllowedModel('anthropic', m.name)) : data.anthropic,
+    mistral: Array.isArray(data.mistral) ? data.mistral.filter((m) => m && isAllowedModel('mistral', m.name)) : data.mistral,
+  };
+}
+
+/** Filter out retired/deprecated models (defense in depth after allowlist). */
 function filterRetiredModels(data) {
   if (!data || typeof data !== 'object') return data;
   return {
@@ -36,7 +49,8 @@ function filterRetiredModels(data) {
 }
 
 function setData(data) {
-  const filtered = filterRetiredModels(data);
+  const allowed = filterToAllowedModels(data);
+  const filtered = filterRetiredModels(allowed);
   if (filtered.gemini) geminiData = filtered.gemini;
   if (filtered.openai) openaiData = filtered.openai;
   if (filtered.anthropic) anthropicData = filtered.anthropic;

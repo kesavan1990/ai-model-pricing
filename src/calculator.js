@@ -5,6 +5,7 @@
  */
 
 import { isRetired } from './utils/retiredModels.js';
+import { isAllowedModel } from './data/allowedModels.js';
 
 export const PROVIDER_DISPLAY_ORDER = { gemini: 0, openai: 1, anthropic: 2, mistral: 3 };
 
@@ -151,10 +152,10 @@ export function calcCostForEntry(entry, inputTokens, cachedTokens, outputTokens)
 export function getUnifiedCalcModels(data) {
   const { gemini = [], openai = [], anthropic = [], mistral = [] } = data;
   const list = [];
-  gemini.forEach((m, i) => { if (!isRetired('gemini', m.name)) list.push({ key: 'gemini:' + i, provider: 'gemini', label: 'Google Gemini — ' + m.name, model: m }); });
-  openai.forEach((m, i) => { if (!isRetired('openai', m.name)) list.push({ key: 'openai:' + i, provider: 'openai', label: 'OpenAI — ' + m.name, model: m }); });
-  anthropic.forEach((m, i) => { if (!isRetired('anthropic', m.name)) list.push({ key: 'anthropic:' + i, provider: 'anthropic', label: 'Anthropic — ' + m.name, model: m }); });
-  mistral.forEach((m, i) => { if (!isRetired('mistral', m.name)) list.push({ key: 'mistral:' + i, provider: 'mistral', label: 'Mistral — ' + m.name, model: m }); });
+  gemini.forEach((m, i) => { if (isAllowedModel('gemini', m.name) && !isRetired('gemini', m.name)) list.push({ key: 'gemini:' + i, provider: 'gemini', label: 'Google Gemini — ' + m.name, model: m }); });
+  openai.forEach((m, i) => { if (isAllowedModel('openai', m.name) && !isRetired('openai', m.name)) list.push({ key: 'openai:' + i, provider: 'openai', label: 'OpenAI — ' + m.name, model: m }); });
+  anthropic.forEach((m, i) => { if (isAllowedModel('anthropic', m.name) && !isRetired('anthropic', m.name)) list.push({ key: 'anthropic:' + i, provider: 'anthropic', label: 'Anthropic — ' + m.name, model: m }); });
+  mistral.forEach((m, i) => { if (isAllowedModel('mistral', m.name) && !isRetired('mistral', m.name)) list.push({ key: 'mistral:' + i, provider: 'mistral', label: 'Mistral — ' + m.name, model: m }); });
   return list;
 }
 
@@ -197,7 +198,7 @@ export function getAllModels(data) {
   const { gemini = [], openai = [], anthropic = [], mistral = [] } = data;
   const list = [];
   gemini.forEach((m) => {
-    if (isRetired('gemini', m.name)) return;
+    if (!isAllowedModel('gemini', m.name) || isRetired('gemini', m.name)) return;
     if (m.tiers && m.tiers.length > 0) {
       m.tiers.forEach((t) => pushModel(list, 'Google Gemini', 'gemini', m, Number(t.input) || 0, Number(t.output) || 0, null, t.contextLabel));
     } else {
@@ -206,7 +207,7 @@ export function getAllModels(data) {
   });
   openai.forEach((m) => {
     if (/^text-embedding/i.test(m.name)) return;
-    if (isRetired('openai', m.name)) return;
+    if (!isAllowedModel('openai', m.name) || isRetired('openai', m.name)) return;
     if (m.tiers && m.tiers.length > 0) {
       m.tiers.forEach((t) => pushModel(list, 'OpenAI', 'openai', m, Number(t.input) || 0, Number(t.output) || 0, t.cachedInput != null ? Number(t.cachedInput) : null, t.contextLabel));
     } else {
@@ -215,7 +216,7 @@ export function getAllModels(data) {
     }
   });
   anthropic.forEach((m) => {
-    if (isRetired('anthropic', m.name)) return;
+    if (!isAllowedModel('anthropic', m.name) || isRetired('anthropic', m.name)) return;
     if (m.tiers && m.tiers.length > 0) {
       m.tiers.forEach((t) => pushModel(list, 'Anthropic', 'anthropic', m, Number(t.input) || 0, Number(t.output) || 0, null, t.contextLabel));
     } else {
@@ -223,7 +224,7 @@ export function getAllModels(data) {
     }
   });
   mistral.forEach((m) => {
-    if (isRetired('mistral', m.name)) return;
+    if (!isAllowedModel('mistral', m.name) || isRetired('mistral', m.name)) return;
     if (m.tiers && m.tiers.length > 0) {
       m.tiers.forEach((t) => pushModel(list, 'Mistral', 'mistral', m, Number(t.input) || 0, Number(t.output) || 0, null, t.contextLabel));
     } else {

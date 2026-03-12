@@ -61,12 +61,16 @@ export function isRetiredOpenAIModel(name) {
   return false;
 }
 
-// --- Google Gemini (source: ai.google.dev/gemini-api/docs/changelog, Vertex deprecations) ---
-// Gemini 1.0 and gemini-pro are retired. Scheduled shutdowns (e.g. 2.0-flash June 2026) can be added when they take effect.
+// --- Google Gemini (source: ai.google.dev/gemini-api/docs/changelog, Vertex deprecations, ai.google.dev/api/models) ---
+// Official "available" list is 2.5 / 3.x; 1.0, 1.5, gemini-pro, and legacy vision are retired.
 export function isRetiredGeminiModel(name) {
   if (!name || typeof name !== 'string') return false;
   const n = name.toLowerCase();
-  return n.includes('1.0') || /^gemini-1\.0-/.test(n) || n === 'gemini-pro';
+  if (n === 'gemini-pro') return true;
+  if (/^gemini-1\.0-/.test(n)) return true;
+  if (/^gemini-1\.5-/.test(n)) return true;
+  if (/gemini-pro-vision|gemini-1\.0-pro-vision/.test(n)) return true;
+  return false;
 }
 
 // --- Anthropic (source: docs.anthropic.com/en/docs/resources/model-deprecations) ---
