@@ -1,15 +1,16 @@
 /**
  * Retired/deprecated model detection for all providers.
  * Used to filter out retired models from the app (app.js) and from model lists (calculator.js).
+ * All deprecated/retired model lists are taken from each provider's official page; update when those pages change.
  *
- * Official sources (cross-check here when updating):
+ * Official deprecation sources (cross-check when updating):
  * - OpenAI: https://developers.openai.com/api/docs/deprecations
- * - Google Gemini: https://ai.google.dev/gemini-api/docs/changelog , https://cloud.google.com/vertex-ai/generative-ai/docs/deprecations
+ * - Google Gemini: https://ai.google.dev/gemini-api/docs/changelog , https://ai.google.dev/gemini-api/docs/deprecations
  * - Anthropic: https://docs.anthropic.com/en/docs/resources/model-deprecations
- * - Mistral: https://docs.mistral.ai/getting-started/changelog (per-model deprecation via API/changelog)
+ * - Mistral: https://docs.mistral.ai/getting-started/changelog
  */
 
-// --- OpenAI (source: developers.openai.com/api/docs/deprecations) ---
+// --- OpenAI (from https://developers.openai.com/api/docs/deprecations) ---
 const OPENAI_RETIRED_IDS = new Set([
   'babbage-002',
   'davinci-002',
@@ -61,20 +62,27 @@ export function isRetiredOpenAIModel(name) {
   return false;
 }
 
-// --- Google Gemini (source: ai.google.dev/gemini-api/docs/changelog, Vertex deprecations, ai.google.dev/api/models) ---
-// Official "available" list is 2.5 / 3.x; 1.0, 1.5, gemini-pro, and legacy vision are retired.
+// --- Google Gemini (from https://ai.google.dev/gemini-api/docs/changelog and deprecations) ---
+// Retired: 1.0, 1.5, gemini-pro, legacy vision; shut-down previews per changelog. (2.0-flash* scheduled June 2026, still shown until then.)
+const GEMINI_RETIRED_IDS = new Set([
+  'gemini-pro',
+  'gemini-2.5-flash-image-preview',
+  'gemini-3-pro-preview',
+  'gemini-2.5-flash-preview-09-25',
+  'text-embedding-004',
+]);
 export function isRetiredGeminiModel(name) {
   if (!name || typeof name !== 'string') return false;
-  const n = name.toLowerCase();
-  if (n === 'gemini-pro') return true;
+  const n = name.toLowerCase().trim();
+  if (GEMINI_RETIRED_IDS.has(n)) return true;
   if (/^gemini-1\.0-/.test(n)) return true;
   if (/^gemini-1\.5-/.test(n)) return true;
   if (/gemini-pro-vision|gemini-1\.0-pro-vision/.test(n)) return true;
   return false;
 }
 
-// --- Anthropic (source: docs.anthropic.com/en/docs/resources/model-deprecations) ---
-// Retired: Claude 3 Opus, Claude 3.5 Haiku (20241022), Claude 3.7 Sonnet (20250219). Deprecated: Claude 3 Haiku (20240307).
+// --- Anthropic (from https://docs.anthropic.com/en/docs/resources/model-deprecations) ---
+// Retired: Claude 3 Opus, Claude 3.5 Haiku, Claude 3.7 Sonnet. Deprecated: Claude 3 Haiku (20240307).
 const ANTHROPIC_RETIRED_PATTERNS = [
   /^claude-3-opus($|-)/i,
   /^claude-3-haiku($|-)/i,
@@ -90,8 +98,7 @@ export function isRetiredAnthropicModel(name) {
   return ANTHROPIC_RETIRED_PATTERNS.some((re) => re.test(n));
 }
 
-// --- Mistral (source: docs.mistral.ai changelog; deprecation often per-model via API) ---
-// Conservative list from public deprecation reports; check changelog for latest.
+// --- Mistral (from https://docs.mistral.ai/getting-started/changelog; no single deprecated-model list; conservative set) ---
 const MISTRAL_RETIRED_IDS = new Set([
   'mistral-large',
   'mistral-small',

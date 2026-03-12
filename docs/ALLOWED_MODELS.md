@@ -16,6 +16,24 @@ The app **displays only models that are listed as available** on each provider�
 
 4. **Lists** — In `src/calculator.js`, `getAllModels(data)` and `getUnifiedCalcModels(data)` only include models for which `isAllowedModel(providerKey, m.name)` is true and the model is not retired.
 
+## Official models overlays (all providers)
+
+So that all models on each provider’s official pricing/models page appear even when the API or `pricing.json` omits them, the app merges in **official overlays** on load. Each overlay adds any listed model not already in the loaded payload (by name). Deprecated models are excluded via [RETIRED_MODELS.md](RETIRED_MODELS.md) (which is also aligned with official deprecation pages).
+
+| Provider   | Overlay file | Source (pricing / models page) |
+|-----------|--------------|---------------------------------|
+| **OpenAI**   | `src/data/openaiOfficialOverlay.js` | [Pricing \| OpenAI API](https://developers.openai.com/api/docs/pricing) |
+| **Gemini**   | `src/data/geminiOfficialOverlay.js` | [Pricing \| Gemini API](https://ai.google.dev/gemini-api/docs/pricing), [Models](https://ai.google.dev/gemini-api/docs/models) |
+| **Anthropic**| `src/data/anthropicOfficialOverlay.js` | [Pricing \| Claude API](https://docs.anthropic.com/en/docs/about-claude/pricing) |
+| **Mistral**  | `src/data/mistralOfficialOverlay.js` | [Pricing \| Mistral](https://docs.mistral.ai/deployment/laplateforme/pricing), [mistral.ai/pricing](https://mistral.ai/pricing) |
+
+- **OpenAI:** GPT-5 series, o3-deep-research, o4-mini-deep-research, gpt-4.1, gpt-4o, o1/o3/o4, etc.
+- **Gemini:** 3.1 Pro/Flash-Lite/Flash, 2.5 Pro/Flash/Flash-Lite, 2.0 Flash, embedding-2, Gemma 2.
+- **Anthropic:** Claude Opus 4.6/4.5/4.1/4, Sonnet 4.6/4.5/4, Haiku 4.5 (current only; deprecated 3.x excluded via retired list).
+- **Mistral:** Mistral Large 3, Medium 3.1, Small 3.2, Ministral 3, Codestral, Magistral, Pixtral, Devstral, open-mistral/open-mixtral.
+
+Update each overlay when that provider’s official pricing or models page changes.
+
 ## Official sources (for allowlist updates)
 
 | Provider   | Official “available” / models page |

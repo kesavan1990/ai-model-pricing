@@ -1,6 +1,6 @@
 # Retired and deprecated models (excluded)
 
-Retired/deprecated models are **excluded from the app**: they do not appear in any section. In addition, **only models listed as available on each provider’s official page** are shown (see [docs/ALLOWED_MODELS.md](ALLOWED_MODELS.md)). The lists in `src/utils/retiredModels.js` are **cross-checked with each provider’s official deprecation pages** (see below).
+Retired/deprecated models are **excluded from the app**: they do not appear in any section. **Deprecated model lists are taken from each provider’s official deprecation page** (see table below). The logic in `src/utils/retiredModels.js` is aligned with those official sources. In addition, only models listed as available on each provider’s official page are shown (see [ALLOWED_MODELS.md](ALLOWED_MODELS.md)).
 
 ## Where they are excluded
 
@@ -34,20 +34,20 @@ Retired/deprecated models are **excluded from the app**: they do not appear in a
 4. **`src/render.js`**  
    Re-exports the `isRetired*` functions from `utils/retiredModels.js` for backward compatibility.
 
-## Official sources (cross-check when updating)
+## Official sources (deprecated lists taken from here)
 
-| Provider | Official deprecation / lifecycle page |
-|----------|--------------------------------------|
-| **OpenAI** | [Deprecations \| OpenAI API](https://developers.openai.com/api/docs/deprecations) |
-| **Google Gemini** | [Models \| Gemini API](https://ai.google.dev/gemini-api/docs/models) (available list), [Changelog](https://ai.google.dev/gemini-api/docs/changelog), [Vertex AI deprecations](https://cloud.google.com/vertex-ai/generative-ai/docs/deprecations) |
+| Provider     | Official deprecation / lifecycle page |
+|-------------|---------------------------------------|
+| **OpenAI**  | [Deprecations \| OpenAI API](https://developers.openai.com/api/docs/deprecations) |
+| **Gemini**  | [Changelog \| Gemini API](https://ai.google.dev/gemini-api/docs/changelog), [Deprecations](https://ai.google.dev/gemini-api/docs/deprecations) |
 | **Anthropic** | [Model deprecations \| Claude API](https://docs.anthropic.com/en/docs/resources/model-deprecations) |
-| **Mistral** | [Changelog \| Mistral Docs](https://docs.mistral.ai/getting-started/changelog) (per-model deprecation via API/changelog) |
+| **Mistral** | [Changelog \| Mistral Docs](https://docs.mistral.ai/getting-started/changelog) |
+
+When updating retired logic, re-check the official page for that provider and edit **`src/utils/retiredModels.js`** accordingly.
 
 ## Examples of excluded models
 
-- **Gemini:** Per [Gemini API models/changelog](https://ai.google.dev/gemini-api/docs/changelog): **entire 1.0 and 1.5 series** (e.g. `gemini-1.0-pro`, `gemini-1.5-pro`, `gemini-1.5-flash`, `gemini-1.5-pro-002`), `gemini-pro`, and legacy vision (`gemini-pro-vision`, `gemini-1.0-pro-vision`). Official “available” list is 2.5 / 3.x only.  
-- **OpenAI:** Per [developers.openai.com deprecations](https://developers.openai.com/api/docs/deprecations): e.g. `babbage-002`, `davinci-002`, `text-embedding-ada-002`, `gpt-4-0314`, `gpt-4-1106-preview`, `gpt-4-0125-preview`, `gpt-4-turbo-preview`, `gpt-3.5-turbo-*` snapshots, `gpt-4-32k*`, `gpt-4.5-preview`, `o1-preview`, `o1-mini`, `chatgpt-4o-latest`, `codex-mini-latest`, DALL·E 2/3, and deprecated realtime/audio previews.  
-- **Anthropic:** Per [model deprecations](https://docs.anthropic.com/en/docs/resources/model-deprecations): Claude 3 Opus, Claude 3 Haiku (e.g. `claude-3-haiku-20240307`), Claude 3.5 Haiku (e.g. `claude-3-5-haiku-20241022`), Claude 3.7 Sonnet (e.g. `claude-3-7-sonnet-20250219`).  
-- **Mistral:** Conservative list from public deprecation reports; check [Mistral changelog](https://docs.mistral.ai/getting-started/changelog): e.g. `mistral-large`, `mistral-small`, `mistral-medium-2312`, `open-mistral-nemo` (and variants).
-
-To change which models are treated as retired, edit the logic in **`src/utils/retiredModels.js`** and re-check the official source for that provider.
+- **Gemini:** Per [changelog](https://ai.google.dev/gemini-api/docs/changelog): 1.0 and 1.5 series, `gemini-pro`, legacy vision; shut-down previews: `gemini-2.5-flash-image-preview`, `gemini-3-pro-preview`, `gemini-2.5-flash-preview-09-25`, `text-embedding-004`.  
+- **OpenAI:** Per [deprecations](https://developers.openai.com/api/docs/deprecations): e.g. `babbage-002`, `davinci-002`, `gpt-4-0314`, `gpt-4-turbo-preview`, `gpt-3.5-turbo-instruct`, `o1-preview`, `o1-mini`, DALL·E 2/3, deprecated realtime/audio previews.  
+- **Anthropic:** Per [model deprecations](https://docs.anthropic.com/en/docs/resources/model-deprecations): Claude 3 Opus, Claude 3 Haiku, Claude 3.5 Haiku, Claude 3.7 Sonnet (and dated variants).  
+- **Mistral:** Per [changelog](https://docs.mistral.ai/getting-started/changelog): conservative set: `mistral-large`, `mistral-small`, `mistral-medium-2312`, `open-mistral-nemo` (and variants).

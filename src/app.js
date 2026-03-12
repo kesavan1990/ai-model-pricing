@@ -7,6 +7,10 @@ import * as api from './api.js';
 import * as pricingApi from './api/pricingService.js';
 import * as pricing from './pricingService.js';
 import { mergeTiersIntoPayload } from './data/pricingTiersOverlay.js';
+import { mergeOpenAIOfficialIntoPayload } from './data/openaiOfficialOverlay.js';
+import { mergeGeminiOfficialIntoPayload } from './data/geminiOfficialOverlay.js';
+import { mergeAnthropicOfficialIntoPayload } from './data/anthropicOfficialOverlay.js';
+import { mergeMistralOfficialIntoPayload } from './data/mistralOfficialOverlay.js';
 import { getCachedPricing, setCachedPricing } from './utils/cacheManager.js';
 import { isRetiredGeminiModel, isRetiredOpenAIModel, isRetiredAnthropicModel, isRetiredMistralModel } from './utils/retiredModels.js';
 import { isAllowedModel } from './data/allowedModels.js';
@@ -112,7 +116,11 @@ function updateValueChartIfVisible() {
 // --- Load & refresh ---
 async function loadPricing() {
   try {
-    const [result, benchPayload] = await Promise.all([pricing.loadPricingFromApi(pricingApi.fetchPricingData), api.getBenchmarks()]);
+    let [result, benchPayload] = await Promise.all([pricing.loadPricingFromApi(pricingApi.fetchPricingData), api.getBenchmarks()]);
+    result = mergeOpenAIOfficialIntoPayload(result);
+    result = mergeGeminiOfficialIntoPayload(result);
+    result = mergeAnthropicOfficialIntoPayload(result);
+    result = mergeMistralOfficialIntoPayload(result);
     mergeTiersIntoPayload(result);
     setData(result);
     benchmarksData = benchPayload?.benchmarks ?? null;
@@ -127,12 +135,16 @@ async function loadPricing() {
     if (result.usedFallback === 'default') render.showToast('Using embedded default pricing (no file or cache).', 'success');
   } catch (err) {
     console.error('loadPricing failed:', err);
-    const fallback = {
+    let fallback = {
       gemini: pricing.DEFAULT_PRICING.gemini.slice(),
       openai: pricing.DEFAULT_PRICING.openai.slice(),
       anthropic: (pricing.DEFAULT_PRICING.anthropic || []).slice(),
       mistral: (pricing.DEFAULT_PRICING.mistral || []).slice(),
     };
+    fallback = mergeOpenAIOfficialIntoPayload(fallback);
+    fallback = mergeGeminiOfficialIntoPayload(fallback);
+    fallback = mergeAnthropicOfficialIntoPayload(fallback);
+    fallback = mergeMistralOfficialIntoPayload(fallback);
     mergeTiersIntoPayload(fallback);
     setData(fallback);
     benchmarksData = null;
