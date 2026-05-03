@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-26",
+  "updated": "2026-05-03",
   "benchmarks": [
     {
       "model": "gemini-2.0-flash-lite",
@@ -491,6 +491,14 @@
     },
     {
       "model": "gemini-3.1-flash-live-preview",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-embedding-2",
       "provider": "gemini",
       "mmlu": 80,
       "code": 82,
