@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-17",
+  "updated": "2026-05-24",
   "benchmarks": [
     {
       "model": "gemini-2.0-flash-lite",
@@ -499,6 +499,22 @@
     },
     {
       "model": "gemini-embedding-2",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-3.5-flash",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-3.1-flash-lite",
       "provider": "gemini",
       "mmlu": 80,
       "code": 82,
@@ -1579,6 +1595,14 @@
     },
     {
       "model": "ministral-3-14b-2512",
+      "provider": "mistral",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "ministral-8b-2512",
       "provider": "mistral",
       "mmlu": 80,
       "code": 82,
