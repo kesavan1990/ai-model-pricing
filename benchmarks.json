@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-24",
+  "updated": "2026-05-31",
   "benchmarks": [
     {
       "model": "gemini-2.0-flash-lite",
@@ -1299,6 +1299,14 @@
     },
     {
       "model": "claude-opus-4-7-20260416",
+      "provider": "anthropic",
+      "mmlu": 89,
+      "code": 91,
+      "reasoning": 93,
+      "arena": 95
+    },
+    {
+      "model": "claude-opus-4-8",
       "provider": "anthropic",
       "mmlu": 89,
       "code": 91,
