@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-21",
+  "updated": "2026-06-28",
   "benchmarks": [
     {
       "model": "gemini-2.0-flash-lite",
@@ -515,6 +515,22 @@
     },
     {
       "model": "gemini-3.1-flash-lite",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-3-pro-image",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-3.1-flash-image",
       "provider": "gemini",
       "mmlu": 80,
       "code": 82,
@@ -1624,6 +1640,30 @@
       "code": 82,
       "reasoning": 83,
       "arena": 84
+    },
+    {
+      "model": "mistral-medium-3-5",
+      "provider": "mistral",
+      "mmlu": 83,
+      "code": 86,
+      "reasoning": 85,
+      "arena": 87
+    },
+    {
+      "model": "mistral-medium-2508",
+      "provider": "mistral",
+      "mmlu": 83,
+      "code": 86,
+      "reasoning": 85,
+      "arena": 87
+    },
+    {
+      "model": "mistral-medium-2604",
+      "provider": "mistral",
+      "mmlu": 83,
+      "code": 86,
+      "reasoning": 85,
+      "arena": 87
     }
   ]
 }
