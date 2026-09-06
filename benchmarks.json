@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30",
+  "updated": "2026-09-06",
   "benchmarks": [
     {
       "model": "gemini-2.5-flash",
@@ -99,14 +99,6 @@
     },
     {
       "model": "gemini-robotics-er-2-preview",
-      "provider": "gemini",
-      "mmlu": 80,
-      "code": 82,
-      "reasoning": 83,
-      "arena": 84
-    },
-    {
-      "model": "gemini-robotics-er-1.6-preview",
       "provider": "gemini",
       "mmlu": 80,
       "code": 82,
@@ -219,6 +211,22 @@
     },
     {
       "model": "gemini-3.5-live-translate-preview",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-omni-1.1-flash",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-3.8-flash",
       "provider": "gemini",
       "mmlu": 80,
       "code": 82,
@@ -522,14 +530,6 @@
       "arena": 93
     },
     {
-      "model": "gpt-4o-audio-preview",
-      "provider": "openai",
-      "mmlu": 88,
-      "code": 90,
-      "reasoning": 92,
-      "arena": 93
-    },
-    {
       "model": "gpt-4o-audio-preview-2024-12-17",
       "provider": "openai",
       "mmlu": 88,
@@ -595,14 +595,6 @@
     },
     {
       "model": "gpt-4o-mini-2024-07-18",
-      "provider": "openai",
-      "mmlu": 88,
-      "code": 90,
-      "reasoning": 92,
-      "arena": 93
-    },
-    {
-      "model": "gpt-4o-mini-audio-preview",
       "provider": "openai",
       "mmlu": 88,
       "code": 90,
@@ -1010,6 +1002,14 @@
       "arena": 89
     },
     {
+      "model": "gpt-6-astra",
+      "provider": "openai",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
       "model": "claude-haiku-4-5-20251001",
       "provider": "anthropic",
       "mmlu": 84,
@@ -1146,6 +1146,14 @@
       "arena": 89
     },
     {
+      "model": "claude-fable-5-1",
+      "provider": "anthropic",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
       "model": "codestral-2508",
       "provider": "mistral",
       "mmlu": 83,
@@ -1178,31 +1186,7 @@
       "arena": 87
     },
     {
-      "model": "mistral-medium-2505",
-      "provider": "mistral",
-      "mmlu": 83,
-      "code": 86,
-      "reasoning": 85,
-      "arena": 87
-    },
-    {
-      "model": "mistral-medium-2508",
-      "provider": "mistral",
-      "mmlu": 83,
-      "code": 86,
-      "reasoning": 85,
-      "arena": 87
-    },
-    {
       "model": "mistral-medium-2604",
-      "provider": "mistral",
-      "mmlu": 83,
-      "code": 86,
-      "reasoning": 85,
-      "arena": 87
-    },
-    {
-      "model": "mistral-medium-3-1-2508",
       "provider": "mistral",
       "mmlu": 83,
       "code": 86,
@@ -1323,6 +1307,30 @@
     },
     {
       "model": "voxtral-small-2507",
+      "provider": "mistral",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "mistral-medium-3.5",
+      "provider": "mistral",
+      "mmlu": 83,
+      "code": 86,
+      "reasoning": 85,
+      "arena": 87
+    },
+    {
+      "model": "mistral-vibe-cli-with-tools",
+      "provider": "mistral",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "mistral-vibe-cli-fast",
       "provider": "mistral",
       "mmlu": 80,
       "code": 82,
