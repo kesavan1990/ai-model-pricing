@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06",
+  "updated": "2026-09-13",
   "benchmarks": [
     {
       "model": "gemini-2.5-flash",
@@ -170,30 +170,6 @@
       "arena": 84
     },
     {
-      "model": "gemini-2.5-flash-native-audio-preview-09-2025",
-      "provider": "gemini",
-      "mmlu": 80,
-      "code": 82,
-      "reasoning": 83,
-      "arena": 84
-    },
-    {
-      "model": "gemini-2.5-flash-native-audio-preview-12-2025",
-      "provider": "gemini",
-      "mmlu": 80,
-      "code": 82,
-      "reasoning": 83,
-      "arena": 84
-    },
-    {
-      "model": "gemini-3.1-flash-live-preview",
-      "provider": "gemini",
-      "mmlu": 80,
-      "code": 82,
-      "reasoning": 83,
-      "arena": 84
-    },
-    {
       "model": "gemini-exp-1206",
       "provider": "gemini",
       "mmlu": 80,
@@ -203,14 +179,6 @@
     },
     {
       "model": "gemini-robotics-er-2-streaming-preview",
-      "provider": "gemini",
-      "mmlu": 80,
-      "code": 82,
-      "reasoning": 83,
-      "arena": 84
-    },
-    {
-      "model": "gemini-3.5-live-translate-preview",
       "provider": "gemini",
       "mmlu": 80,
       "code": 82,
@@ -1147,6 +1115,14 @@
     },
     {
       "model": "claude-fable-5-1",
+      "provider": "anthropic",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
+      "model": "claude-mythos-5-1",
       "provider": "anthropic",
       "mmlu": 85,
       "code": 87,
