@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-13",
+  "updated": "2026-09-20",
   "benchmarks": [
     {
       "model": "gemini-2.5-flash",
@@ -203,6 +203,14 @@
     },
     {
       "model": "babbage-002",
+      "provider": "openai",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
+      "model": "computer-use-preview",
       "provider": "openai",
       "mmlu": 85,
       "code": 87,
@@ -978,6 +986,22 @@
       "arena": 89
     },
     {
+      "model": "gpt-5.5-cyber",
+      "provider": "openai",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
+      "model": "gpt-rosalind-research",
+      "provider": "openai",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
       "model": "claude-haiku-4-5-20251001",
       "provider": "anthropic",
       "mmlu": 84,
@@ -1307,6 +1331,22 @@
     },
     {
       "model": "mistral-vibe-cli-fast",
+      "provider": "mistral",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "zai-glm-5-3",
+      "provider": "mistral",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "zai-glm-5",
       "provider": "mistral",
       "mmlu": 80,
       "code": 82,
