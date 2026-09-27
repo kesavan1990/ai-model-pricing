@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-20",
+  "updated": "2026-09-27",
   "benchmarks": [
     {
       "model": "gemini-2.5-flash",
@@ -202,15 +202,31 @@
       "arena": 84
     },
     {
-      "model": "babbage-002",
-      "provider": "openai",
-      "mmlu": 85,
-      "code": 87,
-      "reasoning": 88,
-      "arena": 89
+      "model": "deep-research-preview-04-2026",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
     },
     {
-      "model": "computer-use-preview",
+      "model": "deep-research-max-preview-04-2026",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "gemini-3.8-flash-cyber",
+      "provider": "gemini",
+      "mmlu": 80,
+      "code": 82,
+      "reasoning": 83,
+      "arena": 84
+    },
+    {
+      "model": "babbage-002",
       "provider": "openai",
       "mmlu": 85,
       "code": 87,
@@ -810,14 +826,6 @@
       "arena": 89
     },
     {
-      "model": "gpt-5-chat",
-      "provider": "openai",
-      "mmlu": 85,
-      "code": 87,
-      "reasoning": 88,
-      "arena": 89
-    },
-    {
       "model": "gpt-5.3-codex",
       "provider": "openai",
       "mmlu": 85,
@@ -1002,6 +1010,38 @@
       "arena": 89
     },
     {
+      "model": "gpt-6-sol",
+      "provider": "openai",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
+      "model": "gpt-6-luna",
+      "provider": "openai",
+      "mmlu": 85,
+      "code": 87,
+      "reasoning": 88,
+      "arena": 89
+    },
+    {
+      "model": "o3-deep-research",
+      "provider": "openai",
+      "mmlu": 89,
+      "code": 91,
+      "reasoning": 96,
+      "arena": 97
+    },
+    {
+      "model": "o4-mini-deep-research",
+      "provider": "openai",
+      "mmlu": 89,
+      "code": 91,
+      "reasoning": 96,
+      "arena": 97
+    },
+    {
       "model": "claude-haiku-4-5-20251001",
       "provider": "anthropic",
       "mmlu": 84,
@@ -1130,14 +1170,6 @@
       "arena": 89
     },
     {
-      "model": "claude-mythos-preview",
-      "provider": "anthropic",
-      "mmlu": 85,
-      "code": 87,
-      "reasoning": 88,
-      "arena": 89
-    },
-    {
       "model": "claude-fable-5-1",
       "provider": "anthropic",
       "mmlu": 85,
@@ -1152,6 +1184,14 @@
       "code": 87,
       "reasoning": 88,
       "arena": 89
+    },
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "mmlu": 89,
+      "code": 91,
+      "reasoning": 93,
+      "arena": 95
     },
     {
       "model": "codestral-2508",
